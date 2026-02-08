@@ -3,6 +3,8 @@ import storage from "redux-persist/lib/storage";
 
 
 import authSlide from "./authSlide";
+import roleSlide from "./roleSlide";
+import userSlide from "./userSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -13,7 +15,9 @@ const persistConfig = {
 };
 
 const reducers = {
-    auth: persistReducer(persistConfig, authSlide),
+  auth: persistReducer(persistConfig, authSlide),
+  role: roleSlide,
+  user: userSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

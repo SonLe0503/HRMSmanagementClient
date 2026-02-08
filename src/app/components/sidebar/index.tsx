@@ -4,7 +4,6 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     UserOutlined,
-    InboxOutlined,
     TeamOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
@@ -28,20 +27,7 @@ const Sidebar = () => {
         [EUserRole.ADMIN]: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
-            {
-                key: "sub-catalog", icon: <InboxOutlined />,
-                label: "Danh mục & Sản phẩm",
-                children: [
-                    {
-                        key: URL.ManageCategory,
-                        label: "Danh mục",
-                    },
-                    {
-                        key: URL.ManageProduct,
-                        label: "Sản phẩm",
-                    },
-                ],
-            },
+            { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },

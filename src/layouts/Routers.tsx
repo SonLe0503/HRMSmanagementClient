@@ -12,6 +12,8 @@ const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"
 const DashboardEmployee = lazy(() => import("../app/pages/dashboard/DashboardEmployee"))
 const DashboardHR = lazy(() => import("../app/pages/dashboard/DashboardHR"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
+const ManageUser = lazy(() => import("../app/pages/manageAccount"))
+const ManageRole = lazy(() => import("../app/pages/manageRole"))
 
 const shareResourceItem = [
     {
@@ -43,6 +45,18 @@ const privateResourceItem = [
     {
         key: URL.DashboardManage,
         element: <DashboardManage />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageUser,
+        element: <ManageUser />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageRole,
+        element: <ManageRole />,
         layout: DEFAULT_LAYOUT,
         private: true,
     }
