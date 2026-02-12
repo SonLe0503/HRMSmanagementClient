@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Tag, Space, Card, Switch, message, Typography } from "antd";
 import { PlusOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
+import { useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchAllUsers, activateUser, deactivateUser, selectUsers, selectUserLoading } from "../../../store/userSlide";
 import { fetchAllRoles } from "../../../store/roleSlide";
@@ -12,6 +13,7 @@ const { Title } = Typography;
 
 const ManageAccount = () => {
     const dispatch = useAppDispatch();
+    const [searchParams] = useSearchParams();
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectUserLoading);
 
@@ -22,11 +24,17 @@ const ManageAccount = () => {
     const [searchText, setSearchText] = useState("");
     const [roleFilter, setRoleFilter] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<boolean | null>(null);
+    const [togglingUserId, setTogglingUserId] = useState<number | null>(null);
 
     useEffect(() => {
         dispatch(fetchAllUsers());
         dispatch(fetchAllRoles());
-    }, [dispatch]);
+
+        const roleParam = searchParams.get("role");
+        if (roleParam) {
+            setRoleFilter(roleParam);
+        }
+    }, [dispatch, searchParams]);
 
     const handleAdd = () => {
         setIsAddModalOpen(true);
@@ -38,15 +46,22 @@ const ManageAccount = () => {
     };
 
     const handleToggleStatus = (record: any) => {
-        if (record.isActive) {
-            dispatch(deactivateUser(record.userId)).then(() => {
-                message.success("User deactivated");
+        const action = record.isActive ? deactivateUser(record.userId) : activateUser(record.userId);
+        const successMsg = record.isActive ? "User deactivated" : "User activated";
+
+        setTogglingUserId(record.userId);
+        dispatch(action)
+            .unwrap()
+            .then(() => {
+                message.success(successMsg);
+            })
+            .catch((error: any) => {
+                const msg = typeof error === 'string' ? error : error?.message || "An error occurred";
+                message.error(msg);
+            })
+            .finally(() => {
+                setTogglingUserId(null);
             });
-        } else {
-            dispatch(activateUser(record.userId)).then(() => {
-                message.success("User activated");
-            });
-        }
     };
 
     const handleSuccess = () => {
@@ -122,6 +137,8 @@ const ManageAccount = () => {
                         onClick={() => handleEdit(record)}
                     />
                     <Switch
+                        size="small"
+                        loading={togglingUserId === record.userId}
                         checked={record.isActive}
                         onChange={() => handleToggleStatus(record)}
                     />
@@ -157,6 +174,8 @@ const ManageAccount = () => {
                     rowKey="userId"
                     loading={loading}
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: 1000 }}
+                    size="middle"
                 />
             </Card>
 

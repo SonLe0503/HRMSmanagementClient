@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
 html,
 body,
@@ -7,5 +8,79 @@ body,
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: hidden;
+    overflow: hidden;
+    background-color: #f1f5f9;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+/* Ant Design Global Customization */
+.ant-layout {
+    background: transparent !important;
+}
+
+.ant-layout-header {
+    padding: 0 24px !important;
+}
+
+.ant-layout-sider {
+    box-shadow: 2px 0 8px 0 rgba(29, 33, 41, 0.05);
+    z-index: 10;
+}
+
+.ant-card {
+    border: none !important;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.ant-table-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* Layout specific classes */
+.app-layout {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.main-content {
+    padding: 24px;
+    overflow-y: auto;
+    background-color: #f8fafc;
+}
+
+.content-container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Action button standardization */
+.action-btn-standard {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }

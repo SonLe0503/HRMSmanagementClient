@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Tag, Space, Card, Switch, message, Typography } from "antd";
-import { PlusOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
+import { Table, Button, Tag, Space, Card, Switch, message, Typography, Tooltip } from "antd";
+import { PlusOutlined, SafetyCertificateOutlined, CalendarOutlined, TeamOutlined, EyeOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import URL from "../../../constants/url";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchAllRoles, changeRoleStatus, selectRoles, selectRoleLoading } from "../../../store/roleSlide";
 import Condition from "./Condition";
@@ -10,12 +13,15 @@ const { Title } = Typography;
 
 const ManageRole = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const roles = useAppSelector(selectRoles);
     const loading = useAppSelector(selectRoleLoading);
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState<boolean | null>(null);
+    const [togglingRoleId, setTogglingRoleId] = useState<number | null>(null);
+    const [viewingRoleId, setViewingRoleId] = useState<number | null>(null);
 
     useEffect(() => {
         dispatch(fetchAllRoles());
@@ -26,13 +32,19 @@ const ManageRole = () => {
     };
 
     const handleToggleStatus = (record: any) => {
-        dispatch(changeRoleStatus({ id: record.roleId, isActive: !record.isActive })).then((res: any) => {
-            if (!res.error) {
+        setTogglingRoleId(record.roleId);
+        dispatch(changeRoleStatus({ id: record.roleId, isActive: !record.isActive }))
+            .unwrap()
+            .then(() => {
                 message.success("Role status updated");
-            } else {
-                message.error(res.payload || "Failed to update status");
-            }
-        });
+            })
+            .catch((error: any) => {
+                const msg = typeof error === 'string' ? error : error?.message || "Failed to update status";
+                message.error(msg);
+            })
+            .finally(() => {
+                setTogglingRoleId(null);
+            });
     };
 
     const handleSuccess = () => {
@@ -72,6 +84,28 @@ const ManageRole = () => {
             key: "description",
         },
         {
+            title: "User Count",
+            dataIndex: "userCount",
+            key: "userCount",
+            render: (count: number) => (
+                <Space>
+                    <TeamOutlined />
+                    {count}
+                </Space>
+            ),
+        },
+        {
+            title: "Last Modified",
+            dataIndex: "lastModifiedDate",
+            key: "lastModifiedDate",
+            render: (date: string) => (
+                <Space>
+                    <CalendarOutlined />
+                    {dayjs(date).format("DD/MM/YYYY HH:mm")}
+                </Space>
+            ),
+        },
+        {
             title: "Status",
             dataIndex: "isActive",
             key: "isActive",
@@ -84,11 +118,30 @@ const ManageRole = () => {
         {
             title: "Action",
             key: "action",
+            width: 150,
             render: (_: any, record: any) => (
-                <Switch
-                    checked={record.isActive}
-                    onChange={() => handleToggleStatus(record)}
-                />
+                <Space size="middle">
+                    <Tooltip title="View Users">
+                        <Button
+                            type="primary"
+                            icon={<EyeOutlined />}
+                            loading={viewingRoleId === record.roleId}
+                            onClick={() => {
+                                setViewingRoleId(record.roleId);
+                                setTimeout(() => {
+                                    navigate(`${URL.ManageUser}?role=${record.roleName}`);
+                                    setViewingRoleId(null);
+                                }, 500);
+                            }}
+                        />
+                    </Tooltip>
+                    <Switch
+                        size="small"
+                        loading={togglingRoleId === record.roleId}
+                        checked={record.isActive}
+                        onChange={() => handleToggleStatus(record)}
+                    />
+                </Space>
             ),
         },
     ];

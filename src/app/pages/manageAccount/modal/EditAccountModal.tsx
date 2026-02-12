@@ -36,7 +36,9 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
                 message.success("User updated successfully");
                 onSuccess();
             } else {
-                message.error(res.payload || "Failed to update user");
+                const error = res.payload;
+                const msg = typeof error === 'string' ? error : error?.message || "Failed to update user";
+                message.error(msg);
             }
         });
     };

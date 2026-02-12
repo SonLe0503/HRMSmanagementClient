@@ -6,7 +6,9 @@ export interface IRole {
     roleId: number;
     roleName: string;
     description?: string;
+    userCount: number;
     isActive: boolean;
+    lastModifiedDate: string;
 }
 
 interface IRoleState {
@@ -24,11 +26,16 @@ const initialState: IRoleState = {
 // GET: /api/Role
 export const fetchAllRoles = createAsyncThunk(
     "role/fetchAllRoles",
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: "/Role",
                 method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return response.data;
         } catch (error: any) {
@@ -57,12 +64,17 @@ export const createRole = createAsyncThunk(
 // PATCH: /api/Role/{id}/status?isActive=...
 export const changeRoleStatus = createAsyncThunk(
     "role/changeRoleStatus",
-    async ({ id, isActive }: { id: number; isActive: boolean }, { rejectWithValue }) => {
+    async ({ id, isActive }: { id: number; isActive: boolean }, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: `/Role/${id}/status`,
                 method: "PATCH",
                 params: { isActive },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return { id, isActive, message: response.data };
         } catch (error: any) {
@@ -91,16 +103,33 @@ export const roleSlice = createSlice({
                 state.error = action.payload as string;
             })
             // Create Role
-            .addCase(createRole.fulfilled, () => {
-                // Role created successfully
+            .addCase(createRole.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createRole.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(createRole.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             })
             // Change Role Status
+            .addCase(changeRoleStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(changeRoleStatus.fulfilled, (state, action) => {
+                state.loading = false;
                 const { id, isActive } = action.payload;
                 const role = state.roles.find((r) => r.roleId === id);
                 if (role) {
                     role.isActive = isActive;
                 }
+            })
+            .addCase(changeRoleStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 });

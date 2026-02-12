@@ -5,6 +5,8 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     TeamOutlined,
+    // SafetyOutlined,
+    NodeIndexOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -23,11 +25,12 @@ const Sidebar = () => {
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
 
-    const menuByRole: any = {
+    const menuByRole: Record<EUserRole, any[]> = {
         [EUserRole.ADMIN]: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
+            { key: URL.ManageWorkflow, icon: <NodeIndexOutlined />, label: "Quản lý quy trình" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },

@@ -25,11 +25,16 @@ const initialState: IUserState = {
 // GET: /api/User
 export const fetchAllUsers = createAsyncThunk(
     "user/fetchAllUsers",
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: "/User",
                 method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return response.data;
         } catch (error: any) {
@@ -41,12 +46,17 @@ export const fetchAllUsers = createAsyncThunk(
 // POST: /api/User
 export const createUser = createAsyncThunk(
     "user/createUser",
-    async (data: any, { rejectWithValue }) => {
+    async (data: any, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: "/User",
                 method: "POST",
                 data,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return response.data;
         } catch (error: any) {
@@ -58,12 +68,17 @@ export const createUser = createAsyncThunk(
 // PUT: /api/User/{id}
 export const updateUser = createAsyncThunk(
     "user/updateUser",
-    async ({ id, data }: { id: number; data: any }, { rejectWithValue }) => {
+    async ({ id, data }: { id: number; data: any }, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: `/User/${id}`,
                 method: "PUT",
                 data,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return { id, data, message: response.data };
         } catch (error: any) {
@@ -75,11 +90,16 @@ export const updateUser = createAsyncThunk(
 // PATCH: /api/User/{id}/activate
 export const activateUser = createAsyncThunk(
     "user/activateUser",
-    async (id: number, { rejectWithValue }) => {
+    async (id: number, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: `/User/${id}/activate`,
                 method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return { id, message: response.data };
         } catch (error: any) {
@@ -91,11 +111,16 @@ export const activateUser = createAsyncThunk(
 // PATCH: /api/User/{id}/deactivate
 export const deactivateUser = createAsyncThunk(
     "user/deactivateUser",
-    async (id: number, { rejectWithValue }) => {
+    async (id: number, { rejectWithValue, getState }) => {
         try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: `/User/${id}/deactivate`,
                 method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             return { id, message: response.data };
         } catch (error: any) {
@@ -124,12 +149,28 @@ export const userSlice = createSlice({
                 state.error = action.payload as string;
             })
             // Create User
-            .addCase(createUser.fulfilled, () => {
-                // Handle success in component
+            .addCase(createUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createUser.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(createUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             })
             // Update User
-            .addCase(updateUser.fulfilled, () => {
-                // Handle success/refetch in component
+            .addCase(updateUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateUser.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(updateUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             })
             // Activate User
             .addCase(activateUser.fulfilled, (state, action) => {

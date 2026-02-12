@@ -7,17 +7,19 @@ interface DefaultLayoutProps {
     children: JSX.Element;
 }
 
-const DefaultLayout = ({children}: DefaultLayoutProps) => {
+const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     return (
-        <Layout className="h-screen">
+        <Layout className="app-layout">
             <Sidebar />
-            <Layout>
+            <Layout className="flex flex-col flex-1">
                 <HeaderBar />
-                <Content className="m-2 bg-white shadow">
-                    {children}
+                <Content className="main-content">
+                    <div className="content-container">
+                        {children}
+                    </div>
                 </Content>
             </Layout>
-        </Layout>   
+        </Layout>
     )
 }
 export default DefaultLayout;

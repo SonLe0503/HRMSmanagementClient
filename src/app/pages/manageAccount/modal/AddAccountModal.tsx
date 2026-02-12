@@ -22,7 +22,9 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
                 form.resetFields();
                 onSuccess();
             } else {
-                message.error(res.payload || "Failed to create user");
+                const error = res.payload;
+                const msg = typeof error === 'string' ? error : error?.message || "Failed to create user";
+                message.error(msg);
             }
         });
     };

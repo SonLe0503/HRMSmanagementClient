@@ -8,6 +8,7 @@ interface IInfoLogin {
   accessToken: string;
   role: EUserRole;
   userId: string;
+  userName: string;
   expiresTime: number;
 }
 
@@ -21,6 +22,7 @@ const initialState: IInitialState = {
     accessToken: "",
     role: EUserRole.EMPLOYEE,
     userId: "",
+    userName: "",
     expiresTime: 0,
   },
   isLogin: false,
@@ -51,7 +53,7 @@ export const slice = createSlice({
       state.isLogin = false;
     },
   },
-   extraReducers: (builder) => {
+  extraReducers: (builder) => {
     builder.addCase(actionLogin.fulfilled, (state, action) => {
       const token = action.payload?.data?.token ?? "";
       if (token) {
@@ -59,8 +61,9 @@ export const slice = createSlice({
         state.infoLogin = {
           ...state.infoLogin,
           accessToken: token,
-          role: decodedToken["role"],  
+          role: decodedToken["role"] as EUserRole,
           userId: decodedToken["nameid"],
+          userName: decodedToken["unique_name"],
           expiresTime: decodedToken["exp"],
         };
         state.isLogin = true;

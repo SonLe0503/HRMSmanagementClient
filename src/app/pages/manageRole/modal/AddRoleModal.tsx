@@ -15,15 +15,17 @@ const AddRoleModal = ({ open, onCancel, onSuccess }: AddRoleModalProps) => {
     const loading = useAppSelector(selectRoleLoading);
 
     const onFinish = (values: any) => {
-        dispatch(createRole(values)).then((res: any) => {
-            if (!res.error) {
+        dispatch(createRole(values))
+            .unwrap()
+            .then(() => {
                 message.success("Role created successfully");
                 form.resetFields();
                 onSuccess();
-            } else {
-                message.error(res.payload || "Failed to create role");
-            }
-        });
+            })
+            .catch((error: any) => {
+                const msg = typeof error === 'string' ? error : error?.message || "Failed to create role";
+                message.error(msg);
+            });
     };
 
     return (
