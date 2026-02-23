@@ -16,6 +16,7 @@ const ManageUser = lazy(() => import("../app/pages/manageAccount"))
 const ManageRole = lazy(() => import("../app/pages/manageRole"))
 // const ManagePermission = lazy(() => import("../app/pages/managePermission"))
 const ManageWorkflow = lazy(() => import("../app/pages/manageWorkflow"))
+const ManageTask = lazy(() => import("../app/pages/manageTask"))
 
 const shareResourceItem = [
     {
@@ -71,6 +72,12 @@ const privateResourceItem = [
     {
         key: URL.ManageWorkflow,
         element: <ManageWorkflow />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageTask,
+        element: <ManageTask />,
         layout: DEFAULT_LAYOUT,
         private: true,
     }

@@ -8,6 +8,7 @@ import userSlide from "./userSlide";
 import workflowSlide from "./workflowSlide";
 import workflowStageSlide from "./workflowstageSlide";
 import stageApproveSlide from "./stageapproveSlice";
+import taskSlide from "./taskSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -24,6 +25,7 @@ const reducers = {
   workflow: workflowSlide,
   workflowStage: workflowStageSlide,
   stageApprove: stageApproveSlide,
+  task: taskSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({
