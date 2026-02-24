@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\public",
+    "\\src",
+    "\\src\\app",
+    "\\src\\app\\pages",
+    "\\src\\app\\pages\\managePermission",
+    "\\src\\app\\pages\\manageRole",
+    "\\src\\app\\pages\\manageWorkflow",
+    "\\src\\constants",
+    "\\src\\layouts"
+  ],
+  "SelectedNode": "\\src\\utils\\common.ts",
+  "PreviewInSolutionExplorer": false
+}

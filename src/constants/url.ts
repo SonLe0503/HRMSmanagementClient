@@ -3,6 +3,7 @@
 
 const URL = {
     Login: "/login",
+    Attendance: "/attendance",
     DashboardAdmin: "/dashboard/admin",
     DashboardManage: "/dashboard/manage",
     DashboardEmployee: "/dashboard/employee",
