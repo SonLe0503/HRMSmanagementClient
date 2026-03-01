@@ -17,6 +17,7 @@ const URL = {
     // ManagePermission: "/admin/manage-permission",
     ManageWorkflow: "/admin/manage-workflow",
     ManageTask: "/manage-task",
+    ManagePayrollPolicy: "/admin/manage-payroll-policy",
 }
 
 export default URL
