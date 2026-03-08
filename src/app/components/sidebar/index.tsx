@@ -5,10 +5,7 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     TeamOutlined,
-    // SafetyOutlined,
     NodeIndexOutlined,
-    AuditOutlined,
-    CheckCircleOutlined,
     IdcardOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";

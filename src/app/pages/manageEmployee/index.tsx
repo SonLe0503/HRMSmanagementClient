@@ -151,7 +151,6 @@ const ManageEmployee = () => {
                     style={{ width: 130 }}
                     onChange={(newStatus) => handleStatusChange(record, newStatus)}
                     onClick={(e) => e.stopPropagation()}
-                    // Render the current tag but dropdown allows change
                     labelRender={({ value }) => (
                         <Tag color={STATUS_COLOR[value as string] ?? "default"} style={{ margin: 0 }}>
                             {value as string}
@@ -169,7 +168,6 @@ const ManageEmployee = () => {
                     <Tooltip title="Xem chi tiết">
                         <Button
                             icon={<EyeOutlined />}
-                            size="small"
                             onClick={() => handleView(record.employeeId)}
                         />
                     </Tooltip>
@@ -177,7 +175,6 @@ const ManageEmployee = () => {
                         <Button
                             type="primary"
                             icon={<EditOutlined />}
-                            size="small"
                             onClick={() => handleEdit(record)}
                         />
                     </Tooltip>
