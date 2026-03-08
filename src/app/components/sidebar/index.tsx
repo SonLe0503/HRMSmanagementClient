@@ -7,6 +7,9 @@ import {
     TeamOutlined,
     // SafetyOutlined,
     NodeIndexOutlined,
+    AuditOutlined,
+    CheckCircleOutlined,
+    IdcardOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -35,7 +38,7 @@ const Sidebar = () => {
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý tài khoản" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.EMPLOYEE]: [
@@ -44,7 +47,7 @@ const Sidebar = () => {
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageUser, icon: <TeamOutlined />, label: "Tuyển dụng" },
+            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
     };
