@@ -17,6 +17,7 @@ const URL = {
     ManageWorkflow: "/admin/manage-workflow",
     ManageTask: "/manage-task",
     ManageEmployee: "/hr/manage-employee",
+    EmployeeDetail: "/hr/manage-employee/:id",
 }
 
 export default URL

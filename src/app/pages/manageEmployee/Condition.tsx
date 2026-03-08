@@ -17,54 +17,30 @@ const EMPLOYMENT_STATUS_OPTIONS = [
     { label: "Terminated", value: "Terminated" },
     { label: "On Leave", value: "On Leave" },
 ];
-
 const GENDER_OPTIONS = [
-    { label: "Male", value: "Male" },
-    { label: "Female", value: "Female" },
-    { label: "Other", value: "Other" },
+    { label: "Nam", value: "Male" },
+    { label: "Nữ", value: "Female" },
+    { label: "Khác", value: "Other" },
 ];
 
-const Condition = ({
-    searchText,
-    setSearchText,
-    statusFilter,
-    setStatusFilter,
-    genderFilter,
-    setGenderFilter,
-}: ConditionProps) => {
-    return (
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-            <Col xs={24} sm={12} md={10}>
-                <Input
-                    placeholder="Tìm theo tên, mã NV hoặc email..."
-                    prefix={<SearchOutlined />}
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    allowClear
-                />
-            </Col>
-            <Col xs={12} sm={6} md={5}>
-                <Select
-                    style={{ width: "100%" }}
-                    placeholder="Trạng thái"
-                    value={statusFilter}
-                    onChange={setStatusFilter}
-                    allowClear
-                    options={EMPLOYMENT_STATUS_OPTIONS}
-                />
-            </Col>
-            <Col xs={12} sm={6} md={5}>
-                <Select
-                    style={{ width: "100%" }}
-                    placeholder="Giới tính"
-                    value={genderFilter}
-                    onChange={setGenderFilter}
-                    allowClear
-                    options={GENDER_OPTIONS}
-                />
-            </Col>
-        </Row>
-    );
-};
+const Condition = ({ searchText, setSearchText, statusFilter, setStatusFilter, genderFilter, setGenderFilter }: ConditionProps) => (
+    <Row gutter={[16, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={24} sm={12} md={10}>
+            <Input
+                placeholder="Tìm theo tên, mã NV hoặc email..."
+                prefix={<SearchOutlined />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+            />
+        </Col>
+        <Col xs={12} sm={6} md={5}>
+            <Select style={{ width: "100%" }} placeholder="Trạng thái" value={statusFilter} onChange={setStatusFilter} allowClear options={EMPLOYMENT_STATUS_OPTIONS} />
+        </Col>
+        <Col xs={12} sm={6} md={5}>
+            <Select style={{ width: "100%" }} placeholder="Giới tính" value={genderFilter} onChange={setGenderFilter} allowClear options={GENDER_OPTIONS} />
+        </Col>
+    </Row>
+);
 
 export default Condition;
