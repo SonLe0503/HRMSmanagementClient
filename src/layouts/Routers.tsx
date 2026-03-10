@@ -17,6 +17,8 @@ const ManageRole = lazy(() => import("../app/pages/manageRole"))
 // const ManagePermission = lazy(() => import("../app/pages/managePermission"))
 const ManageWorkflow = lazy(() => import("../app/pages/manageWorkflow"))
 const ManageTask = lazy(() => import("../app/pages/manageTask"))
+const ManageEmployee = lazy(() => import("../app/pages/manageEmployee"))
+const EmployeeDetail = lazy(() => import("../app/pages/manageEmployee/EmployeeDetail"))
 
 const shareResourceItem = [
     {
@@ -63,12 +65,6 @@ const privateResourceItem = [
         layout: DEFAULT_LAYOUT,
         private: true,
     },
-    /* {
-        key: URL.ManagePermission,
-        element: <ManagePermission />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    } */
     {
         key: URL.ManageWorkflow,
         element: <ManageWorkflow />,
@@ -80,7 +76,20 @@ const privateResourceItem = [
         element: <ManageTask />,
         layout: DEFAULT_LAYOUT,
         private: true,
-    }
+    },
+    {
+        key: URL.ManageEmployee,
+        element: <ManageEmployee />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EmployeeDetail,
+        element: <EmployeeDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+
 ]
 const menus = [...shareResourceItem, ...privateResourceItem]
 

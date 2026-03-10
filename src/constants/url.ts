@@ -14,9 +14,10 @@ const URL = {
     ManageRole: "/admin/manage-role",
     ManageCategory: "/admin/manage-category",
     ManageProduct: "/admin/manage-product",
-    // ManagePermission: "/admin/manage-permission",
     ManageWorkflow: "/admin/manage-workflow",
     ManageTask: "/manage-task",
+    ManageEmployee: "/hr/manage-employee",
+    EmployeeDetail: "/hr/manage-employee/:id",
 }
 
 export default URL
