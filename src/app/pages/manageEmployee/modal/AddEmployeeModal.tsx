@@ -31,7 +31,7 @@ const AddEmployeeModal = ({ open, onCancel, onSuccess }: AddEmployeeModalProps) 
             baseSalary: values.baseSalary || 0,
             city: values.city || null,
             country: values.country || null,
-            createdBy: infoLogin?.userId || null, // Thêm createdBy từ thông tin đăng nhập
+            createdBy: infoLogin?.userId || null,
         };
         dispatch(createEmployee(payload))
             .unwrap()
