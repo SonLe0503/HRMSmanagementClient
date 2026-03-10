@@ -7,6 +7,7 @@ import {
     TeamOutlined,
     NodeIndexOutlined,
     IdcardOutlined,
+    ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -45,6 +46,7 @@ const Sidebar = () => {
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
     };
