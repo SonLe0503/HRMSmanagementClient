@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select, Switch, message } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { updateUser, selectUserLoading } from "../../../../store/userSlide";
 import { selectRoles } from "../../../../store/roleSlide";
+import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
 
 interface EditAccountModalProps {
     open: boolean;
@@ -15,7 +16,14 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const roles = useAppSelector(selectRoles);
+    const employees = useAppSelector(selectEmployees);
     const loading = useAppSelector(selectUserLoading);
+
+    useEffect(() => {
+        if (open && employees.length === 0) {
+            dispatch(fetchAllEmployees());
+        }
+    }, [open, employees.length, dispatch]);
 
     useEffect(() => {
         if (open && editingUser) {
@@ -68,6 +76,30 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
                 </Form.Item>
 
                 <Form.Item
+                    name="employeeId"
+                    label="Employee"
+                    rules={[{ required: true, message: "Please select an employee!" }]}
+                >
+                    <Select
+                        showSearch
+                        placeholder="Select an employee"
+                        optionFilterProp="children"
+                        onChange={(value) => {
+                            const emp = employees.find(e => e.employeeId === value);
+                            if (emp) {
+                                form.setFieldsValue({ email: emp.email });
+                            }
+                        }}
+                    >
+                        {employees.map((emp) => (
+                            <Select.Option key={emp.employeeId} value={emp.employeeId}>
+                                {emp.fullName} ({emp.employeeCode})
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+
+                <Form.Item
                     name="email"
                     label="Email"
                     rules={[
@@ -75,7 +107,7 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
                         { type: "email", message: "Please enter a valid email!" },
                     ]}
                 >
-                    <Input />
+                    <Input disabled />
                 </Form.Item>
 
                 <Form.Item
