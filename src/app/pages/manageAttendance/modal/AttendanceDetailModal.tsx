@@ -1,91 +1,144 @@
-import { Modal, Descriptions, Tag, Typography, Image, Card, Row, Col } from "antd";
+import { Modal, Descriptions, Spin, Tag, Button, Space, Typography } from "antd";
+import { useAppDispatch, useAppSelector } from "../../../../store";
+import { fetchAttendanceDetail, selectSelectedDetail, selectAttendanceLoading, lockAttendance, unlockAttendance } from "../../../../store/attendanceSlide";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { EnvironmentOutlined, PictureOutlined } from "@ant-design/icons";
+import { LockOutlined, UnlockOutlined, HistoryOutlined } from "@ant-design/icons";
+import AttendanceLogsModal from "./AttendanceLogsModal";
 
 const { Text } = Typography;
 
-interface Props {
+interface AttendanceDetailModalProps {
     open: boolean;
-    onCancel: () => void;
-    record: any;
+    onClose: () => void;
+    employeeId: number;
+    employeeName: string;
+    date: string;
 }
 
-const AttendanceDetailModal = ({ open, onCancel, record }: Props) => {
-    if (!record) return null;
+const AttendanceDetailModal = ({ open, onClose, employeeId, employeeName, date }: AttendanceDetailModalProps) => {
+    const dispatch = useAppDispatch();
+    const detailPayload = useAppSelector(selectSelectedDetail);
+    const loading = useAppSelector(selectAttendanceLoading);
+    const [logsOpen, setLogsOpen] = useState(false);
+
+    useEffect(() => {
+        if (open && employeeId && date) {
+            dispatch(fetchAttendanceDetail({ employeeId, date }));
+        }
+    }, [open, employeeId, date, dispatch]);
+
+    const detail = detailPayload?.attendance;
+
+    const handleLock = async () => {
+        if (detail?.attendanceId) {
+            await dispatch(lockAttendance(detail.attendanceId));
+            dispatch(fetchAttendanceDetail({ employeeId, date })); // Refresh if needed, though slide updates the state
+        }
+    };
+
+    const handleUnlock = async () => {
+        if (detail?.attendanceId) {
+            await dispatch(unlockAttendance(detail.attendanceId));
+            dispatch(fetchAttendanceDetail({ employeeId, date }));
+        }
+    };
 
     return (
         <Modal
-            title="Chi tiết bản ghi chấm công"
+            title={`Chi tiết chấm công - ${employeeName}`}
             open={open}
-            onCancel={onCancel}
-            footer={null}
-            width={700}
+            onCancel={onClose}
+            width={800}
+            footer={[
+                <Button key="logs" icon={<HistoryOutlined />} onClick={() => setLogsOpen(true)}>
+                    Lịch sử chỉnh sửa
+                </Button>,
+                <Button key="close" onClick={onClose} type="primary">
+                    Đóng
+                </Button>
+            ]}
         >
-            <Descriptions bordered column={2}>
-                <Descriptions.Item label="Nhân viên" span={2}>
-                    <Text strong>{record.fullName}</Text> ({record.employeeCode})
-                </Descriptions.Item>
-                <Descriptions.Item label="Ngày">
-                    {record.date}
-                </Descriptions.Item>
-                <Descriptions.Item label="Ca làm việc">
-                    {record.shiftName}
-                </Descriptions.Item>
-                <Descriptions.Item label="Giờ vào">
-                    {record.checkIn ? dayjs(record.checkIn).format("HH:mm:ss") : <Text type="secondary">Chưa vào ca</Text>}
-                </Descriptions.Item>
-                <Descriptions.Item label="Giờ ra">
-                    {record.checkOut ? dayjs(record.checkOut).format("HH:mm:ss") : <Text type="secondary">Chưa ra ca</Text>}
-                </Descriptions.Item>
-                <Descriptions.Item label="Số phút trễ">
-                    <Tag color={record.lateMinutes > 0 ? "red" : "green"}>
-                        {record.lateMinutes || 0} phút
-                    </Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Trạng thái">
-                    <Tag color={record.status === "Present" ? "green" : "orange"}>
-                        {record.status}
-                    </Tag>
-                </Descriptions.Item>
-            </Descriptions>
+            {loading && !detail ? (
+                <div className="text-center p-6"><Spin /></div>
+            ) : detail ? (
+                <div className="mt-4">
+                    <Descriptions column={2} bordered size="small">
+                        <Descriptions.Item label="Ngày">
+                            {dayjs(detail.attendanceDate).format("DD/MM/YYYY")}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Trạng thái">
+                            {detail.status === "Present" && <Tag color="green">Hiện diện</Tag>}
+                            {detail.status === "Late" && <Tag color="orange">Đi muộn</Tag>}
+                            {detail.status === "Absent" && <Tag color="red">Vắng mặt</Tag>}
+                            {detail.status === "Incomplete" && <Tag color="blue">Chưa hoàn tất</Tag>}
+                        </Descriptions.Item>
 
-            <div style={{ marginTop: 24 }}>
-                <Title level={5}>Minh chứng hình ảnh & Vị trí (Verification)</Title>
-                <Row gutter={16} style={{ marginTop: 12 }}>
-                    <Col span={12}>
-                        <Card
-                            size="small"
-                            title={<span><PictureOutlined /> Hình ảnh AI Check-in</span>}
-                            cover={
-                                <Image
-                                    alt="Check-in verification"
-                                    src="https://via.placeholder.com/300x200?text=AI+Face+Recognition+Check-in"
-                                />
-                            }
-                        >
-                            <Card.Meta description="Xác thực khuôn mặt thành công" />
-                        </Card>
-                    </Col>
-                    <Col span={12}>
-                        <Card
-                            size="small"
-                            title={<span><EnvironmentOutlined /> Vị trí Check-in</span>}
-                            cover={
-                                <Image
-                                    alt="Location verification"
-                                    src="https://via.placeholder.com/300x200?text=Map+Location+Verification"
-                                />
-                            }
-                        >
-                            <Card.Meta description="Văn phòng 1 - Quận 1, TP.HCM" />
-                        </Card>
-                    </Col>
-                </Row>
-            </div>
+                        <Descriptions.Item label="Giờ Check-in">
+                            {detail.checkInTime ? dayjs(detail.checkInTime).format("HH:mm:ss") : "—"}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Giờ Check-out">
+                            {detail.checkOutTime ? dayjs(detail.checkOutTime).format("HH:mm:ss") : "—"}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Giờ làm việc">
+                            <Text strong>{detail.workingHours ?? "0"}h</Text>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Đi muộn/Về sớm">
+                            {detail.lateMinutes! > 0 ? (
+                                <Text type="danger">{detail.lateMinutes} phút muộn</Text>
+                            ) : detail.earlyLeaveMinutes! > 0 ? (
+                                <Text type="warning">{detail.earlyLeaveMinutes} phút về sớm</Text>
+                            ) : (
+                                "Không"
+                            )}
+                        </Descriptions.Item>
+
+                        <Descriptions.Item label="Nguồn">
+                            {detail.source} {detail.isManualAdjusted && <Tag color="gold">Manual Adjusted</Tag>}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Vị trí">
+                            {detail.location || "—"}
+                        </Descriptions.Item>
+                        
+                        <Descriptions.Item label="Ghi chú" span={2}>
+                            {detail.remarks || "—"}
+                        </Descriptions.Item>
+                    </Descriptions>
+
+                    <div className="mt-6 flex justify-between items-center bg-gray-50 p-4 border rounded">
+                        <div>
+                            <Text strong>Trạng thái khóa: </Text>
+                            {detail.isLocked ? (
+                                <Tag color="red" icon={<LockOutlined />}>Đã khóa</Tag>
+                            ) : (
+                                <Tag color="green" icon={<UnlockOutlined />}>Đang mở</Tag>
+                            )}
+                            <br/>
+                            <Text type="secondary" className="text-xs">Bản ghi bị khóa sẽ không thể điều chỉnh được.</Text>
+                        </div>
+                        <Space>
+                            {detail.isLocked ? (
+                                <Button danger icon={<UnlockOutlined />} onClick={handleUnlock}>Mở khóa bản ghi</Button>
+                            ) : (
+                                <Button type="primary" icon={<LockOutlined />} onClick={handleLock}>Khóa bản ghi</Button>
+                            )}
+                        </Space>
+                    </div>
+
+                    <AttendanceLogsModal
+                        open={logsOpen}
+                        onClose={() => setLogsOpen(false)}
+                        employeeId={employeeId}
+                        employeeName={employeeName}
+                        date={date}
+                    />
+                </div>
+            ) : (
+                <div className="text-center p-6 text-gray-500">Chưa có dữ liệu chấm công ngày này.</div>
+            )}
         </Modal>
     );
 };
-
-const { Title } = Typography;
 
 export default AttendanceDetailModal;

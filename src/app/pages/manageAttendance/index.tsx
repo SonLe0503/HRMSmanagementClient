@@ -1,41 +1,21 @@
-import { Card, Tabs, Typography } from "antd";
-import { CalendarOutlined, TableOutlined } from "@ant-design/icons";
-import ShiftSchedules from "./components/ShiftSchedules";
-import AttendanceRecords from "./components/AttendanceRecords";
+import { Layout, Typography } from "antd";
+import AttendanceTable from "./components/AttendanceTable";
 
+const { Content } = Layout;
 const { Title } = Typography;
 
 const ManageAttendance = () => {
-    const items = [
-        {
-            key: "1",
-            label: (
-                <span>
-                    <CalendarOutlined />
-                    Lịch làm việc
-                </span>
-            ),
-            children: <ShiftSchedules />,
-        },
-        {
-            key: "2",
-            label: (
-                <span>
-                    <TableOutlined />
-                    Dữ liệu chấm công
-                </span>
-            ),
-            children: <AttendanceRecords />,
-        },
-    ];
-
     return (
-        <div className="p-2">
-            <Card>
-                <Title level={4} style={{ marginBottom: 16 }}>Quản lý chấm công & Lịch làm việc</Title>
-                <Tabs defaultActiveKey="1" items={items} />
-            </Card>
-        </div>
+        <Layout className="bg-transparent p-6 min-h-screen">
+            <Content>
+                <div className="mb-6">
+                    <Title level={2} className="m-0">Quản lý Chấm công</Title>
+                    <p className="text-gray-500 mt-2">Tra cứu, điều chỉnh và quản lý dữ liệu chấm công của toàn bộ nhân viên.</p>
+                </div>
+
+                <AttendanceTable />
+            </Content>
+        </Layout>
     );
 };
 
