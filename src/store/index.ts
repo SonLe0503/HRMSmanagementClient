@@ -12,6 +12,7 @@ import taskSlide from "./taskSlide";
 import employeeSlide from "./employeeSlide";
 import employeeDocumentSlide from "./employeeDocumentSlide";
 import attendanceSlide from "./attendanceSlide";
+import hrProcedureSlide from "./hrProcedureSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -32,6 +33,7 @@ const reducers = {
   employee: employeeSlide,
   employeeDocument: employeeDocumentSlide,
   attendance: attendanceSlide,
+  hrProcedure: hrProcedureSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

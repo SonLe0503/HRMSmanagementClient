@@ -21,6 +21,7 @@ const ManageEmployee = lazy(() => import("../app/pages/manageEmployee"))
 const EmployeeDetail = lazy(() => import("../app/pages/manageEmployee/EmployeeDetail"))
 const MyAttendance = lazy(() => import("../app/pages/myAttendance"))
 const ManageAttendance = lazy(() => import("../app/pages/manageAttendance"))
+const ManageHRProcedure = lazy(() => import("../app/pages/manageHRProcedure"))
 
 const shareResourceItem = [
     {
@@ -100,6 +101,12 @@ const privateResourceItem = [
     {
         key: URL.ManageAttendance,
         element: <ManageAttendance />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageHRProcedure,
+        element: <ManageHRProcedure />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

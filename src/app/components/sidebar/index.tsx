@@ -39,6 +39,7 @@ const Sidebar = () => {
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý tài khoản" },
+            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.EMPLOYEE]: [
@@ -50,6 +51,7 @@ const Sidebar = () => {
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
     };

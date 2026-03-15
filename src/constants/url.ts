@@ -20,7 +20,7 @@ const URL = {
     EmployeeDetail: "/hr/manage-employee/:id",
     MyAttendance: "/attendance/my",
     ManageAttendance: "/attendance/manage",
-
+    ManageHRProcedure: "/hr/manage-procedure",
 }
 
 export default URL
