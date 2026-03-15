@@ -23,6 +23,11 @@ const MyAttendance = lazy(() => import("../app/pages/myAttendance"))
 const ManageAttendance = lazy(() => import("../app/pages/manageAttendance"))
 const ManageHRProcedure = lazy(() => import("../app/pages/manageHRProcedure"))
 
+const ManageDepartment = lazy(() => import("../app/pages/manageDepartment"));
+const DepartmentDetail = lazy(() => import("../app/pages/manageDepartment/DepartmentDetail"));
+const ManagePosition = lazy(() => import("../app/pages/managePosition"));
+const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
+
 const shareResourceItem = [
     {
         key: URL.Login,
@@ -89,6 +94,30 @@ const privateResourceItem = [
     {
         key: URL.EmployeeDetail,
         element: <EmployeeDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageDepartment,
+        element: <ManageDepartment />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.DepartmentDetail,
+        element: <DepartmentDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManagePosition,
+        element: <ManagePosition />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PositionDetail,
+        element: <PositionDetail />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

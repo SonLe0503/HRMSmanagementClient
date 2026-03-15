@@ -11,6 +11,8 @@ import stageApproveSlide from "./stageapproveSlice";
 import taskSlide from "./taskSlide";
 import employeeSlide from "./employeeSlide";
 import employeeDocumentSlide from "./employeeDocumentSlide";
+import departmentSlide from "./departmentSlide";
+import positionSlide from "./positionSlide";
 import attendanceSlide from "./attendanceSlide";
 import hrProcedureSlide from "./hrProcedureSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -32,6 +34,8 @@ const reducers = {
   task: taskSlide,
   employee: employeeSlide,
   employeeDocument: employeeDocumentSlide,
+  department: departmentSlide,
+  position: positionSlide,
   attendance: attendanceSlide,
   hrProcedure: hrProcedureSlide,
 }
