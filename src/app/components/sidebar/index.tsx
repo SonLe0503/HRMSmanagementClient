@@ -9,6 +9,7 @@ import {
     IdcardOutlined,
     BankOutlined,
     SolutionOutlined,
+    ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -30,6 +31,7 @@ const Sidebar = () => {
     const menuByRole: Record<EUserRole, any[]> = {
         [EUserRole.ADMIN]: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
             { key: URL.ManageWorkflow, icon: <NodeIndexOutlined />, label: "Quản lý quy trình" },
@@ -39,15 +41,18 @@ const Sidebar = () => {
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý tài khoản" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.EMPLOYEE]: [
             { key: URL.DashboardEmployee, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
             { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
             { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
