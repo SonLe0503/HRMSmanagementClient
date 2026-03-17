@@ -63,7 +63,7 @@ const ManageHRProcedure = () => {
                 setEditingData(data);
                 setIsAddOpen(true);
             })
-            .catch((err) => {
+            .catch(() => {
                 message.error("Không thể lấy thông tin chi tiết để cập nhật!");
             });
     };
