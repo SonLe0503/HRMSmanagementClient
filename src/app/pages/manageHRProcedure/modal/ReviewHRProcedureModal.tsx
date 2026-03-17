@@ -93,7 +93,7 @@ const ReviewHRProcedureModal = ({ open, procedureId, canApprove = false, onCance
                             </Descriptions.Item>
                         )}
 
-                        <Descriptions.Item label="Người tạo">{detail.submittedBy}</Descriptions.Item>
+                        <Descriptions.Item label="Người tạo">{detail.submittedByName}</Descriptions.Item>
                         <Descriptions.Item label="Ngày tạo">
                             {new Date(detail.submittedDate).toLocaleString("vi-VN")}
                         </Descriptions.Item>
