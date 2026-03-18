@@ -5,7 +5,6 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     TeamOutlined,
-    NodeIndexOutlined,
     IdcardOutlined,
     BankOutlined,
     SolutionOutlined,
@@ -34,7 +33,7 @@ const Sidebar = () => {
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
-            { key: URL.ManageWorkflow, icon: <NodeIndexOutlined />, label: "Quản lý quy trình" },
+
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
             { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },

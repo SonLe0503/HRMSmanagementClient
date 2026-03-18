@@ -14,8 +14,7 @@ const DashboardHR = lazy(() => import("../app/pages/dashboard/DashboardHR"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const ManageUser = lazy(() => import("../app/pages/manageAccount"))
 const ManageRole = lazy(() => import("../app/pages/manageRole"))
-// const ManagePermission = lazy(() => import("../app/pages/managePermission"))
-const ManageWorkflow = lazy(() => import("../app/pages/manageWorkflow"))
+
 const ManageTask = lazy(() => import("../app/pages/manageTask"))
 const ManageEmployee = lazy(() => import("../app/pages/manageEmployee"))
 const EmployeeDetail = lazy(() => import("../app/pages/manageEmployee/EmployeeDetail"))
@@ -73,12 +72,7 @@ const privateResourceItem = [
         layout: DEFAULT_LAYOUT,
         private: true,
     },
-    {
-        key: URL.ManageWorkflow,
-        element: <ManageWorkflow />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
+
     {
         key: URL.ManageTask,
         element: <ManageTask />,

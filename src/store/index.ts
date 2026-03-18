@@ -5,9 +5,7 @@ import storage from "redux-persist/lib/storage";
 import authSlide from "./authSlide";
 import roleSlide from "./roleSlide";
 import userSlide from "./userSlide";
-import workflowSlide from "./workflowSlide";
-import workflowStageSlide from "./workflowstageSlide";
-import stageApproveSlide from "./stageapproveSlice";
+
 import taskSlide from "./taskSlide";
 import employeeSlide from "./employeeSlide";
 import employeeDocumentSlide from "./employeeDocumentSlide";
@@ -28,9 +26,6 @@ const reducers = {
   auth: persistReducer(persistConfig, authSlide),
   role: roleSlide,
   user: userSlide,
-  workflow: workflowSlide,
-  workflowStage: workflowStageSlide,
-  stageApprove: stageApproveSlide,
   task: taskSlide,
   employee: employeeSlide,
   employeeDocument: employeeDocumentSlide,

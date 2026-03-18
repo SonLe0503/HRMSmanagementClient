@@ -14,7 +14,7 @@ const URL = {
     ManageRole: "/admin/manage-role",
     ManageCategory: "/admin/manage-category",
     ManageProduct: "/admin/manage-product",
-    ManageWorkflow: "/admin/manage-workflow",
+
     ManageTask: "/manage-task",
     ManageEmployee: "/hr/manage-employee",
     EmployeeDetail: "/hr/manage-employee/:id",
