@@ -5,8 +5,9 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     TeamOutlined,
-    NodeIndexOutlined,
     IdcardOutlined,
+    BankOutlined,
+    SolutionOutlined,
     ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
@@ -32,13 +33,16 @@ const Sidebar = () => {
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
-            { key: URL.ManageWorkflow, icon: <NodeIndexOutlined />, label: "Quản lý quy trình" },
+
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
+            { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý tài khoản" },
+            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.EMPLOYEE]: [
@@ -50,6 +54,9 @@ const Sidebar = () => {
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
+            { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
+            { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
     };

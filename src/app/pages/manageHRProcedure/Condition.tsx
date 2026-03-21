@@ -1,0 +1,58 @@
+import { Input, Select, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+
+const { Option } = Select;
+
+interface ConditionProps {
+    searchText: string;
+    setSearchText: (value: string) => void;
+    statusFilter: string | null;
+    setStatusFilter: (value: string | null) => void;
+    typeFilter: string | null;
+    setTypeFilter: (value: string | null) => void;
+}
+
+const Condition = ({
+    searchText, setSearchText,
+    statusFilter, setStatusFilter,
+    typeFilter, setTypeFilter
+}: ConditionProps) => {
+    return (
+        <Space style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <Input
+                placeholder="Tìm thủ tục theo mã, tên NV..."
+                prefix={<SearchOutlined />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: 250 }}
+                allowClear
+            />
+            <Select
+                placeholder="Lọc theo trạng thái"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 150 }}
+                allowClear
+            >
+                <Option value="Pending">Pending</Option>
+                <Option value="Approved">Approved</Option>
+                <Option value="Rejected">Rejected</Option>
+            </Select>
+            <Select
+                placeholder="Lọc theo loại"
+                value={typeFilter}
+                onChange={setTypeFilter}
+                style={{ width: 150 }}
+                allowClear
+            >
+                <Option value="Appointment">Appointment</Option>
+                <Option value="Transfer">Transfer</Option>
+                <Option value="Promotion">Promotion</Option>
+                <Option value="Resignation">Resignation</Option>
+                <Option value="Termination">Termination</Option>
+            </Select>
+        </Space>
+    );
+};
+
+export default Condition;

@@ -14,13 +14,18 @@ const DashboardHR = lazy(() => import("../app/pages/dashboard/DashboardHR"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const ManageUser = lazy(() => import("../app/pages/manageAccount"))
 const ManageRole = lazy(() => import("../app/pages/manageRole"))
-// const ManagePermission = lazy(() => import("../app/pages/managePermission"))
-const ManageWorkflow = lazy(() => import("../app/pages/manageWorkflow"))
+
 const ManageTask = lazy(() => import("../app/pages/manageTask"))
 const ManageEmployee = lazy(() => import("../app/pages/manageEmployee"))
 const EmployeeDetail = lazy(() => import("../app/pages/manageEmployee/EmployeeDetail"))
 const MyAttendance = lazy(() => import("../app/pages/myAttendance"))
 const ManageAttendance = lazy(() => import("../app/pages/manageAttendance"))
+const ManageHRProcedure = lazy(() => import("../app/pages/manageHRProcedure"))
+
+const ManageDepartment = lazy(() => import("../app/pages/manageDepartment"));
+const DepartmentDetail = lazy(() => import("../app/pages/manageDepartment/DepartmentDetail"));
+const ManagePosition = lazy(() => import("../app/pages/managePosition"));
+const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
 
 const shareResourceItem = [
     {
@@ -67,12 +72,7 @@ const privateResourceItem = [
         layout: DEFAULT_LAYOUT,
         private: true,
     },
-    {
-        key: URL.ManageWorkflow,
-        element: <ManageWorkflow />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
+
     {
         key: URL.ManageTask,
         element: <ManageTask />,
@@ -92,6 +92,30 @@ const privateResourceItem = [
         private: true,
     },
     {
+        key: URL.ManageDepartment,
+        element: <ManageDepartment />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.DepartmentDetail,
+        element: <DepartmentDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManagePosition,
+        element: <ManagePosition />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PositionDetail,
+        element: <PositionDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
         key: URL.MyAttendance,
         element: <MyAttendance />,
         layout: DEFAULT_LAYOUT,
@@ -100,6 +124,12 @@ const privateResourceItem = [
     {
         key: URL.ManageAttendance,
         element: <ManageAttendance />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageHRProcedure,
+        element: <ManageHRProcedure />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
