@@ -33,10 +33,10 @@ const Sidebar = () => {
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
-
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
             { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
+            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -46,7 +46,6 @@ const Sidebar = () => {
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.EMPLOYEE]: [
-            { key: URL.DashboardEmployee, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],

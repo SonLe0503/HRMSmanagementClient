@@ -9,6 +9,7 @@ export interface CheckInRequestDto {
     deviceInfo?: string;
     ipAddress?: string;
     remarks?: string;
+    faceImageBase64?: string;
 }
 
 export interface CheckOutRequestDto {
@@ -16,6 +17,7 @@ export interface CheckOutRequestDto {
     deviceInfo?: string;
     ipAddress?: string;
     remarks?: string;
+    faceImageBase64?: string;
 }
 
 export interface AttendanceResponseDto {
@@ -156,6 +158,25 @@ export const fetchMyToday = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Lỗi lấy dữ liệu chấm công hôm nay");
+        }
+    }
+);
+
+export const registerFace = createAsyncThunk(
+    "attendance/registerFace",
+    async (dto: { referenceImageBase64: string }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: "/Face/register",
+                method: "POST",
+                data: dto,
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi đăng ký khuôn mặt");
         }
     }
 );

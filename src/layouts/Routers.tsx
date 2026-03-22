@@ -9,7 +9,6 @@ import DefaultLayout from "./DefaultLayout"
 
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
-const DashboardEmployee = lazy(() => import("../app/pages/dashboard/DashboardEmployee"))
 const DashboardHR = lazy(() => import("../app/pages/dashboard/DashboardHR"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const ManageUser = lazy(() => import("../app/pages/manageAccount"))
@@ -39,12 +38,6 @@ const privateResourceItem = [
     {
         key: URL.DashboardAdmin,
         element: <DashboardAdmin />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardEmployee,
-        element: <DashboardEmployee />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
