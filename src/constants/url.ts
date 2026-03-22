@@ -24,6 +24,7 @@ const URL = {
     MyAttendance: "/attendance/my",
     ManageAttendance: "/attendance/manage",
     ManageHRProcedure: "/hr/manage-procedure",
+    ManageShift: "/hr/manage-shift",
 }
 
 export default URL

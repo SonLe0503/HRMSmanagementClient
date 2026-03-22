@@ -13,6 +13,7 @@ import departmentSlide from "./departmentSlide";
 import positionSlide from "./positionSlide";
 import attendanceSlide from "./attendanceSlide";
 import hrProcedureSlide from "./hrProcedureSlide";
+import shiftSlide from "./shiftSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -33,6 +34,7 @@ const reducers = {
   position: positionSlide,
   attendance: attendanceSlide,
   hrProcedure: hrProcedureSlide,
+  shift: shiftSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({
