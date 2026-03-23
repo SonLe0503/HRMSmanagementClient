@@ -26,6 +26,7 @@ const DepartmentDetail = lazy(() => import("../app/pages/manageDepartment/Depart
 const ManagePosition = lazy(() => import("../app/pages/managePosition"));
 const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
 const ManageShift = lazy(() => import("../app/pages/manageShift"));
+const ManageShiftAssignment = lazy(() => import("../app/pages/manageShiftAssignment"));
 
 const shareResourceItem = [
     {
@@ -130,6 +131,12 @@ const privateResourceItem = [
     {
         key: URL.ManageShift,
         element: <ManageShift />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageShiftAssignment,
+        element: <ManageShiftAssignment />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
