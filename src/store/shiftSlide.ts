@@ -13,6 +13,7 @@ export interface IShift {
     lateGraceMinutes: number;
     earlyCheckInMinutes: number;
     latestCheckInMinutes: number;
+    earliestCheckOutMinutes: number;
     latestCheckOutMinutes: number;
     isOvernight: boolean;
     isActive: boolean;

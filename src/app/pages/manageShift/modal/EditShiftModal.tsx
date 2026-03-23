@@ -137,18 +137,26 @@ const EditShiftModal = ({ open, onCancel, shift }: EditShiftModalProps) => {
                 </Row>
 
                 <Row gutter={16}>
-                    <Col span={12}>
+                    <Col span={8}>
                         <Form.Item
                             name="lateGraceMinutes"
-                            label="Phút cho phép đi trễ"
+                            label="Phút đi trễ cho phép"
                         >
                             <InputNumber min={0} style={{ width: "100%" }} />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={8}>
                         <Form.Item
                             name="earlyCheckInMinutes"
-                            label="Phút được phép check-in sớm"
+                            label="Phút check-in sớm"
+                        >
+                            <InputNumber min={0} style={{ width: "100%" }} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            name="latestCheckInMinutes"
+                            label="Phút check-in muộn"
                         >
                             <InputNumber min={0} style={{ width: "100%" }} />
                         </Form.Item>
@@ -158,8 +166,8 @@ const EditShiftModal = ({ open, onCancel, shift }: EditShiftModalProps) => {
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
-                            name="latestCheckInMinutes"
-                            label="Phút check-in muộn tối đa"
+                            name="earliestCheckOutMinutes"
+                            label="Phút check-out sớm tối đa"
                         >
                             <InputNumber min={0} style={{ width: "100%" }} />
                         </Form.Item>
