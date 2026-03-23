@@ -45,6 +45,22 @@ const EditShiftModal = ({ open, onCancel, shift }: EditShiftModalProps) => {
             });
     };
 
+    const handleValuesChange = (changedValues: any, allValues: any) => {
+        if (changedValues.startTime || changedValues.endTime || changedValues.isOvernight !== undefined) {
+            const { startTime, endTime, isOvernight } = allValues;
+            if (startTime && endTime) {
+                let diff = endTime.diff(startTime, "hour", true);
+                if (diff < 0) {
+                    diff += 24;
+                    form.setFieldsValue({ isOvernight: true });
+                } else if (isOvernight) {
+                    // stays positive
+                }
+                form.setFieldsValue({ workingHours: Math.round(diff * 2) / 2 });
+            }
+        }
+    };
+
     return (
         <Modal
             title="Sửa Ca Làm Việc"
@@ -58,6 +74,7 @@ const EditShiftModal = ({ open, onCancel, shift }: EditShiftModalProps) => {
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
+                onValuesChange={handleValuesChange}
             >
                 <Row gutter={16}>
                     <Col span={12}>
@@ -108,7 +125,7 @@ const EditShiftModal = ({ open, onCancel, shift }: EditShiftModalProps) => {
                             label="Số giờ công"
                             rules={[{ required: true, message: "Nhập số giờ công" }]}
                         >
-                            <InputNumber min={0.5} max={24} step={0.5} style={{ width: "100%" }} />
+                            <InputNumber min={0} max={24} style={{ width: "100%" }} disabled />
                         </Form.Item>
                     </Col>
                     <Col span={8}>

@@ -1,4 +1,4 @@
-import { Modal, Form, Select, DatePicker, message, Checkbox } from "antd";
+import { Modal, Form, Select, DatePicker, message, Checkbox, InputNumber } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { assignShift, fetchShiftAssignments, type AssignShiftDto } from "../../../../store/shiftAssignmentSlide";
 import { selectShifts, fetchAllShifts } from "../../../../store/shiftSlide";
@@ -6,7 +6,7 @@ import { selectEmployees, fetchAllEmployees } from "../../../../store/employeeSl
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 
 interface AssignShiftModalProps {
     open: boolean;
@@ -39,7 +39,9 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
             
             form.setFieldsValue({
                 employeeId: initialEmployeeId,
-                dateRange: initialDate ? [dayjs(initialDate), dayjs(initialDate)] : [dayjs(), dayjs()],
+                startDate: initialDate ? dayjs(initialDate) : dayjs(),
+                durationValue: 1,
+                durationUnit: "week",
                 assignType: "Daily",
                 daysOfWeek: [1, 2, 3, 4, 5, 6], // Default T2 -> T7
             });
@@ -48,11 +50,14 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
     }, [open, dispatch, initialDate, initialEmployeeId, form]);
 
     const onFinish = (values: any) => {
+        const { startDate, durationValue, durationUnit } = values;
+        const endDate = startDate.add(durationValue, durationUnit).subtract(1, 'day');
+
         const data: AssignShiftDto = {
             employeeId: values.employeeId,
             shiftId: values.shiftId,
-            startDate: values.dateRange[0].format("YYYY-MM-DD"),
-            endDate: values.dateRange[1].format("YYYY-MM-DD"),
+            startDate: startDate.format("YYYY-MM-DD"),
+            endDate: endDate.format("YYYY-MM-DD"),
             assignType: values.assignType,
             daysOfWeek: values.assignType === "Weekly" ? values.daysOfWeek : undefined,
         };
@@ -78,7 +83,7 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
             onCancel={onCancel}
             onOk={() => form.submit()}
             centered
-            width={600}
+            width={800}
         >
             <Form
                 form={form}
@@ -114,13 +119,35 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
                     </Form.Item>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                     <Form.Item
-                        name="dateRange"
-                        label="Giai đoạn phân ca"
-                        rules={[{ required: true, message: "Vui lòng chọn khoảng ngày" }]}
+                        name="startDate"
+                        label="Ngày bắt đầu"
+                        rules={[{ required: true, message: "Vui lòng chọn ngày bắt đầu" }]}
                     >
-                        <RangePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+                        <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="durationValue"
+                        label="Số lượng"
+                        rules={[{ required: true, message: "Nhập số lượng" }]}
+                    >
+                        <InputNumber min={1} style={{ width: "100%" }} placeholder="VD: 1, 2, 3..." />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="durationUnit"
+                        label="Đơn vị"
+                        rules={[{ required: true }]}
+                    >
+                        <Select
+                            options={[
+                                { label: "Tuần", value: "week" },
+                                { label: "Tháng", value: "month" },
+                                { label: "Năm", value: "year" },
+                            ]}
+                        />
                     </Form.Item>
 
                     <Form.Item
@@ -131,8 +158,8 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
                         <Select 
                             onChange={(val) => setAssignType(val)}
                             options={[
-                                { label: "Tất cả các ngày (Daily)", value: "Daily" },
-                                { label: "Theo các thứ trong tuần (Weekly)", value: "Weekly" },
+                                { label: "Hàng ngày (Daily)", value: "Daily" },
+                                { label: "Theo tuần (Weekly)", value: "Weekly" },
                             ]}
                         />
                     </Form.Item>
@@ -141,7 +168,7 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
                 {assignType === "Weekly" && (
                     <Form.Item
                         name="daysOfWeek"
-                        label="Các ngày được gán (Nếu chọn Weekly)"
+                        label="Các ngày được gán trong tuần"
                         rules={[{ required: true, message: "Vui lòng chọn ít nhất một thứ" }]}
                     >
                         <Checkbox.Group options={DAYS_OF_WEEK} />

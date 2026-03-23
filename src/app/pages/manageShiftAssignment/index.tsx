@@ -41,18 +41,20 @@ const ManageShiftAssignment = () => {
     const columns = [
         {
             title: "Nhân viên",
-            dataIndex: "employeeName",
             key: "employeeName",
             width: 250,
-            render: (name: string, record: IShiftAssignment) => (
-                <Space>
-                    <Avatar icon={<UserOutlined />} className="bg-indigo-100 text-indigo-600" />
-                    <div>
-                        <div className="font-semibold text-gray-800">{name}</div>
-                        <div className="text-xs text-gray-400">ID: {record.employeeId}</div>
-                    </div>
-                </Space>
-            )
+            render: (_: any, record: IShiftAssignment) => {
+                const employee = employees.find(e => e.employeeId === record.employeeId);
+                const name = employee ? employee.fullName : record.employeeName || "N/A";
+                return (
+                    <Space>
+                        <Avatar icon={<UserOutlined />} className="bg-indigo-100 text-indigo-600" />
+                        <div>
+                            <div className="font-semibold text-gray-800">{name}</div>
+                        </div>
+                    </Space>
+                );
+            }
         },
         {
             title: "Phân ca cho ngày",
