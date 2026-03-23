@@ -9,6 +9,7 @@ import {
     BankOutlined,
     SolutionOutlined,
     ClockCircleOutlined,
+    CalendarOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -33,10 +34,12 @@ const Sidebar = () => {
             { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
-
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
             { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
+            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
+            { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -46,7 +49,6 @@ const Sidebar = () => {
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
         [EUserRole.EMPLOYEE]: [
-            { key: URL.DashboardEmployee, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
         ],
@@ -58,6 +60,8 @@ const Sidebar = () => {
             { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
             { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
+            { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
         ],
     };
 

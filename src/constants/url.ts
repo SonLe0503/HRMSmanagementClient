@@ -5,7 +5,6 @@ const URL = {
     Login: "/login",
     DashboardAdmin: "/dashboard/admin",
     DashboardManage: "/dashboard/manage",
-    DashboardEmployee: "/dashboard/employee",
     DashboardHR: "/dashboard/hr",
     DashboardStaff: "/dashboard/staff",
     DashboardPurchase: "/dashboard/purchase",
@@ -25,6 +24,8 @@ const URL = {
     MyAttendance: "/attendance/my",
     ManageAttendance: "/attendance/manage",
     ManageHRProcedure: "/hr/manage-procedure",
+    ManageShift: "/hr/manage-shift",
+    ManageShiftAssignment: "/hr/manage-shift-assignment",
 }
 
 export default URL

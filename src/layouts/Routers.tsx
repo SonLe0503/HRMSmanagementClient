@@ -9,7 +9,6 @@ import DefaultLayout from "./DefaultLayout"
 
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
-const DashboardEmployee = lazy(() => import("../app/pages/dashboard/DashboardEmployee"))
 const DashboardHR = lazy(() => import("../app/pages/dashboard/DashboardHR"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const ManageUser = lazy(() => import("../app/pages/manageAccount"))
@@ -26,6 +25,8 @@ const ManageDepartment = lazy(() => import("../app/pages/manageDepartment"));
 const DepartmentDetail = lazy(() => import("../app/pages/manageDepartment/DepartmentDetail"));
 const ManagePosition = lazy(() => import("../app/pages/managePosition"));
 const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
+const ManageShift = lazy(() => import("../app/pages/manageShift"));
+const ManageShiftAssignment = lazy(() => import("../app/pages/manageShiftAssignment"));
 
 const shareResourceItem = [
     {
@@ -39,12 +40,6 @@ const privateResourceItem = [
     {
         key: URL.DashboardAdmin,
         element: <DashboardAdmin />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardEmployee,
-        element: <DashboardEmployee />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -130,6 +125,18 @@ const privateResourceItem = [
     {
         key: URL.ManageHRProcedure,
         element: <ManageHRProcedure />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageShift,
+        element: <ManageShift />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageShiftAssignment,
+        element: <ManageShiftAssignment />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

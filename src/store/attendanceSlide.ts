@@ -9,6 +9,7 @@ export interface CheckInRequestDto {
     deviceInfo?: string;
     ipAddress?: string;
     remarks?: string;
+    faceImageBase64?: string;
 }
 
 export interface CheckOutRequestDto {
@@ -16,6 +17,7 @@ export interface CheckOutRequestDto {
     deviceInfo?: string;
     ipAddress?: string;
     remarks?: string;
+    faceImageBase64?: string;
 }
 
 export interface AttendanceResponseDto {
@@ -85,9 +87,6 @@ interface IAttendanceState {
     loading: boolean;
     error: string | null;
     successMessage: string | null;
-    
-    // Legacy support for older components mock
-    schedules: any[]; 
 }
 
 const initialState: IAttendanceState = {
@@ -99,7 +98,6 @@ const initialState: IAttendanceState = {
     loading: false,
     error: null,
     successMessage: null,
-    schedules: [],
 };
 
 // ── Thunks: Employee ───────────────────────────────────────────────────────────────────
@@ -156,6 +154,25 @@ export const fetchMyToday = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Lỗi lấy dữ liệu chấm công hôm nay");
+        }
+    }
+);
+
+export const registerFace = createAsyncThunk(
+    "attendance/registerFace",
+    async (dto: { referenceImageBase64: string }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: "/Face/register",
+                method: "POST",
+                data: dto,
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi đăng ký khuôn mặt");
         }
     }
 );
@@ -330,25 +347,6 @@ export const fetchAttendanceLogs = createAsyncThunk(
     }
 );
 
-// MOCK: Weekly Schedule fetching (for ShiftSchedules UI compatibility currently)
-export const fetchWeeklySchedule = createAsyncThunk(
-    "attendance/fetchWeeklySchedule",
-    async (_employeeId: number | undefined) => {
-        // Return dummy data since API is not present yet
-        return [];
-    }
-);
-
-export const assignShift = createAsyncThunk(
-    "attendance/assignShift",
-    async (data: any) => { return data; }
-);
-
-export const updateAssignment = createAsyncThunk(
-    "attendance/updateAssignment",
-    async (data: { id: number; dto: any }) => { return data.dto; }
-);
-
 
 // ── Slice ─────────────────────────────────────────────────────────────────────
 
@@ -436,11 +434,6 @@ export const attendanceSlice = createSlice({
                 state.logs = action.payload;
             })
             
-            // Compatibility
-            .addCase(fetchWeeklySchedule.fulfilled, (state, action) => {
-                state.loading = false;
-                state.schedules = action.payload;
-            })
 
             // Common State matchers (only handles the common async actions, specific thunks have logic above)
             .addMatcher(isPending, (state) => {
@@ -486,8 +479,6 @@ export const selectAttendanceLoading = (state: RootState) => state.attendance.lo
 export const selectAttendanceError = (state: RootState) => state.attendance.error;
 export const selectAttendanceSuccess = (state: RootState) => state.attendance.successMessage;
 
-// Legacy support
-export const selectSchedules = (state: RootState) => state.attendance.schedules;
 export const selectAdminAttendance = (state: RootState) => state.attendance.records; 
 export const fetchAdminAttendance = searchAttendance;
 

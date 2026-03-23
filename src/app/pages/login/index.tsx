@@ -37,11 +37,11 @@ const LoginPage = () => {
             const role = infoLogin.role;
             const routes = {
                 [EUserRole.ADMIN]: URL.DashboardAdmin,
-                [EUserRole.EMPLOYEE]: URL.DashboardEmployee,
+                [EUserRole.EMPLOYEE]: URL.MyAttendance,
                 [EUserRole.MANAGE]: URL.DashboardManage,
                 [EUserRole.HR]: URL.DashboardHR,
             };
-            navigate(routes[role as keyof typeof routes] || URL.DashboardEmployee);
+            navigate(routes[role as keyof typeof routes] || URL.MyAttendance);
         }
     }, [infoLogin, navigate]);
 
