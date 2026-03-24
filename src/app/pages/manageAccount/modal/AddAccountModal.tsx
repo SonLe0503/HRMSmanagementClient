@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { Modal, Form, Input, Select, Switch, message } from "antd";
+import { Modal, Form, Input, Select, message } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { createUser, selectUserLoading } from "../../../../store/userSlide";
+import { createUser, selectUserLoading, fetchAllUsers, selectUsers } from "../../../../store/userSlide";
 import { selectRoles } from "../../../../store/roleSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
 
@@ -16,14 +16,19 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
     const dispatch = useAppDispatch();
     const roles = useAppSelector(selectRoles);
     const employees = useAppSelector(selectEmployees);
+    const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectUserLoading);
 
     useEffect(() => {
-        if (open && employees.length === 0) {
+        if (open) {
             dispatch(fetchAllEmployees());
+            dispatch(fetchAllUsers());
         }
-    }, [open, employees.length, dispatch]);
+    }, [open, dispatch]);
 
+    const availableEmployees = employees.filter(
+        emp => !users.some(user => user.employeeId === emp.employeeId)
+    );
     const onFinish = (values: any) => {
         dispatch(createUser(values)).then((res: any) => {
             if (!res.error) {
@@ -54,16 +59,7 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
                 form={form}
                 layout="vertical"
                 onFinish={onFinish}
-                initialValues={{ isActive: true }}
             >
-                <Form.Item
-                    name="username"
-                    label="Username"
-                    rules={[{ required: true, message: "Please input the username!" }]}
-                >
-                    <Input />
-                </Form.Item>
-
                 <Form.Item
                     name="employeeId"
                     label="Employee"
@@ -74,13 +70,13 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
                         placeholder="Select an employee"
                         optionFilterProp="children"
                         onChange={(value) => {
-                            const emp = employees.find(e => e.employeeId === value);
+                            const emp = availableEmployees.find(e => e.employeeId === value);
                             if (emp) {
                                 form.setFieldsValue({ email: emp.email });
                             }
                         }}
                     >
-                        {employees.map((emp) => (
+                        {availableEmployees.map((emp) => (
                             <Select.Option key={emp.employeeId} value={emp.employeeId}>
                                 {emp.fullName} ({emp.employeeCode})
                             </Select.Option>
@@ -96,7 +92,7 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
                         { type: "email", message: "Please enter a valid email!" },
                     ]}
                 >
-                    <Input disabled placeholder="Email will be auto-filled" />
+                    <Input placeholder="Email for account information" />
                 </Form.Item>
 
                 <Form.Item
@@ -111,10 +107,6 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
                             </Select.Option>
                         ))}
                     </Select>
-                </Form.Item>
-
-                <Form.Item name="isActive" label="Active Status" valuePropName="checked">
-                    <Switch />
                 </Form.Item>
             </Form>
         </Modal>

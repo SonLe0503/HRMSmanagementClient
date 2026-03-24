@@ -9,6 +9,7 @@ import { EUserRole } from '../../../interface/app';
 import URL from '../../../constants/url';
 import { handleError } from '../../../utils/common';
 import { motion } from 'framer-motion';
+import ForgotPasswordModal from '../auth/ForgotPasswordModal';
 
 const { Title, Text } = Typography;
 
@@ -17,6 +18,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
     const [loading, setLoading] = useState(false);
+    const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
     const onFinish = async (values: any) => {
         setLoading(true);
@@ -141,7 +143,10 @@ const LoginPage = () => {
                             </Form.Item>
 
                             <div className="flex justify-end mb-10">
-                                <Text className="text-xs font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors px-1">
+                                <Text 
+                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors px-1"
+                                    onClick={() => setIsForgotPasswordOpen(true)}
+                                >
                                     QUÊN MẬT KHẨU?
                                 </Text>
                             </div>
@@ -169,6 +174,11 @@ const LoginPage = () => {
                         </Text>
                     </div>
                 </motion.div>
+
+                <ForgotPasswordModal 
+                    open={isForgotPasswordOpen}
+                    onCancel={() => setIsForgotPasswordOpen(false)}
+                />
             </div>
         </ConfigProvider>
     );
