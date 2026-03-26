@@ -51,6 +51,7 @@ const Sidebar = () => {
         [EUserRole.EMPLOYEE]: [
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -89,7 +90,7 @@ const Sidebar = () => {
                         className="border-r-0 flex-1"
                         items={
                             role
-                                ? (menuByRole[role] || []).map((item: any) => ({
+                                ? (menuByRole[role as EUserRole] || []).map((item: any) => ({
                                     ...item,
                                     label: collapsed ? null : item.label,
                                 }))
