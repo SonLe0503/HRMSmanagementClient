@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker, InputNumber, message, Row, Col } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { updateEmployee, fetchAllEmployees, selectEmployeeLoading } from "../../../../store/employeeSlide";
+import { updateEmployee, fetchAllEmployees, selectEmployeeLoading, selectEmployees } from "../../../../store/employeeSlide";
 import type { IEmployeeDetail } from "../../../../store/employeeSlide";
 import { selectInfoLogin } from "../../../../store/authSlide";
 import { fetchActiveDepartments, selectActiveDepartments } from "../../../../store/departmentSlide";
 import { fetchActivePositions, selectActivePositions } from "../../../../store/positionSlide";
+import { fetchAllUsers, selectUsers } from "../../../../store/userSlide";
+import { EUserRole } from "../../../../interface/app";
 import dayjs from "dayjs";
 
 interface EditEmployeeModalProps {
@@ -27,12 +29,16 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
     const infoLogin = useAppSelector(selectInfoLogin);
     const activeDepartments = useAppSelector(selectActiveDepartments);
     const activePositions = useAppSelector(selectActivePositions);
+    const employees = useAppSelector(selectEmployees);
+    const users = useAppSelector(selectUsers);
 
     // Fetch danh sách phòng ban & chức vụ đang active khi modal mở
     useEffect(() => {
         if (open) {
             dispatch(fetchActiveDepartments());
             dispatch(fetchActivePositions());
+            dispatch(fetchAllEmployees());
+            dispatch(fetchAllUsers());
         }
     }, [open, dispatch]);
 
@@ -45,6 +51,18 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
         label: p.positionName,
         value: p.positionId,
     }));
+
+    // Lọc danh sách quản lý: Những nhân viên có role là MANAGE hoặc ADMIN
+    const managerUserIds = users
+        .filter(u => u.roles.includes(EUserRole.MANAGE) || u.roles.includes(EUserRole.ADMIN))
+        .map(u => u.employeeId);
+
+    const managerOptions = employees
+        .filter(e => managerUserIds.includes(e.employeeId))
+        .map(e => ({
+            label: `${e.fullName} (${e.employeeCode})`,
+            value: e.employeeId,
+        }));
 
     useEffect(() => {
         if (editingEmployee && open) {
@@ -237,8 +255,16 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
                         </Form.Item>
                     </Col>
                     <Col span={8}>
-                        <Form.Item name="managerId" label="Quản lý (ID)">
-                            <InputNumber style={{ width: "100%" }} min={1} />
+                        <Form.Item name="managerId" label="Quản lý">
+                            <Select
+                                options={managerOptions}
+                                placeholder="Chọn quản lý"
+                                allowClear
+                                showSearch
+                                filterOption={(input, option) =>
+                                    (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
+                                }
+                            />
                         </Form.Item>
                     </Col>
                 </Row>

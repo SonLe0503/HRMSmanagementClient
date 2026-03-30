@@ -114,7 +114,7 @@ const MyLeaveRequestTable = () => {
     return (
         <Table 
             columns={columns} 
-            dataSource={requests} 
+            dataSource={requests || []} 
             loading={loading} 
             rowKey="leaveRequestID"
             pagination={{ pageSize: 10 }}

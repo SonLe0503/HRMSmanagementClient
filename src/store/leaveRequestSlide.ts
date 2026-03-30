@@ -41,8 +41,48 @@ export interface CancelLeaveRequestDto {
   reason: string;
 }
 
+export interface TeamLeaveCalendarDto {
+  leaveRequestId: number;
+  employeeId: number;
+  employeeName: string;
+  leaveTypeId: number;
+  leaveTypeName: string;
+  startDate: string;
+  endDate: string;
+  numberOfDays: number;
+  status: string;
+}
+
+export interface PendingLeaveRequestDto {
+  leaveRequestId: number;
+  requestNumber: string;
+  employeeId: number;
+  employeeName: string;
+  leaveTypeId: number;
+  leaveTypeName: string;
+  startDate: string;
+  endDate: string;
+  numberOfDays: number;
+  reason?: string;
+  status: string;
+  submittedDate: string;
+}
+
+export interface LeaveBalanceDto {
+  leaveTypeId: number;
+  leaveTypeName: string;
+  year: number;
+  totalEntitlement: number;
+  usedDays: number;
+  carriedForward: number;
+  remainingDays: number;
+}
+
 interface ILeaveRequestState {
   myRequests: ILeaveRequest[];
+  pendingRequests: PendingLeaveRequestDto[];
+  teamCalendar: TeamLeaveCalendarDto[];
+  myBalance: LeaveBalanceDto[];
   loading: boolean;
   error: any | null;
   lastResponse: any | null;
@@ -50,6 +90,9 @@ interface ILeaveRequestState {
 
 const initialState: ILeaveRequestState = {
   myRequests: [],
+  pendingRequests: [],
+  teamCalendar: [],
+  myBalance: [],
   loading: false,
   error: null,
   lastResponse: null,
@@ -149,6 +192,42 @@ export const cancelLeaveRequest = createAsyncThunk(
   }
 );
 
+export const fetchTeamLeaveCalendar = createAsyncThunk(
+  "leaveRequest/fetchTeamCalendar",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      const response = await request({
+        url: "/LeaveRequests/team-calendar",
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
+export const fetchPendingLeaveRequests = createAsyncThunk(
+  "leaveRequest/fetchPending",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      const response = await request({
+        url: "/LeaveRequests/pending",
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
 export const leaveRequestSlice = createSlice({
   name: "leaveRequest",
   initialState,
@@ -227,6 +306,32 @@ export const leaveRequestSlice = createSlice({
       .addCase(cancelLeaveRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Fetch Team Calendar
+      .addCase(fetchTeamLeaveCalendar.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTeamLeaveCalendar.fulfilled, (state, action) => {
+        state.loading = false;
+        state.teamCalendar = action.payload.data || action.payload;
+      })
+      .addCase(fetchTeamLeaveCalendar.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Pending Requests
+      .addCase(fetchPendingLeaveRequests.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingLeaveRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.pendingRequests = action.payload.data || action.payload;
+      })
+      .addCase(fetchPendingLeaveRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
@@ -234,8 +339,11 @@ export const leaveRequestSlice = createSlice({
 export const { clearLastResponse, clearError } = leaveRequestSlice.actions;
 
 export const selectMyLeaveRequests = (state: RootState) => state.leaveRequest.myRequests;
+export const selectPendingLeaveRequests = (state: RootState) => state.leaveRequest.pendingRequests;
+export const selectTeamLeaveCalendar = (state: RootState) => state.leaveRequest.teamCalendar;
 export const selectLeaveRequestLoading = (state: RootState) => state.leaveRequest.loading;
 export const selectLeaveRequestError = (state: RootState) => state.leaveRequest.error;
 export const selectLeaveRequestLastResponse = (state: RootState) => state.leaveRequest.lastResponse;
 
 export default leaveRequestSlice.reducer;
+

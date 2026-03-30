@@ -65,7 +65,7 @@ const ForgotPasswordModal = ({ open, onCancel }: ForgotPasswordModalProps) => {
             footer={null}
             centered
             width={450}
-            destroyOnClose
+            destroyOnHidden
             className="forgot-password-modal"
         >
             <div className="py-4">

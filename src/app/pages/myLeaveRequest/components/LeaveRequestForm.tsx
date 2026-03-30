@@ -8,26 +8,26 @@ import {
     selectLeaveRequestLastResponse,
     clearLastResponse
 } from "../../../../store/leaveRequestSlide";
+import { fetchMyBalance } from "../../../../store/leaveBalanceSlide";
+import { fetchActiveLeaveTypes, selectActiveLeaveTypes } from "../../../../store/leaveTypeSlide";
 import dayjs from "dayjs";
 
 const { Option } = Select;
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
-const LeaveTypeOptions = [
-    { label: "Nghỉ phép năm", value: 1 },
-    { label: "Nghỉ bệnh", value: 2 },
-    { label: "Nghỉ không lương", value: 3 },
-    { label: "Nghỉ việc riêng", value: 4 },
-];
-
 const LeaveRequestForm = () => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectLeaveRequestLoading);
     const lastResponse = useAppSelector(selectLeaveRequestLastResponse);
+    const leaveTypes = useAppSelector(selectActiveLeaveTypes);
     const [submitAnywayModal, setSubmitAnywayModal] = useState(false);
     const [formData, setFormData] = useState<any>(null);
+
+    useEffect(() => {
+        dispatch(fetchActiveLeaveTypes());
+    }, [dispatch]);
 
     useEffect(() => {
         if (lastResponse) {
@@ -35,6 +35,7 @@ const LeaveRequestForm = () => {
                 message.success(lastResponse.message);
                 form.resetFields();
                 dispatch(fetchMyLeaveRequests());
+                dispatch(fetchMyBalance());
                 dispatch(clearLastResponse());
             } else if (lastResponse.messageCode === "MSG-27") {
                 // Insufficient balance, show warning modal
@@ -82,13 +83,13 @@ const LeaveRequestForm = () => {
     };
 
     return (
-        <Card title="Đăng ký nghỉ phép" className="shadow-sm border-none">
+        <Card title="Đăng ký nghỉ phép" className="shadow-lg border-none rounded-2xl bg-white/70 backdrop-blur-md">
             <Form form={form} layout="vertical" onFinish={onFinish}>
                 <Form.Item name="leaveTypeID" label="Loại nghỉ phép" rules={[{ required: true, message: 'Vui lòng chọn loại nghỉ phép' }]}>
-                    <Select placeholder="Chọn loại nghỉ phép">
-                        {LeaveTypeOptions.map(item => (
-                            <Option key={item.value} value={item.value}>
-                                {item.label}
+                    <Select placeholder="Chọn loại nghỉ phép" size="large" className="rounded-lg">
+                        {(leaveTypes || []).map(item => (
+                            <Option key={item.leaveTypeId} value={item.leaveTypeId}>
+                                {item.leaveTypeName}
                             </Option>
                         ))}
                     </Select>
@@ -96,21 +97,22 @@ const LeaveRequestForm = () => {
 
                 <Form.Item name="range" label="Thời gian" rules={[{ required: true, message: 'Vui lòng chọn thời gian' }]}>
                     <RangePicker 
-                        className="w-full" 
+                        className="w-full h-12 rounded-lg" 
                         onChange={handleDateChange}
                         disabledDate={(current) => current && current < dayjs().startOf('day')}
+                        size="large"
                     />
                 </Form.Item>
 
                 <Form.Item name="numberOfDays" label="Số ngày nghỉ" rules={[{ required: true, message: 'Vui lòng nhập số ngày' }]}>
-                    <InputNumber min={0.5} step={0.5} className="w-full" />
+                    <InputNumber min={0.5} step={0.5} className="w-full !h-12 flex items-center rounded-lg" size="large" />
                 </Form.Item>
 
                 <Form.Item name="reason" label="Lý do" rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}>
-                    <TextArea rows={3} placeholder="Mô tả lý do nghỉ phép..." />
+                    <TextArea rows={4} placeholder="Mô tả lý do nghỉ phép..." className="rounded-lg" />
                 </Form.Item>
 
-                <Button type="primary" htmlType="submit" block loading={loading}>
+                <Button type="primary" htmlType="submit" block loading={loading} className="h-12 text-md font-bold rounded-xl mt-4 shadow-blue-200 shadow-lg">
                     Gửi yêu cầu
                 </Button>
             </Form>
@@ -125,10 +127,26 @@ const LeaveRequestForm = () => {
                 }}
                 okText="Vẫn gửi"
                 cancelText="Hủy"
+                centered
+                className="rounded-2xl overflow-hidden"
             >
-                <p>Số dư ngày nghỉ của bạn không đủ. Bạn có chắc chắn muốn gửi yêu cầu nghỉ phép này không?</p>
-                <p>Số dư hiện tại: <b>{formData?.currentBalance}</b> ngày</p>
-                <p>Yêu cầu: <b>{formData?.numberOfDays}</b> ngày</p>
+                <div className="py-4 text-center">
+                    <svg className="w-16 h-16 text-yellow-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p className="text-gray-800 text-lg font-medium mb-4">Số dư ngày nghỉ của bạn không đủ.</p>
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-slate-400 text-sm mb-1 uppercase font-bold tracking-wider">Số dư hiện tại</p>
+                            <p className="text-slate-800 text-2xl font-bold">{formData?.currentBalance} <span className="text-sm font-normal text-slate-400">ngày</span></p>
+                        </div>
+                        <div>
+                            <p className="text-slate-400 text-sm mb-1 uppercase font-bold tracking-wider">Yêu cầu</p>
+                            <p className="text-slate-800 text-2xl font-bold">{formData?.numberOfDays} <span className="text-sm font-normal text-slate-400">ngày</span></p>
+                        </div>
+                    </div>
+                    <p className="mt-6 text-slate-500 italic">Bạn có chắc chắn muốn gửi yêu cầu này không?</p>
+                </div>
             </Modal>
         </Card>
     );
