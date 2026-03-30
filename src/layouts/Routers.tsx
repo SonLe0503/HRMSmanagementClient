@@ -30,6 +30,8 @@ const ManageShiftAssignment = lazy(() => import("../app/pages/manageShiftAssignm
 const MyLeaveRequest = lazy(() => import("../app/pages/myLeaveRequest/index"));
 const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/index"));
 const LeaveConfiguration = lazy(() => import("../app/pages/leaveConfiguration/index"));
+const MyOvertimeRequest = lazy(() => import("../app/pages/myOvertimeRequest/index"));
+const ManageOvertimeRequest = lazy(() => import("../app/pages/manageOvertimeRequest/index"));
 
 
 const shareResourceItem = [
@@ -159,6 +161,18 @@ const privateResourceItem = [
     {
         key: URL.LeaveConfiguration,
         element: <LeaveConfiguration />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyOvertimeRequest,
+        element: <MyOvertimeRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageOvertimeRequest,
+        element: <ManageOvertimeRequest />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
