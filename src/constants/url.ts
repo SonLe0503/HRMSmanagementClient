@@ -26,6 +26,9 @@ const URL = {
     ManageHRProcedure: "/hr/manage-procedure",
     ManageShift: "/hr/manage-shift",
     ManageShiftAssignment: "/hr/manage-shift-assignment",
+    MyLeaveRequest: "/leave/my",
+    ManageLeaveRequest: "/leave/manage",
+    LeaveConfiguration: "/leave/configuration",
 }
 
 export default URL

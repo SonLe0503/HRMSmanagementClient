@@ -69,7 +69,7 @@ const FaceRegisterModal: React.FC<FaceRegisterModalProps> = ({ open, onCancel, o
             onCancel={handleCancel}
             footer={null}
             width={520}
-            destroyOnClose
+            destroyOnHidden
         >
             <div className="flex flex-col items-center p-4">
                 <div className="relative w-full max-w-[400px] aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center">

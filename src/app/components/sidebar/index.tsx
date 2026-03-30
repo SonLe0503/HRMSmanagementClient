@@ -40,6 +40,9 @@ const Sidebar = () => {
             { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
             { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
             { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
+            { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -47,10 +50,13 @@ const Sidebar = () => {
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý tài khoản" },
             { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
         ],
         [EUserRole.EMPLOYEE]: [
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -62,6 +68,9 @@ const Sidebar = () => {
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
             { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
+            { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
         ],
     };
 
@@ -89,7 +98,7 @@ const Sidebar = () => {
                         className="border-r-0 flex-1"
                         items={
                             role
-                                ? (menuByRole[role] || []).map((item: any) => ({
+                                ? (menuByRole[role as EUserRole] || []).map((item: any) => ({
                                     ...item,
                                     label: collapsed ? null : item.label,
                                 }))

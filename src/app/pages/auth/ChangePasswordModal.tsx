@@ -41,7 +41,7 @@ const ChangePasswordModal = ({ open, onCancel }: ChangePasswordModalProps) => {
             confirmLoading={loading}
             centered
             width={400}
-            destroyOnClose
+            destroyOnHidden
             className="change-password-modal"
         >
             <Form

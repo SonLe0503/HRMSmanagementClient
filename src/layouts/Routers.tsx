@@ -27,6 +27,10 @@ const ManagePosition = lazy(() => import("../app/pages/managePosition"));
 const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
 const ManageShift = lazy(() => import("../app/pages/manageShift"));
 const ManageShiftAssignment = lazy(() => import("../app/pages/manageShiftAssignment"));
+const MyLeaveRequest = lazy(() => import("../app/pages/myLeaveRequest/index"));
+const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/index"));
+const LeaveConfiguration = lazy(() => import("../app/pages/leaveConfiguration/index"));
+
 
 const shareResourceItem = [
     {
@@ -137,6 +141,24 @@ const privateResourceItem = [
     {
         key: URL.ManageShiftAssignment,
         element: <ManageShiftAssignment />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyLeaveRequest,
+        element: <MyLeaveRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageLeaveRequest,
+        element: <ManageLeaveRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.LeaveConfiguration,
+        element: <LeaveConfiguration />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
