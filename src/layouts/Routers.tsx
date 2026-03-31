@@ -32,6 +32,7 @@ const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/in
 const LeaveConfiguration = lazy(() => import("../app/pages/leaveConfiguration/index"));
 const MyOvertimeRequest = lazy(() => import("../app/pages/myOvertimeRequest/index"));
 const ManageOvertimeRequest = lazy(() => import("../app/pages/manageOvertimeRequest/index"));
+const CompetencyReport = lazy(() => import("../app/pages/competency/CompetencyReport"));
 
 
 const shareResourceItem = [
@@ -173,6 +174,12 @@ const privateResourceItem = [
     {
         key: URL.ManageOvertimeRequest,
         element: <ManageOvertimeRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.CompetencyReport,
+        element: <CompetencyReport />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
