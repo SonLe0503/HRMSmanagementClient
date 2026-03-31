@@ -95,28 +95,30 @@ const Sidebar = () => {
                 transition={{ duration: 0.3 }}
                 className="h-full flex flex-col justify-between"
             >
-                <div>
-                    <div className="h-16 flex items-center justify-center font-bold text-blue-600 text-xl overflow-hidden whitespace-nowrap">
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                    <div className="h-16 flex items-center justify-center font-bold text-blue-600 text-xl overflow-hidden whitespace-nowrap flex-shrink-0">
                         {collapsed ? "HR" : "HR MANAGEMENT"}
                     </div>
-                    <Menu
-                        mode="inline"
-                        selectedKeys={[location.pathname]}
-                        className="border-r-0 flex-1"
-                        items={
-                            role
-                                ? (menuByRole[role as EUserRole] || []).map((item: any) => ({
-                                    ...item,
-                                    label: collapsed ? null : item.label,
-                                }))
-                                : []
-                        }
-                        onClick={({ key }) => {
-                            if (key.startsWith("/")) {
-                                navigate(key);
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden sidebar-menu-scroll">
+                        <Menu
+                            mode="inline"
+                            selectedKeys={[location.pathname]}
+                            className="border-r-0"
+                            items={
+                                role
+                                    ? (menuByRole[role as EUserRole] || []).map((item: any) => ({
+                                        ...item,
+                                        label: collapsed ? null : item.label,
+                                    }))
+                                    : []
                             }
-                        }}
-                    />
+                            onClick={({ key }) => {
+                                if (key.startsWith("/")) {
+                                    navigate(key);
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
                 <div className="flex justify-center items-center p-3 border-t border-gray-100">
                     <button

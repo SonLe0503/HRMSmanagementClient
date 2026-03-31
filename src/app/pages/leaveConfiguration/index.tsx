@@ -357,7 +357,7 @@ const LeaveConfiguration = () => {
                     </Col>
 
                     <Col xs={24} xl={16}>
-                        <Space direction="vertical" size={24} className="w-full">
+                        <Space orientation="vertical" size={24} className="w-full">
                             <Card 
                                 title={
                                     <Space>
