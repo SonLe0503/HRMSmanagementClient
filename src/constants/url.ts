@@ -31,11 +31,6 @@ const URL = {
     LeaveConfiguration: "/leave/configuration",
     MyOvertimeRequest: "/overtime/my",
     ManageOvertimeRequest: "/overtime/manage",
-    PerformanceTemplates: "/performance/templates",
-    PerformanceCycles: "/performance/cycles",
-    EvaluatorAssignments: "/performance/assignments",
-    EvaluationList: "/performance/evaluations",
-    PerformanceCriteria: "/performance/templates/:templateId/criteria",
 }
 
 export default URL
