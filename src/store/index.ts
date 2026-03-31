@@ -20,6 +20,7 @@ import leaveTypeSlide from "./leaveTypeSlide";
 import leaveBalanceSlide from "./leaveBalanceSlide";
 import overtimeSlide from "./overtimeSlide";
 import exportSlide from "./exportSlide";
+import workforceAnalyticsSlide from "./workforceAnalyticsSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -47,6 +48,7 @@ const reducers = {
   leaveBalance: leaveBalanceSlide,
   overtime: overtimeSlide,
   export: exportSlide,
+  workforceAnalytics: workforceAnalyticsSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({
