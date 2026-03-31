@@ -10,6 +10,7 @@ import {
     SolutionOutlined,
     ClockCircleOutlined,
     CalendarOutlined,
+    PieChartOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -45,6 +46,7 @@ const Sidebar = () => {
             { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -57,6 +59,7 @@ const Sidebar = () => {
             { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
         ],
         [EUserRole.EMPLOYEE]: [
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },

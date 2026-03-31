@@ -31,6 +31,7 @@ const URL = {
     LeaveConfiguration: "/leave/configuration",
     MyOvertimeRequest: "/overtime/my",
     ManageOvertimeRequest: "/overtime/manage",
+    CompetencyReport: "/competency/report",
 }
 
 export default URL
