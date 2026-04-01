@@ -110,14 +110,32 @@ export const updateShift = createAsyncThunk(
     }
 );
 
-export const toggleShiftActive = createAsyncThunk(
-    "shift/toggleActive",
+export const deactivateShift = createAsyncThunk(
+    "shift/deactivate",
     async (id: number, { rejectWithValue, getState }) => {
         try {
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
-                url: `/Shifts/${id}/toggle-active`,
+                url: `/Shifts/${id}/deactivate`,
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { id, message: response.data.message };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
+export const activateShift = createAsyncThunk(
+    "shift/activate",
+    async (id: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Shifts/${id}/activate`,
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -160,11 +178,18 @@ export const shiftSlice = createSlice({
             .addCase(updateShift.fulfilled, (state) => { state.loading = false; })
             .addCase(updateShift.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
 
-            .addCase(toggleShiftActive.fulfilled, (state, action) => {
+            .addCase(deactivateShift.fulfilled, (state, action) => {
                 const shift = state.shifts.find(s => s.shiftId === action.payload.id);
-                if (shift) shift.isActive = !shift.isActive;
+                if (shift) shift.isActive = false;
                 if (state.selectedShift && state.selectedShift.shiftId === action.payload.id) {
-                    state.selectedShift.isActive = !state.selectedShift.isActive;
+                    state.selectedShift.isActive = false;
+                }
+            })
+            .addCase(activateShift.fulfilled, (state, action) => {
+                const shift = state.shifts.find(s => s.shiftId === action.payload.id);
+                if (shift) shift.isActive = true;
+                if (state.selectedShift && state.selectedShift.shiftId === action.payload.id) {
+                    state.selectedShift.isActive = true;
                 }
             });
     },
