@@ -222,23 +222,6 @@ const ManageShift = () => {
                 shift={selectedShift}
             />
 
-            <style>{`
-                .shift-table .ant-table-thead > tr > th {
-                    background-color: #f8fafc;
-                    color: #475569;
-                    font-weight: 600;
-                    border-bottom: 2px solid #f1f5f9;
-                }
-                .shift-table .ant-table-row:hover {
-                    cursor: default;
-                }
-                .custom-search .ant-input-wrapper .ant-input {
-                    border-radius: 8px 0 0 8px;
-                }
-                .custom-search .ant-input-group-addon .ant-btn {
-                    border-radius: 0 8px 8px 0 !important;
-                }
-            `}</style>
         </div>
     );
 };
