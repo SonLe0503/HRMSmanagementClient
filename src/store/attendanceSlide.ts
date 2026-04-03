@@ -109,7 +109,7 @@ export const checkIn = createAsyncThunk(
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
-                url: "/Attendance/check-in",
+                url: "/attendance/face-checkin",
                 method: "POST",
                 data: dto,
                 headers: { Authorization: `Bearer ${token}` }
@@ -128,7 +128,7 @@ export const checkOut = createAsyncThunk(
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
-                url: "/Attendance/check-out",
+                url: "/attendance/face-checkout",
                 method: "POST",
                 data: dto,
                 headers: { Authorization: `Bearer ${token}` }
