@@ -109,7 +109,7 @@ export const checkIn = createAsyncThunk(
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
-                url: "/attendance/face-checkin",
+                url: "/Attendance/checkin",
                 method: "POST",
                 data: dto,
                 headers: { Authorization: `Bearer ${token}` }
@@ -128,7 +128,7 @@ export const checkOut = createAsyncThunk(
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
-                url: "/attendance/face-checkout",
+                url: "/Attendance/checkout",
                 method: "POST",
                 data: dto,
                 headers: { Authorization: `Bearer ${token}` }
@@ -154,6 +154,24 @@ export const fetchMyToday = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Lỗi lấy dữ liệu chấm công hôm nay");
+        }
+    }
+);
+
+export const checkFaceRegistration = createAsyncThunk(
+    "attendance/checkFaceRegistration",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: "/Face/check-registration",
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi kiểm tra trạng thái đăng ký");
         }
     }
 );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spin, Tooltip } from "antd";
+import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spin, Tooltip, Modal } from "antd";
 import { CheckCircleOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading } from "../../../../store/attendanceSlide";
+import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading, checkFaceRegistration } from "../../../../store/attendanceSlide";
 import dayjs from "dayjs";
 import FaceRegisterModal from "../modal/FaceRegisterModal";
 import CameraCaptureModal from "../modal/CameraCaptureModal";
@@ -22,6 +22,25 @@ const AttendanceTodayCard = () => {
     useEffect(() => {
         dispatch(fetchMyToday());
     }, [dispatch]);
+
+    const handleOpenFaceRegister = async () => {
+        try {
+            const res = await dispatch(checkFaceRegistration()).unwrap();
+            if (res.isRegistered) {
+                Modal.confirm({
+                    title: 'Đã có dữ liệu khuôn mặt',
+                    content: 'Bạn đã đăng ký khuôn mặt trên hệ thống. Bạn có muốn chụp lại để cập nhật mới không?',
+                    okText: 'Cập nhật',
+                    cancelText: 'Huỷ',
+                    onOk: () => setFaceRegisterOpen(true)
+                });
+            } else {
+                setFaceRegisterOpen(true);
+            }
+        } catch (error) {
+            setFaceRegisterOpen(true);
+        }
+    };
 
     const handleCheckInCapture = async (faceImage: string) => {
         try {
@@ -79,7 +98,7 @@ const AttendanceTodayCard = () => {
                             <Button 
                                 type="text" 
                                 icon={<UserOutlined />} 
-                                onClick={() => setFaceRegisterOpen(true)}
+                                onClick={handleOpenFaceRegister}
                                 size="small"
                                 className="flex items-center"
                             >
@@ -138,7 +157,7 @@ const AttendanceTodayCard = () => {
                             size="large"
                             icon={<CheckCircleOutlined />}
                             onClick={() => setCheckInOpen(true)}
-                            disabled={hasCheckedIn || loading}
+                            disabled={loading}
                             className="bg-green-600 hover:bg-green-700"
                         >
                             Face Check In
@@ -149,7 +168,7 @@ const AttendanceTodayCard = () => {
                             size="large"
                             icon={<LogoutOutlined />}
                             onClick={() => setCheckOutOpen(true)}
-                            disabled={!hasCheckedIn || hasCheckedOut || loading}
+                            disabled={!hasCheckedIn || loading}
                         >
                             Face Check Out
                         </Button>
