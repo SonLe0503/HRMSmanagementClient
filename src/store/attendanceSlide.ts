@@ -8,6 +8,8 @@ export interface CheckInRequestDto {
     location?: string;
     deviceInfo?: string;
     ipAddress?: string;
+    latitude?: number;
+    longitude?: number;
     remarks?: string;
     faceImageBase64?: string;
 }
@@ -16,6 +18,8 @@ export interface CheckOutRequestDto {
     location?: string;
     deviceInfo?: string;
     ipAddress?: string;
+    latitude?: number;
+    longitude?: number;
     remarks?: string;
     faceImageBase64?: string;
 }

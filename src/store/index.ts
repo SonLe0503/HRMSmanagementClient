@@ -19,6 +19,7 @@ import leaveRequestSlide from "./leaveRequestSlide";
 import leaveTypeSlide from "./leaveTypeSlide";
 import leaveBalanceSlide from "./leaveBalanceSlide";
 import overtimeSlide from "./overtimeSlide";
+import systemSettingSlide from "./systemSettingSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -45,6 +46,7 @@ const reducers = {
   leaveType: leaveTypeSlide,
   leaveBalance: leaveBalanceSlide,
   overtime: overtimeSlide,
+  systemSetting: systemSettingSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

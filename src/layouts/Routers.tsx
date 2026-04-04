@@ -32,6 +32,7 @@ const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/in
 const LeaveConfiguration = lazy(() => import("../app/pages/leaveConfiguration/index"));
 const MyOvertimeRequest = lazy(() => import("../app/pages/myOvertimeRequest/index"));
 const ManageOvertimeRequest = lazy(() => import("../app/pages/manageOvertimeRequest/index"));
+const ManageSystemSettings = lazy(() => import("../app/pages/manageSystemSettings/index"));
 
 
 const shareResourceItem = [
@@ -173,6 +174,12 @@ const privateResourceItem = [
     {
         key: URL.ManageOvertimeRequest,
         element: <ManageOvertimeRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageSystemSettings,
+        element: <ManageSystemSettings />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
