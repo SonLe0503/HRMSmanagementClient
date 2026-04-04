@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Modal, Button, Space, Typography, Spin } from "antd";
 import Webcam from "react-webcam";
 import { CameraOutlined, RetweetOutlined, CheckCircleOutlined } from "@ant-design/icons";
@@ -23,6 +23,13 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
     const webcamRef = useRef<Webcam>(null);
     const [image, setImage] = useState<string | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            setImage(null);
+            setIsCameraReady(false);
+        }
+    }, [open]);
 
     const capture = useCallback(() => {
         const imageSrc = webcamRef.current?.getScreenshot();
