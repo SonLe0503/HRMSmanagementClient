@@ -6,7 +6,9 @@ import {
     fetchMyLeaveRequests,
     selectLeaveRequestLoading, 
     selectLeaveRequestLastResponse,
-    clearLastResponse
+    selectLeaveRequestError,
+    clearLastResponse,
+    clearError
 } from "../../../../store/leaveRequestSlide";
 import { fetchMyBalance } from "../../../../store/leaveBalanceSlide";
 import { fetchActiveLeaveTypes, selectActiveLeaveTypes } from "../../../../store/leaveTypeSlide";
@@ -21,6 +23,7 @@ const LeaveRequestForm = () => {
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectLeaveRequestLoading);
     const lastResponse = useAppSelector(selectLeaveRequestLastResponse);
+    const error = useAppSelector(selectLeaveRequestError);
     const leaveTypes = useAppSelector(selectActiveLeaveTypes);
     const [submitAnywayModal, setSubmitAnywayModal] = useState(false);
     const [formData, setFormData] = useState<any>(null);
@@ -47,6 +50,13 @@ const LeaveRequestForm = () => {
             }
         }
     }, [lastResponse, form, dispatch]);
+    
+    useEffect(() => {
+        if (error) {
+            message.error(error.message || "Đã có lỗi xảy ra khi gửi yêu cầu.");
+            dispatch(clearError());
+        }
+    }, [error, dispatch]);
 
     const onFinish = (values: any) => {
         const payload = {
@@ -89,7 +99,7 @@ const LeaveRequestForm = () => {
                     <Select placeholder="Chọn loại nghỉ phép" size="large" className="rounded-lg">
                         {(leaveTypes || []).map(item => (
                             <Option key={item.leaveTypeId} value={item.leaveTypeId}>
-                                {item.leaveTypeName}
+                                {item.leaveTypeName} {item.annualEntitlement === 0 ? <span className="text-purple-500 text-xs ml-2">(Sự kiện/Không giới hạn)</span> : ""}
                             </Option>
                         ))}
                     </Select>

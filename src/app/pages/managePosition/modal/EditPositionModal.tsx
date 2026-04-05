@@ -1,4 +1,4 @@
-import { Modal, Form, Input, InputNumber, message } from "antd";
+import { Modal, Form, Input, InputNumber, message, Checkbox } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { updatePosition, selectPositionLoading, fetchPositionById } from "../../../../store/positionSlide";
 import { useEffect } from "react";
@@ -82,6 +82,13 @@ const EditPositionModal = ({ open, onCancel, positionId, initialValues }: EditPo
                     rules={[{ required: true, message: "Please input the level (1-10)!" }]}
                 >
                     <InputNumber min={1} max={10} style={{ width: '100%' }} />
+                </Form.Item>
+
+                <Form.Item
+                    name="isTopLevel"
+                    valuePropName="checked"
+                >
+                    <Checkbox>Is Top-Level Management Position</Checkbox>
                 </Form.Item>
             </Form>
         </Modal>

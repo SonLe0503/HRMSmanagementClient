@@ -30,8 +30,15 @@ const ManageOvertimeRequest = () => {
             title: "Nhân viên",
             key: "employee",
             render: (_: any, record: any) => (
-                <div className="flex flex-col">
-                    <Text className="font-bold text-slate-800">{record.employeeName}</Text>
+                <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                        <Text className="font-bold text-slate-800">{record.employeeName}</Text>
+                        {record.isTopLevel && (
+                            <Tag color="blue" className="rounded-full px-3 m-0 border-blue-100 text-[10px] font-bold uppercase tracking-wider">
+                                Management
+                            </Tag>
+                        )}
+                    </div>
                     <Text type="secondary" className="text-xs">Mã NV: {record.employeeId}</Text>
                 </div>
             ),

@@ -7,6 +7,7 @@ export interface IPositionList {
     positionCode: string;
     positionName: string;
     level: number;
+    isTopLevel: boolean;
     employeeCount: number;
     isActive: boolean;
 }
@@ -17,6 +18,7 @@ export interface IPositionResponse {
     positionName: string;
     description: string | null;
     level: number;
+    isTopLevel: boolean;
     isActive: boolean;
     employeeCount: number;
     createdDate: string;
