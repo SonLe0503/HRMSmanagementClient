@@ -50,6 +50,7 @@ export interface PendingOvertimeRequestDto {
   taskDescription?: string;
   status: string;
   submittedDate: string;
+  isTopLevel: boolean;
 }
 
 interface IOvertimeState {
