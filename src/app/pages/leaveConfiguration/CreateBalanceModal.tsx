@@ -60,7 +60,7 @@ const CreateBalanceModal = ({ visible, onClose }: CreateBalanceModalProps) => {
             cancelText="Hủy"
         >
             <Alert 
-                message="Lưu ý: Bạn nên khởi tạo số dư trước khi thực hiện điều chỉnh hoặc đăng ký nghỉ phép nếu hệ thống báo không tìm thấy số dư."
+                title="Lưu ý: Bạn nên khởi tạo số dư trước khi thực hiện điều chỉnh hoặc đăng ký nghỉ phép nếu hệ thống báo không tìm thấy số dư."
                 type="info"
                 showIcon
                 className="mb-6 rounded-xl"

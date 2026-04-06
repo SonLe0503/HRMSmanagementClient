@@ -80,7 +80,7 @@ const ForgotPasswordModal = ({ open, onCancel }: ForgotPasswordModalProps) => {
                 />
 
                 {currentStep === 0 ? (
-                    <Form layout="vertical" onFinish={handleSendOtp} requiredMark={false}>
+                    <Form form={form} layout="vertical" onFinish={handleSendOtp} requiredMark={false}>
                         <div className="mb-6 text-gray-500 text-sm">
                             Nhập Email hoặc Tên tài khoản của bạn để nhận mã xác thực OTP.
                         </div>

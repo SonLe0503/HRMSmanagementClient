@@ -160,14 +160,14 @@ const AttendanceTodayCard = () => {
                             <Statistic
                                 title="Check-in time"
                                 value={attendance?.checkInTime ? dayjs(attendance.checkInTime).format("HH:mm:ss") : "--:--:--"}
-                                valueStyle={{ color: hasCheckedIn ? '#3f8600' : '#cf1322' }}
+                                styles={{ content: { color: hasCheckedIn ? '#3f8600' : '#cf1322' } }}
                             />
                         </Col>
                         <Col xs={24} sm={12} md={12}>
                             <Statistic
                                 title="Check-out time"
                                 value={attendance?.checkOutTime ? dayjs(attendance.checkOutTime).format("HH:mm:ss") : "--:--:--"}
-                                valueStyle={{ color: hasCheckedOut ? '#3f8600' : '#888' }}
+                                styles={{ content: { color: hasCheckedOut ? '#3f8600' : '#888' } }}
                             />
                         </Col>
                         <Col xs={24} sm={12} md={12}>
