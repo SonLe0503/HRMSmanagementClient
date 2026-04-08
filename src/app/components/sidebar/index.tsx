@@ -46,6 +46,10 @@ const Sidebar = () => {
             { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
+            { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
+            { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
             { key: URL.ManageSystemSettings, icon: <SettingOutlined />, label: "Cấu hình hệ thống" },
         ],
         [EUserRole.MANAGE]: [
@@ -59,12 +63,14 @@ const Sidebar = () => {
             { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
         ],
         [EUserRole.EMPLOYEE]: [
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá của tôi" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -80,6 +86,10 @@ const Sidebar = () => {
             { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
             { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
+            { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
+            { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
         ],
     };
 
