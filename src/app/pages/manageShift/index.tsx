@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Card, Space, Input, Switch, message, Tooltip, Typography, Tag } from "antd";
-import { PlusOutlined, EditOutlined, ClockCircleOutlined, SettingOutlined } from "@ant-design/icons";
+import { Table, Button, Card, Space, Input, message, Tooltip, Typography, Tag } from "antd";
+import { PlusOutlined, EditOutlined, ClockCircleOutlined, SettingOutlined, StopOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { fetchAllShifts, selectShifts, selectShiftLoading, toggleShiftActive, type IShift } from "../../../store/shiftSlide";
+import { fetchAllShifts, selectShifts, selectShiftLoading, deactivateShift, activateShift, type IShift } from "../../../store/shiftSlide";
 import AddShiftModal from "./modal/AddShiftModal";
 import EditShiftModal from "./modal/EditShiftModal";
 
@@ -25,10 +25,12 @@ const ManageShift = () => {
 
     const handleToggleStatus = (record: IShift) => {
         setTogglingId(record.shiftId);
-        dispatch(toggleShiftActive(record.shiftId))
+        const action = record.isActive ? deactivateShift(record.shiftId) : activateShift(record.shiftId);
+        
+        dispatch(action)
             .unwrap()
             .then(() => {
-                message.success("Cập nhật trạng thái ca làm việc thành công.");
+                message.success(`${record.isActive ? 'Ngưng sử dụng' : 'Kích hoạt'} ca làm việc thành công.`);
                 dispatch(fetchAllShifts());
             })
             .catch((error: any) => {
@@ -103,28 +105,45 @@ const ManageShift = () => {
             title: "Trạng thái",
             dataIndex: "isActive",
             key: "isActive",
-            width: 100,
-            render: (isActive: boolean, record: IShift) => (
-                 <Switch
-                    loading={togglingId === record.shiftId}
-                    checked={isActive}
-                    onChange={() => handleToggleStatus(record)}
-                 />
+            width: 120,
+            render: (isActive: boolean) => (
+                 <Tag color={isActive ? "success" : "error"} className="px-3 py-1 rounded-full border-none">
+                    {isActive ? "Đang hoạt động" : "Ngưng sử dụng"}
+                 </Tag>
             ),
         },
         {
             title: "Thao tác",
             key: "action",
-            width: 100,
+            width: 150,
             render: (_: any, record: IShift) => (
                 <Space size="middle">
                     <Tooltip title="Chỉnh sửa">
                         <Button 
-                            className="bg-sky-50 text-sky-600 border-sky-100 hover:bg-sky-100"
+                            className="bg-sky-50 text-sky-600 border-sky-100 hover:bg-sky-100 flex items-center justify-center"
                             icon={<EditOutlined />} 
                             onClick={() => handleEdit(record)} 
                         />
                     </Tooltip>
+                    {record.isActive ? (
+                        <Tooltip title="Ngưng sử dụng">
+                            <Button 
+                                className="bg-red-50 text-red-600 border-red-100 hover:bg-red-100 flex items-center justify-center"
+                                icon={<StopOutlined />} 
+                                loading={togglingId === record.shiftId}
+                                onClick={() => handleToggleStatus(record)} 
+                            />
+                        </Tooltip>
+                    ) : (
+                        <Tooltip title="Kích hoạt">
+                            <Button 
+                                className="bg-green-50 text-green-600 border-green-100 hover:bg-green-100 flex items-center justify-center"
+                                icon={<CheckCircleOutlined />} 
+                                loading={togglingId === record.shiftId}
+                                onClick={() => handleToggleStatus(record)} 
+                            />
+                        </Tooltip>
+                    )}
                 </Space>
             ),
         },
@@ -203,23 +222,6 @@ const ManageShift = () => {
                 shift={selectedShift}
             />
 
-            <style>{`
-                .shift-table .ant-table-thead > tr > th {
-                    background-color: #f8fafc;
-                    color: #475569;
-                    font-weight: 600;
-                    border-bottom: 2px solid #f1f5f9;
-                }
-                .shift-table .ant-table-row:hover {
-                    cursor: default;
-                }
-                .custom-search .ant-input-wrapper .ant-input {
-                    border-radius: 8px 0 0 8px;
-                }
-                .custom-search .ant-input-group-addon .ant-btn {
-                    border-radius: 0 8px 8px 0 !important;
-                }
-            `}</style>
         </div>
     );
 };

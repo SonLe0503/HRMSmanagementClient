@@ -27,9 +27,9 @@ const TeamLeaveCalendar = () => {
             <ul className="list-none p-0 m-0 overflow-hidden">
                 {(listData || []).map(item => (
                     <li key={item.leaveRequestId} className="mb-1">
-                        <Tooltip title={`${item.employeeName} (${item.leaveTypeName})`}>
+                        <Tooltip title={`${item.employeeName} (${item.leaveTypeName}${item.isTopLevel ? ' - Management' : ''})`}>
                             <Badge 
-                                status="success" 
+                                status={item.isTopLevel ? "processing" : "success"} 
                                 text={item.employeeName} 
                                 className="text-[10px] whitespace-nowrap overflow-hidden transition-all duration-300 hover:scale-105" 
                             />

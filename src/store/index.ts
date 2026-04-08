@@ -23,6 +23,7 @@ import evaluationTemplateSlide from "./evaluationTemplateSlide";
 import evaluationCriteriaSlide from "./evaluationCriteriaSlide";
 import evaluationCycleSlide from "./evaluationCycleSlide";
 import evaluationSlide from "./evaluationSlide";
+import systemSettingSlide from "./systemSettingSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -53,6 +54,7 @@ const reducers = {
   evaluationCriteria: evaluationCriteriaSlide,
   evaluationCycle: evaluationCycleSlide,
   evaluation: evaluationSlide,
+  systemSetting: systemSettingSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

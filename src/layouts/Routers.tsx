@@ -37,6 +37,7 @@ const PerformanceCriteria = lazy(() => import("../app/pages/performanceEvaluatio
 const PerformanceCycles = lazy(() => import("../app/pages/performanceEvaluation/PerformanceCycles"));
 const EvaluatorAssignments = lazy(() => import("../app/pages/performanceEvaluation/EvaluatorAssignments"));
 const EvaluationList = lazy(() => import("../app/pages/performanceEvaluation/EvaluationList"));
+const ManageSystemSettings = lazy(() => import("../app/pages/manageSystemSettings/index"));
 
 
 const shareResourceItem = [
@@ -208,6 +209,12 @@ const privateResourceItem = [
     {
         key: URL.EvaluationList,
         element: <EvaluationList />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageSystemSettings,
+        element: <ManageSystemSettings />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

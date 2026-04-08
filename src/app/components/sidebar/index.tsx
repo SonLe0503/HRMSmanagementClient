@@ -10,6 +10,7 @@ import {
     SolutionOutlined,
     ClockCircleOutlined,
     CalendarOutlined,
+    SettingOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -49,6 +50,7 @@ const Sidebar = () => {
             { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
             { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
             { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
+            { key: URL.ManageSystemSettings, icon: <SettingOutlined />, label: "Cấu hình hệ thống" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },

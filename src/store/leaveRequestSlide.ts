@@ -51,6 +51,7 @@ export interface TeamLeaveCalendarDto {
   endDate: string;
   numberOfDays: number;
   status: string;
+  isTopLevel: boolean;
 }
 
 export interface PendingLeaveRequestDto {
@@ -66,6 +67,7 @@ export interface PendingLeaveRequestDto {
   reason?: string;
   status: string;
   submittedDate: string;
+  isTopLevel: boolean;
 }
 
 export interface LeaveBalanceDto {

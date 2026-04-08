@@ -36,6 +36,7 @@ const URL = {
     EvaluatorAssignments: "/performance/assignments",
     EvaluationList: "/performance/evaluations",
     PerformanceCriteria: "/performance/templates/:templateId/criteria",
+    ManageSystemSettings: "/admin/system-settings",
 }
 
 export default URL
