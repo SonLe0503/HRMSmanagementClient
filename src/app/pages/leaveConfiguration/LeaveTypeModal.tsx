@@ -23,15 +23,11 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
     const isUnlimited = Form.useWatch('isUnlimited', form);
 
     useEffect(() => {
-        if (visible) {
-            if (editingLeaveType) {
-                form.setFieldsValue({
-                    ...editingLeaveType,
-                    isUnlimited: editingLeaveType.annualEntitlement === 0
-                });
-            } else {
-                form.resetFields();
-            }
+        if (visible && editingLeaveType) {
+            form.setFieldsValue({
+                ...editingLeaveType,
+                isUnlimited: editingLeaveType.annualEntitlement === 0
+            });
         }
     }, [visible, editingLeaveType, form]);
 
@@ -81,6 +77,7 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
             className="rounded-2xl overflow-hidden"
             okText={editingLeaveType ? "Cập nhật" : "Thêm mới"}
             cancelText="Hủy"
+            destroyOnHidden
         >
             <Form 
                 form={form} 
