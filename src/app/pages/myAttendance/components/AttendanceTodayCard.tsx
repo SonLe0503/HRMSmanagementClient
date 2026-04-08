@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spin, Tooltip } from "antd";
+import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spin, Tooltip, Modal } from "antd";
 import { CheckCircleOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading } from "../../../../store/attendanceSlide";
+import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading, checkFaceRegistration } from "../../../../store/attendanceSlide";
 import dayjs from "dayjs";
 import FaceRegisterModal from "../modal/FaceRegisterModal";
 import CameraCaptureModal from "../modal/CameraCaptureModal";
@@ -23,10 +23,49 @@ const AttendanceTodayCard = () => {
         dispatch(fetchMyToday());
     }, [dispatch]);
 
+    const handleOpenFaceRegister = async () => {
+        try {
+            const res = await dispatch(checkFaceRegistration()).unwrap();
+            if (res.isRegistered) {
+                Modal.confirm({
+                    title: 'Đã có dữ liệu khuôn mặt',
+                    content: 'Bạn đã đăng ký khuôn mặt trên hệ thống. Bạn có muốn chụp lại để cập nhật mới không?',
+                    okText: 'Cập nhật',
+                    cancelText: 'Huỷ',
+                    onOk: () => setFaceRegisterOpen(true)
+                });
+            } else {
+                setFaceRegisterOpen(true);
+            }
+        } catch (error) {
+            setFaceRegisterOpen(true);
+        }
+    };
+
     const handleCheckInCapture = async (faceImage: string) => {
         try {
+            let latitude: number | undefined = undefined;
+            let longitude: number | undefined = undefined;
+            
+            try {
+                const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { 
+                        timeout: 10000,
+                        enableHighAccuracy: true 
+                    });
+                });
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+            } catch (geoError) {
+                console.error("Geolocation error:", geoError);
+                message.error("Hệ thống yêu cầu quyền truy cập vị trí GPS để thực hiện điểm danh. Vui lòng cấp quyền trình duyệt.");
+                return;
+            }
+
             await dispatch(checkIn({
-                location: "Tại văn phòng", // In real scenario, would use geolocation
+                location: `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+                latitude,
+                longitude,
                 remarks: "Check-in từ Web Face-ID",
                 faceImageBase64: faceImage,
                 deviceInfo: navigator.userAgent
@@ -35,14 +74,34 @@ const AttendanceTodayCard = () => {
             setCheckInOpen(false);
             dispatch(fetchMyToday());
         } catch (error: any) {
-            message.error(error || "Bạn đã check-in hôm nay rồi");
+            message.error(error || "Check-in thất bại");
         }
     };
 
     const handleCheckOutCapture = async (faceImage: string) => {
         try {
+            let latitude: number | undefined = undefined;
+            let longitude: number | undefined = undefined;
+
+            try {
+                const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { 
+                        timeout: 10000,
+                        enableHighAccuracy: true
+                    });
+                });
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+            } catch (geoError) {
+                console.error("Geolocation error:", geoError);
+                message.error("Hệ thống yêu cầu quyền truy cập vị trí GPS để thực hiện điểm danh. Vui lòng cấp quyền trình duyệt.");
+                return;
+            }
+
             await dispatch(checkOut({
-                location: "Tại văn phòng",
+                location: `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+                latitude,
+                longitude,
                 remarks: "Check-out từ Web Face-ID",
                 faceImageBase64: faceImage,
                 deviceInfo: navigator.userAgent
@@ -79,7 +138,7 @@ const AttendanceTodayCard = () => {
                             <Button 
                                 type="text" 
                                 icon={<UserOutlined />} 
-                                onClick={() => setFaceRegisterOpen(true)}
+                                onClick={handleOpenFaceRegister}
                                 size="small"
                                 className="flex items-center"
                             >
@@ -138,7 +197,7 @@ const AttendanceTodayCard = () => {
                             size="large"
                             icon={<CheckCircleOutlined />}
                             onClick={() => setCheckInOpen(true)}
-                            disabled={hasCheckedIn || loading}
+                            disabled={loading}
                             className="bg-green-600 hover:bg-green-700"
                         >
                             Face Check In
@@ -149,7 +208,7 @@ const AttendanceTodayCard = () => {
                             size="large"
                             icon={<LogoutOutlined />}
                             onClick={() => setCheckOutOpen(true)}
-                            disabled={!hasCheckedIn || hasCheckedOut || loading}
+                            disabled={!hasCheckedIn || loading}
                         >
                             Face Check Out
                         </Button>

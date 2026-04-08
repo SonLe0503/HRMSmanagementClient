@@ -79,7 +79,7 @@ const AttendanceTable = () => {
                 if (status === "Incomplete") color = "blue";
                 
                 return (
-                    <Space direction="vertical" size="small">
+                    <Space orientation="vertical" size="small">
                         <Tag color={color}>{status}</Tag>
                         {record.isManualAdjusted && <Tag color="gold" style={{ fontSize: '10px' }}>Adjusted</Tag>}
                     </Space>

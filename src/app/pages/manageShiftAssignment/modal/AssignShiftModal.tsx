@@ -34,7 +34,7 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
 
     useEffect(() => {
         if (open) {
-            dispatch(fetchAllShifts());
+            dispatch(fetchAllShifts(true));
             dispatch(fetchAllEmployees());
             
             form.setFieldsValue({

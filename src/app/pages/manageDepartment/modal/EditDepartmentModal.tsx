@@ -23,9 +23,14 @@ const EditDepartmentModal = ({ open, onCancel, departmentId, initialValues }: Ed
         if (open) {
             dispatch(fetchActiveDepartments());
             dispatch(fetchAllEmployees());
+        }
+    }, [open, dispatch]);
+
+    useEffect(() => {
+        if (open && initialValues) {
             form.setFieldsValue(initialValues);
         }
-    }, [open, initialValues, form, dispatch]);
+    }, [open, initialValues, form]);
 
     const onFinish = (values: any) => {
         dispatch(updateDepartment({ id: departmentId, data: values })).then((res: any) => {

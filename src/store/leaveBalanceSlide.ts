@@ -44,6 +44,15 @@ export interface AdjustLeaveBalanceDto {
   effectiveDate: string;
 }
 
+export interface GenerateBalanceResultDto {
+  year: number;
+  totalEmployees: number;
+  totalLeaveTypes: number;
+  created: number;
+  skipped: number;
+  carriedForward: number;
+}
+
 interface ILeaveBalanceState {
   myBalances: MyLeaveBalanceDto[];
   allBalances: LeaveBalanceListDto[];
@@ -154,6 +163,24 @@ export const adjustLeaveBalance = createAsyncThunk(
   }
 );
 
+export const generateLeaveBalances = createAsyncThunk(
+  "leaveBalance/generate",
+  async ({ year, carryForward }: { year: number; carryForward: boolean }, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      const response = await request({
+        url: `/LeaveBalances/generate?year=${year}&carryForward=${carryForward}`,
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
 export const leaveBalanceSlice = createSlice({
   name: "leaveBalance",
   initialState,
@@ -231,6 +258,20 @@ export const leaveBalanceSlice = createSlice({
         state.lastResponse = action.payload;
       })
       .addCase(adjustLeaveBalance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Generate Balances
+      .addCase(generateLeaveBalances.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.lastResponse = null;
+      })
+      .addCase(generateLeaveBalances.fulfilled, (state, action) => {
+        state.loading = false;
+        state.lastResponse = action.payload;
+      })
+      .addCase(generateLeaveBalances.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

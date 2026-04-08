@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import { Table, Button, Card, Space, Select, DatePicker, Typography, Tag, Avatar } from "antd";
-import { UserOutlined, PlusOutlined, CalendarOutlined } from "@ant-design/icons";
+import { UserOutlined, PlusOutlined, CalendarOutlined, EditOutlined, DeleteOutlined, StopOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { Table, Button, Card, Space, Select, DatePicker, Typography, Tag, Avatar, Popconfirm, message, Tooltip } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { fetchShiftAssignments, selectAssignments, selectShiftAssignmentLoading, type IShiftAssignment } from "../../../store/shiftAssignmentSlide";
+import { fetchShiftAssignments, selectAssignments, selectShiftAssignmentLoading, deactivateShiftAssignment, activateShiftAssignment, deleteShiftAssignment, type IShiftAssignment } from "../../../store/shiftAssignmentSlide";
 import { selectEmployees, fetchAllEmployees } from "../../../store/employeeSlide";
 import AssignShiftModal from "./modal/AssignShiftModal";
+import EditAssignmentModal from "./modal/EditAssignmentModal";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
 const { Title, Text } = Typography;
 
@@ -16,8 +17,11 @@ const ManageShiftAssignment = () => {
     const employees = useAppSelector(selectEmployees);
     
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedAssignment, setSelectedAssignment] = useState<IShiftAssignment | null>(null);
     const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs>(dayjs());
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | undefined>(undefined);
+    const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
     useEffect(() => {
         dispatch(fetchAllEmployees());
@@ -36,6 +40,34 @@ const ManageShiftAssignment = () => {
 
     const handleEmployeeChange = (val: number | undefined) => {
         setSelectedEmployeeId(val);
+    };
+
+    const handleRefresh = () => {
+        dispatch(fetchShiftAssignments({ 
+            date: selectedDate.format("YYYY-MM-DD"),
+            employeeId: selectedEmployeeId
+        }));
+    };
+
+    const handleAction = (id: number, action: any, successMsg: string) => {
+        setActionLoadingId(id);
+        dispatch(action(id))
+            .unwrap()
+            .then(() => {
+                message.success(successMsg);
+                handleRefresh();
+            })
+            .catch((err: any) => {
+                message.error(err.message || "Đã xảy ra lỗi.");
+            })
+            .finally(() => {
+                setActionLoadingId(null);
+            });
+    };
+
+    const handleEdit = (record: IShiftAssignment) => {
+        setSelectedAssignment(record);
+        setIsEditModalOpen(true);
     };
 
     const columns = [
@@ -76,18 +108,73 @@ const ManageShiftAssignment = () => {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
-            width: 120,
+            width: 130,
             render: (status: string) => (
-                <Tag color={status === "Active" ? "green" : "red"}>{status}</Tag>
+                <Tag color={status === "Active" ? "success" : "error"} className="px-3 py-1 rounded-full border-none">
+                    {status === "Active" ? "Đang hoạt động" : "Ngưng sử dụng"}
+                </Tag>
             )
         },
         {
-            title: "Ngày tạo",
-            dataIndex: "createdDate",
-            key: "createdDate",
-            width: 150,
-            render: (date: string) => <Text className="text-gray-500">{dayjs(date).format("DD/MM/YYYY HH:mm")}</Text>
-        }
+            title: "Thao tác",
+            key: "action",
+            width: 180,
+            render: (_: any, record: IShiftAssignment) => (
+                <Space size="middle">
+                    <Tooltip title="Chỉnh sửa">
+                        <Button 
+                            className="bg-sky-50 text-sky-600 border-sky-100 hover:bg-sky-100 flex items-center justify-center"
+                            icon={<EditOutlined />} 
+                            onClick={() => handleEdit(record)} 
+                        />
+                    </Tooltip>
+                    
+                    {record.status === "Active" ? (
+                        <Tooltip title="Ngưng sử dụng">
+                            <Popconfirm
+                                title="Ngưng sử dụng phân ca?"
+                                description="Bạn có chắc chắn muốn ngưng sử dụng phân ca này?"
+                                onConfirm={() => handleAction(record.assignmentId, deactivateShiftAssignment, "Đã ngưng sử dụng phân ca.")}
+                                okText="Đồng ý"
+                                cancelText="Hủy"
+                            >
+                                <Button 
+                                    className="bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100 flex items-center justify-center"
+                                    icon={<StopOutlined />} 
+                                    loading={actionLoadingId === record.assignmentId}
+                                />
+                            </Popconfirm>
+                        </Tooltip>
+                    ) : (
+                        <Tooltip title="Kích hoạt lại">
+                            <Button 
+                                className="bg-green-50 text-green-600 border-green-100 hover:bg-green-100 flex items-center justify-center"
+                                icon={<CheckCircleOutlined />} 
+                                loading={actionLoadingId === record.assignmentId}
+                                onClick={() => handleAction(record.assignmentId, activateShiftAssignment, "Đã kích hoạt lại phân ca.")}
+                            />
+                        </Tooltip>
+                    )}
+
+                    <Tooltip title="Xóa">
+                        <Popconfirm
+                            title="Xác nhận xóa?"
+                            description="Bạn có chắc chắn muốn xóa bản ghi này? Hành động này không thể hoàn tác."
+                            onConfirm={() => handleAction(record.assignmentId, deleteShiftAssignment, "Đã xóa phân ca.")}
+                            okText="Xóa"
+                            cancelText="Hủy"
+                            okButtonProps={{ danger: true }}
+                        >
+                            <Button 
+                                className="bg-red-50 text-red-600 border-red-100 hover:bg-red-100 flex items-center justify-center"
+                                icon={<DeleteOutlined />} 
+                                loading={actionLoadingId === record.assignmentId}
+                            />
+                        </Popconfirm>
+                    </Tooltip>
+                </Space>
+            ),
+        },
     ];
 
     return (
@@ -168,14 +255,13 @@ const ManageShiftAssignment = () => {
                 initialDate={selectedDate.format("YYYY-MM-DD")}
             />
 
-            <style>{`
-                .assignment-table .ant-table-thead > tr > th {
-                    background-color: #f8fafc;
-                    color: #475569;
-                    font-weight: 600;
-                    border-bottom: 2px solid #f1f5f9;
-                }
-            `}</style>
+            <EditAssignmentModal
+                open={isEditModalOpen}
+                onCancel={() => setIsEditModalOpen(false)}
+                assignment={selectedAssignment}
+                onSuccess={handleRefresh}
+            />
+
         </div>
     );
 };

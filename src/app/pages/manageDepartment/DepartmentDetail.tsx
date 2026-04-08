@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Descriptions, Button, Tag, Space, Typography, Spin, message, Modal } from "antd";
 import { ArrowLeftOutlined, EditOutlined, StopOutlined } from "@ant-design/icons";
@@ -42,6 +42,17 @@ const DepartmentDetail = () => {
             }
         });
     };
+
+    const initialValues = useMemo(() => {
+        if (!department) return {};
+        return {
+            departmentCode: department.departmentCode,
+            departmentName: department.departmentName,
+            description: department.description,
+            parentDepartmentId: department.parentDepartmentId,
+            managerId: department.managerId
+        };
+    }, [department]);
 
     if (loading && !department) {
         return <div style={{ textAlign: "center", padding: "50px" }}><Spin size="large" /></div>;
@@ -102,13 +113,7 @@ const DepartmentDetail = () => {
                 open={isEditModalOpen}
                 onCancel={() => setIsEditModalOpen(false)}
                 departmentId={department.departmentId}
-                initialValues={{
-                    departmentCode: department.departmentCode,
-                    departmentName: department.departmentName,
-                    description: department.description,
-                    parentDepartmentId: department.parentDepartmentId,
-                    managerId: department.managerId
-                }}
+                initialValues={initialValues}
             />
         </div>
     );

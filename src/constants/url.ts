@@ -32,6 +32,12 @@ const URL = {
     MyOvertimeRequest: "/overtime/my",
     ManageOvertimeRequest: "/overtime/manage",
     CompetencyReport: "/competency/report",
+    PerformanceTemplates: "/performance/templates",
+    PerformanceCycles: "/performance/cycles",
+    EvaluatorAssignments: "/performance/assignments",
+    EvaluationList: "/performance/evaluations",
+    PerformanceCriteria: "/performance/templates/:templateId/criteria",
+    ManageSystemSettings: "/admin/system-settings",
 }
 
 export default URL

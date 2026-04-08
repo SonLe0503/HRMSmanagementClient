@@ -7,10 +7,12 @@ export interface IShiftAssignment {
     employeeId: number;
     employeeName: string;
     shiftId: number;
+    shiftCode: string;
     shiftName: string;
     assignmentDate: string; // ISO string date
     startDate: string;
     endDate: string | null;
+    recurrencePattern?: string;
     status: string;
     createdDate: string;
     createdBy: number;
@@ -23,6 +25,12 @@ export interface AssignShiftDto {
     endDate: string;
     assignType: "Daily" | "Weekly";
     daysOfWeek?: number[];
+}
+
+export interface UpdateShiftAssignmentDto {
+    shiftId: number;
+    assignmentDate: string;
+    status: string;
 }
 
 interface IShiftAssignmentState {
@@ -96,6 +104,79 @@ export const fetchMySchedule = createAsyncThunk(
     }
 );
 
+export const updateShiftAssignment = createAsyncThunk(
+    "shiftAssignment/update",
+    async ({ id, data }: { id: number; data: UpdateShiftAssignmentDto }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/ShiftAssignments/${id}`,
+                method: "PUT",
+                data,
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
+export const deactivateShiftAssignment = createAsyncThunk(
+    "shiftAssignment/deactivate",
+    async (id: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/ShiftAssignments/${id}/deactivate`,
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { id, ...response.data };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
+export const activateShiftAssignment = createAsyncThunk(
+    "shiftAssignment/activate",
+    async (id: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/ShiftAssignments/${id}/activate`,
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { id, ...response.data };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
+export const deleteShiftAssignment = createAsyncThunk(
+    "shiftAssignment/delete",
+    async (id: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/ShiftAssignments/${id}`,
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return { id, ...response.data };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
 export const shiftAssignmentSlice = createSlice({
     name: "shiftAssignment",
     initialState,
@@ -109,20 +190,36 @@ export const shiftAssignmentSlice = createSlice({
             .addCase(fetchShiftAssignments.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchShiftAssignments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.assignments = action.payload;
+                state.assignments = action.payload.data || [];
             })
-            .addCase(fetchShiftAssignments.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+            .addCase(fetchShiftAssignments.rejected, (state, action) => { state.loading = false; state.error = (action.payload as any)?.message || "Something went wrong"; })
             
             .addCase(fetchMySchedule.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchMySchedule.fulfilled, (state, action) => {
                 state.loading = false;
-                state.mySchedule = action.payload;
+                state.mySchedule = action.payload.data || [];
             })
-            .addCase(fetchMySchedule.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+            .addCase(fetchMySchedule.rejected, (state, action) => { state.loading = false; state.error = (action.payload as any)?.message || "Something went wrong"; })
 
             .addCase(assignShift.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(assignShift.fulfilled, (state) => { state.loading = false; })
-            .addCase(assignShift.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; });
+            .addCase(assignShift.rejected, (state, action) => { state.loading = false; state.error = (action.payload as any)?.message || "Something went wrong"; })
+
+            .addCase(updateShiftAssignment.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(updateShiftAssignment.fulfilled, (state) => { state.loading = false; })
+            .addCase(updateShiftAssignment.rejected, (state, action) => { state.loading = false; state.error = (action.payload as any)?.message || "Something went wrong"; })
+
+            .addCase(deactivateShiftAssignment.fulfilled, (state, action) => {
+                const item = state.assignments.find(a => a.assignmentId === action.payload.id);
+                if (item) item.status = "Inactive";
+            })
+            .addCase(activateShiftAssignment.fulfilled, (state, action) => {
+                const item = state.assignments.find(a => a.assignmentId === action.payload.id);
+                if (item) item.status = "Active";
+            })
+            .addCase(deleteShiftAssignment.fulfilled, (state, action) => {
+                state.assignments = state.assignments.filter(a => a.assignmentId !== action.payload.id);
+            });
     },
 });
 

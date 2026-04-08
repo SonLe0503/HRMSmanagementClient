@@ -20,11 +20,15 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
     const loading = useAppSelector(selectLeaveTypeLoading);
     const error = useAppSelector(selectLeaveTypeError);
     const [form] = Form.useForm();
+    const isUnlimited = Form.useWatch('isUnlimited', form);
 
     useEffect(() => {
         if (visible) {
             if (editingLeaveType) {
-                form.setFieldsValue(editingLeaveType);
+                form.setFieldsValue({
+                    ...editingLeaveType,
+                    isUnlimited: editingLeaveType.annualEntitlement === 0
+                });
             } else {
                 form.resetFields();
             }
@@ -40,14 +44,22 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
 
     const handleFinish = async (values: any) => {
         try {
+            // Map isUnlimited back into the payload
+            const payload = {
+                ...values,
+                annualEntitlement: values.isUnlimited ? 0 : values.annualEntitlement,
+                isCarryForward: values.isUnlimited ? false : values.isCarryForward,
+                maxCarryForwardDays: values.isUnlimited ? null : values.maxCarryForwardDays
+            };
+            
             if (editingLeaveType) {
-                const result = await dispatch(updateLeaveType({ id: editingLeaveType.leaveTypeId, dto: values })).unwrap();
+                const result = await dispatch(updateLeaveType({ id: editingLeaveType.leaveTypeId, dto: payload })).unwrap();
                 if (result) {
                     message.success("Cập nhật loại phép thành công.");
                     onClose();
                 }
             } else {
-                const result = await dispatch(createLeaveType(values)).unwrap();
+                const result = await dispatch(createLeaveType(payload)).unwrap();
                 if (result) {
                     message.success("Thêm mới loại phép thành công.");
                     onClose();
@@ -79,6 +91,7 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
                     isPaid: true, 
                     requiresApproval: true, 
                     isCarryForward: false,
+                    isUnlimited: false,
                     isActive: true
                 }}
             >
@@ -103,26 +116,32 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
                     </Col>
                 </Row>
 
-                <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item 
-                            name="annualEntitlement" 
-                            label="Số ngày được hưởng/năm" 
-                            rules={[{ required: true, message: "Nhập số ngày" }]}
-                        >
-                            <InputNumber min={0} max={365} className="w-full h-10 flex items-center rounded-lg" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item 
-                            name="maxCarryForwardDays" 
-                            label="Số ngày tối đa cộng dồn"
-                            dependencies={['isCarryForward']}
-                        >
-                            <InputNumber min={0} max={365} className="w-full h-10 flex items-center rounded-lg" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <Form.Item name="isUnlimited" label="Loại phép Sự kiện / Không giới hạn (Vd: Thai sản, Tai nạn, ...)" valuePropName="checked">
+                    <Switch checkedChildren="Có" unCheckedChildren="Không (Phép theo năm)" />
+                </Form.Item>
+
+                {!isUnlimited && (
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item 
+                                name="annualEntitlement" 
+                                label="Số ngày được hưởng/năm" 
+                                rules={[{ required: true, message: "Nhập số ngày" }]}
+                            >
+                                <InputNumber min={1} max={365} className="w-full h-10 flex items-center rounded-lg" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item 
+                                name="maxCarryForwardDays" 
+                                label="Số ngày tối đa cộng dồn"
+                                dependencies={['isCarryForward']}
+                            >
+                                <InputNumber min={0} max={365} className="w-full h-10 flex items-center rounded-lg" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                )}
 
                 <Row gutter={24} className="mt-4">
                     <Col span={8}>
@@ -135,11 +154,13 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
                             <Switch checkedChildren="Có" unCheckedChildren="Không" />
                         </Form.Item>
                     </Col>
-                    <Col span={8}>
-                        <Form.Item name="isCarryForward" label="Cộng dồn" valuePropName="checked">
-                            <Switch checkedChildren="Có" unCheckedChildren="Không" />
-                        </Form.Item>
-                    </Col>
+                    {!isUnlimited && (
+                        <Col span={8}>
+                            <Form.Item name="isCarryForward" label="Cộng dồn" valuePropName="checked">
+                                <Switch checkedChildren="Có" unCheckedChildren="Không" />
+                            </Form.Item>
+                        </Col>
+                    )}
                 </Row>
 
                 <Form.Item name="isActive" label="Trạng thái hoạt động" valuePropName="checked">

@@ -22,7 +22,7 @@ const CreateBalanceModal = ({ visible, onClose }: CreateBalanceModalProps) => {
     const employees = useAppSelector(selectEmployees);
     const [form] = Form.useForm();
 
-    const activeLeaveTypes = (leaveTypes || []).filter(lt => lt.isActive);
+    const activeLeaveTypes = (leaveTypes || []).filter(lt => lt.isActive && lt.annualEntitlement > 0);
 
     useEffect(() => {
         if (!visible) {
