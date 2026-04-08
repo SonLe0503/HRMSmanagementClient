@@ -147,7 +147,7 @@ const AttendanceTodayCard = () => {
                         </Tooltip>
                     </div>
                 } 
-                bordered={false} 
+                variant="borderless" 
                 className="shadow-sm mb-6"
             >
                 <Text type="secondary" className="block mb-4">Ngày hiện tại: {dayjs().format("DD/MM/YYYY")}</Text>
