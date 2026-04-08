@@ -1,4 +1,4 @@
-import { Table, Button, Space, Modal, Input, message } from "antd";
+import { Table, Button, Space, Modal, Input, message, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { 
@@ -62,7 +62,16 @@ const PendingLeaveRequestTable = () => {
             title: "Nhân viên",
             dataIndex: "employeeName",
             key: "employeeName",
-            render: (text: string) => <span className="font-medium text-gray-800">{text}</span>
+            render: (text: string, record: any) => (
+                <Space>
+                    <span className="font-medium text-gray-800">{text}</span>
+                    {record.isTopLevel && (
+                        <Tag color="blue" className="rounded-full px-3 m-0 border-blue-100">
+                            Management
+                        </Tag>
+                    )}
+                </Space>
+            )
         },
         {
             title: "Loại nghỉ",

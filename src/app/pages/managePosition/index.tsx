@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Card, Space, Input, Switch, message, Tooltip, Typography } from "antd";
-import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
+import { Table, Button, Card, Space, Input, Switch, message, Tooltip, Typography, Tag } from "antd";
+import { PlusOutlined, EyeOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchAllPositions, selectPositions, selectPositionLoading, deactivatePosition, activatePosition } from "../../../store/positionSlide";
 import AddPositionModal from "./modal/AddPositionModal";
@@ -71,6 +71,15 @@ const ManagePosition = () => {
             dataIndex: "level",
             key: "level",
             width: 100,
+        },
+        {
+            title: "Top Level",
+            dataIndex: "isTopLevel",
+            key: "isTopLevel",
+            width: 120,
+            render: (isTopLevel: boolean) => (
+                isTopLevel ? <Tag color="blue" icon={<CheckCircleOutlined />}>Top-Level</Tag> : <Text type="secondary">-</Text>
+            ),
         },
         {
             title: "Employees",
