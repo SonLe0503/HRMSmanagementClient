@@ -10,6 +10,7 @@ import {
     SolutionOutlined,
     ClockCircleOutlined,
     CalendarOutlined,
+    PieChartOutlined,
     SettingOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
@@ -46,6 +47,7 @@ const Sidebar = () => {
             { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
             { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
             { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
             { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
@@ -63,6 +65,7 @@ const Sidebar = () => {
             { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
             { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
         ],
         [EUserRole.EMPLOYEE]: [
