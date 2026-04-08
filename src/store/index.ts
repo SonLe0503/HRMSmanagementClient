@@ -19,6 +19,8 @@ import leaveRequestSlide from "./leaveRequestSlide";
 import leaveTypeSlide from "./leaveTypeSlide";
 import leaveBalanceSlide from "./leaveBalanceSlide";
 import overtimeSlide from "./overtimeSlide";
+import exportSlide from "./exportSlide";
+import workforceAnalyticsSlide from "./workforceAnalyticsSlide";
 import competencySlide from "./competencySlide";
 import evaluationCycleSlide from "./evaluationCycleSlide";
 import evaluationTemplateSlide from "./evaluationTemplateSlide";
@@ -51,6 +53,8 @@ const reducers = {
   leaveType: leaveTypeSlide,
   leaveBalance: leaveBalanceSlide,
   overtime: overtimeSlide,
+  export: exportSlide,
+  workforceAnalytics: workforceAnalyticsSlide,
   competency: competencySlide,
   evaluationCycle: evaluationCycleSlide,
   evaluationTemplate: evaluationTemplateSlide,

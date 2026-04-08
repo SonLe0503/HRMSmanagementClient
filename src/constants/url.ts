@@ -31,6 +31,7 @@ const URL = {
     LeaveConfiguration: "/leave/configuration",
     MyOvertimeRequest: "/overtime/my",
     ManageOvertimeRequest: "/overtime/manage",
+    WorkforceAnalytics: "/analytics/workforce",
     CompetencyReport: "/competency/report",
     PerformanceTemplates: "/performance/templates",
     PerformanceCycles: "/performance/cycles",
