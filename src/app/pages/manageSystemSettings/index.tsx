@@ -93,7 +93,7 @@ const SystemSettingPage: React.FC = () => {
 
             <Row gutter={[24, 24]}>
                 <Col xs={24} lg={16}>
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <Space orientation="vertical" size="large" style={{ width: '100%' }}>
                         {/* Approval Configuration */}
                         <Card 
                             title={<Space><SafetyCertificateOutlined /><span>Cấu hình Phê duyệt (Approval)</span></Space>}
@@ -108,7 +108,7 @@ const SystemSettingPage: React.FC = () => {
                             }
                         >
                             <Alert 
-                                message="Thông báo về quy trình phê duyệt"
+                                title="Thông báo về quy trình phê duyệt"
                                 description="Thiết lập người phê duyệt dự phòng cho các cấp quản lý cao nhất (Top-level Management). Khi một nhân viên cấp cao nhất gửi yêu cầu, hệ thống sẽ gửi yêu cầu đó đến người được chỉ định dưới đây."
                                 type="warning"
                                 showIcon
@@ -164,7 +164,7 @@ const SystemSettingPage: React.FC = () => {
                             }
                         >
                             <Alert 
-                                message="Lưu ý về điểm danh"
+                                title="Lưu ý về điểm danh"
                                 description="Tọa độ này sẽ được dùng để xác minh vị trí khi nhân viên thực hiện Check-in/Check-out. Nhân viên phải nằm trong bán kính cho phép mới có thể điểm danh."
                                 type="info"
                                 showIcon

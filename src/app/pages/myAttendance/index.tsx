@@ -22,7 +22,7 @@ const MyAttendance = () => {
                         <AttendanceTodayCard />
                     </Col>
                     <Col xs={24} lg={14}>
-                        <Card title="Giao dịch chấm công" bordered={false} className="shadow-sm">
+                        <Card title="Giao dịch chấm công" variant="borderless" className="shadow-sm">
                              <Text type="secondary">Các hoạt động check-in/out gần đây nhất của bạn sẽ hiển thị tại đây.</Text>
                              <MyAttendanceHistoryTable />
                         </Card>

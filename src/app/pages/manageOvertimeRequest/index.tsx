@@ -99,10 +99,13 @@ const ManageOvertimeRequest = () => {
         <Layout className="bg-slate-50/30 p-8 min-h-screen">
             <Content>
                 <div className="mb-10">
-                    <Breadcrumb className="mb-4">
-                        <Breadcrumb.Item>Quản lý</Breadcrumb.Item>
-                        <Breadcrumb.Item>Duyệt tăng ca</Breadcrumb.Item>
-                    </Breadcrumb>
+                    <Breadcrumb 
+                        className="mb-4"
+                        items={[
+                            { title: 'Quản lý' },
+                            { title: 'Duyệt tăng ca' }
+                        ]}
+                    />
                     <Title level={2} className="m-0 text-slate-900 font-extrabold tracking-tight">Duyệt yêu cầu làm thêm giờ</Title>
                     <p className="text-slate-500 mt-2 text-lg font-medium opacity-80">Xem và phê duyệt các yêu cầu tăng ca từ nhân viên trong bộ phận.</p>
                 </div>
@@ -115,7 +118,7 @@ const ManageOvertimeRequest = () => {
                                     title={<span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Chờ phê duyệt</span>}
                                     value={pendingRequests.length}
                                     prefix={<ClockCircleOutlined className="mr-3 p-3 rounded-2xl bg-orange-50 text-orange-500 transition-transform group-hover:scale-110" />}
-                                    valueStyle={{ color: '#f59e0b', fontWeight: 900, fontSize: '2.5rem' }}
+                                    styles={{ content: { color: '#f59e0b', fontWeight: 900, fontSize: '2.5rem' } }}
                                 />
                             </div>
                         </Card>
@@ -127,7 +130,7 @@ const ManageOvertimeRequest = () => {
                                     title={<span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Tổng nhân viên</span>}
                                     value={new Set(pendingRequests.map(r => r.employeeId)).size}
                                     prefix={<TeamOutlined className="mr-3 p-3 rounded-2xl bg-blue-50 text-blue-500 transition-transform group-hover:scale-110" />}
-                                    valueStyle={{ color: '#3b82f6', fontWeight: 900, fontSize: '2.5rem' }}
+                                    styles={{ content: { color: '#3b82f6', fontWeight: 900, fontSize: '2.5rem' } }}
                                 />
                             </div>
                         </Card>

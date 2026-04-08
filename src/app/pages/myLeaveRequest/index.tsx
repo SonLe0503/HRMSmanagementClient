@@ -33,7 +33,7 @@ const MyLeaveRequest = () => {
                                     title={<span className="text-slate-500 font-medium">{item.leaveTypeName}</span>}
                                     value={item.remainingDays}
                                     suffix={<span className="text-sm text-slate-400">/ {item.totalEntitlement}</span>}
-                                    valueStyle={{ color: '#1e293b', fontWeight: 700 }}
+                                    styles={{ content: { color: '#1e293b', fontWeight: 700 } }}
                                 />
                                 <div className="mt-2">
                                     <Badge status="processing" text={`Đã dùng: ${item.usedDays}`} className="text-xs text-slate-400" />

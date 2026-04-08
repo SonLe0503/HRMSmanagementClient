@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table, Button, Space, DatePicker, Select, Tag, Card, Tooltip } from "antd";
-import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined } from "@ant-design/icons";
+import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { searchAttendance, selectAdminAttendance, selectAttendanceLoading, lockAttendance, unlockAttendance } from "../../../../store/attendanceSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
@@ -78,11 +78,32 @@ const AttendanceTable = () => {
                 if (status === "Absent") color = "error";
                 if (status === "Incomplete") color = "blue";
                 
+                const isInvalidLocation = record.location?.includes("[INVALID]");
                 return (
                     <Space orientation="vertical" size="small">
-                        <Tag color={color}>{status}</Tag>
+                        <Space>
+                            <Tag color={color}>{status}</Tag>
+                            {isInvalidLocation && (
+                                <Tooltip title="Vị trí check-in/out không hợp lệ">
+                                    <ExclamationCircleOutlined className="text-red-500" />
+                                </Tooltip>
+                            )}
+                        </Space>
                         {record.isManualAdjusted && <Tag color="gold" style={{ fontSize: '10px' }}>Adjusted</Tag>}
                     </Space>
+                );
+            }
+        },
+        {
+            title: "Ghi chú",
+            dataIndex: "remarks",
+            key: "remarks",
+            render: (val: string) => {
+                if (!val) return "—";
+                return (
+                    <Tooltip title={val}>
+                        <div className="max-w-[150px] truncate">{val}</div>
+                    </Tooltip>
                 );
             }
         },

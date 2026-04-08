@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, createSelector } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";
 
@@ -245,7 +245,10 @@ export const leaveTypeSlice = createSlice({
 export const { clearError, clearSelectedLeaveType } = leaveTypeSlice.actions;
 
 export const selectLeaveTypes = (state: RootState) => state.leaveType.leaveTypes;
-export const selectActiveLeaveTypes = (state: RootState) => state.leaveType.leaveTypes.filter(lt => lt.isActive);
+export const selectActiveLeaveTypes = createSelector(
+  [selectLeaveTypes],
+  (leaveTypes) => leaveTypes.filter(lt => lt.isActive)
+);
 export const selectSelectedLeaveType = (state: RootState) => state.leaveType.selectedLeaveType;
 export const selectLeaveTypeLoading = (state: RootState) => state.leaveType.loading;
 export const selectLeaveTypeError = (state: RootState) => state.leaveType.error;

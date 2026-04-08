@@ -298,7 +298,7 @@ const LeaveConfiguration = () => {
                                 </Space>
                             }
                             className="shadow-xl border-none rounded-2xl bg-white/70 backdrop-blur-lg overflow-hidden"
-                            headStyle={{ borderBottom: '1px solid #f1f5f9' }}
+                            styles={{ header: { borderBottom: '1px solid #f1f5f9' } }}
                         >
                             <Form form={adjustmentForm} layout="vertical" onFinish={onFinishAdjustment}>
                                 <Form.Item name="employeeId" label="Nhân viên" rules={[{ required: true, message: "Chọn nhân viên" }]}>
@@ -364,7 +364,7 @@ const LeaveConfiguration = () => {
 
                         <Card
                             className="!mt-6 shadow-xl border-none rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white overflow-hidden"
-                            bodyStyle={{ padding: '24px' }}
+                            styles={{ body: { padding: '24px' } }}
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div>
@@ -425,7 +425,7 @@ const LeaveConfiguration = () => {
                                     </Space>
                                 }
                                 className="shadow-xl border-none rounded-2xl bg-white/70 backdrop-blur-lg overflow-hidden"
-                                headStyle={{ borderBottom: '1px solid #f1f5f9' }}
+                                styles={{ header: { borderBottom: '1px solid #f1f5f9' } }}
                             >
                                 <Table
                                     columns={leaveTypeColumns}
@@ -455,7 +455,7 @@ const LeaveConfiguration = () => {
                                     </div>
                                 }
                                 className="shadow-xl border-none rounded-2xl bg-white/70 backdrop-blur-lg overflow-hidden"
-                                headStyle={{ borderBottom: '1px solid #f1f5f9' }}
+                                styles={{ header: { borderBottom: '1px solid #f1f5f9' } }}
                             >
                                 <Table
                                     columns={balanceColumns}
@@ -516,7 +516,7 @@ const LeaveConfiguration = () => {
                                 <Statistic
                                     title="Bản ghi đã tạo"
                                     value={generateResult.created}
-                                    valueStyle={{ color: '#10b981', fontWeight: 700 }}
+                                    styles={{ content: { color: '#10b981', fontWeight: 700 } }}
                                     suffix="bản ghi"
                                 />
                             </Col>
@@ -524,7 +524,7 @@ const LeaveConfiguration = () => {
                                 <Statistic
                                     title="Đã bỏ qua (tồn tại)"
                                     value={generateResult.skipped}
-                                    valueStyle={{ color: '#f59e0b', fontWeight: 700 }}
+                                    styles={{ content: { color: '#f59e0b', fontWeight: 700 } }}
                                     suffix="bản ghi"
                                 />
                             </Col>

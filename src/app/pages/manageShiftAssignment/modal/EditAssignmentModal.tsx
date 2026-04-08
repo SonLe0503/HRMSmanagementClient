@@ -56,7 +56,7 @@ const EditAssignmentModal = ({ open, onCancel, assignment, onSuccess }: EditAssi
             onCancel={onCancel}
             onOk={() => form.submit()}
             centered
-            destroyOnClose
+            destroyOnHidden
         >
             <Form
                 form={form}
