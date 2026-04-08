@@ -32,6 +32,13 @@ const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/in
 const LeaveConfiguration = lazy(() => import("../app/pages/leaveConfiguration/index"));
 const MyOvertimeRequest = lazy(() => import("../app/pages/myOvertimeRequest/index"));
 const ManageOvertimeRequest = lazy(() => import("../app/pages/manageOvertimeRequest/index"));
+const WorkforceAnalytics = lazy(() => import("../app/pages/analytics/WorkforceAnalytics"));
+const CompetencyReport = lazy(() => import("../app/pages/competency/CompetencyReport"));
+const PerformanceTemplates = lazy(() => import("../app/pages/performanceEvaluation/PerformanceTemplates"));
+const PerformanceCriteria = lazy(() => import("../app/pages/performanceEvaluation/PerformanceCriteria"));
+const PerformanceCycles = lazy(() => import("../app/pages/performanceEvaluation/PerformanceCycles"));
+const EvaluatorAssignments = lazy(() => import("../app/pages/performanceEvaluation/EvaluatorAssignments"));
+const EvaluationList = lazy(() => import("../app/pages/performanceEvaluation/EvaluationList"));
 const ManageSystemSettings = lazy(() => import("../app/pages/manageSystemSettings/index"));
 
 
@@ -174,6 +181,48 @@ const privateResourceItem = [
     {
         key: URL.ManageOvertimeRequest,
         element: <ManageOvertimeRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.WorkforceAnalytics,
+        element: <WorkforceAnalytics />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.CompetencyReport,
+        element: <CompetencyReport />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PerformanceTemplates,
+        element: <PerformanceTemplates />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PerformanceCriteria,
+        element: <PerformanceCriteria />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PerformanceCycles,
+        element: <PerformanceCycles />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EvaluatorAssignments,
+        element: <EvaluatorAssignments />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EvaluationList,
+        element: <EvaluationList />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
