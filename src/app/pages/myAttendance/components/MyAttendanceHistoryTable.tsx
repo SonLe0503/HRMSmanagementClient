@@ -98,6 +98,8 @@ const MyAttendanceHistoryTable = () => {
                 if (status === "Late") color = "warning";
                 if (status === "Absent") color = "error";
                 if (status === "Incomplete") color = "blue";
+                if (status === "PaidLeave") color = "cyan";
+                if (status === "UnpaidLeave") color = "purple";
                 
                 const isInvalidLocation = record.location?.includes("[INVALID]");
 
@@ -164,7 +166,7 @@ const MyAttendanceHistoryTable = () => {
             <Table 
                 columns={columns} 
                 dataSource={records} 
-                rowKey="attendanceId" 
+                rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}`} 
                 loading={loading}
                 pagination={{ pageSize: 15 }}
                 bordered

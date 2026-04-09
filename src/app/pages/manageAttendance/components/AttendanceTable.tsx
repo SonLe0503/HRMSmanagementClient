@@ -77,6 +77,8 @@ const AttendanceTable = () => {
                 if (status === "Late") color = "warning";
                 if (status === "Absent") color = "error";
                 if (status === "Incomplete") color = "blue";
+                if (status === "PaidLeave") color = "cyan";
+                if (status === "UnpaidLeave") color = "purple";
                 
                 const isInvalidLocation = record.location?.includes("[INVALID]");
                 return (
@@ -136,7 +138,7 @@ const AttendanceTable = () => {
                         <Button 
                             size="small" 
                             icon={<EditOutlined />} 
-                            disabled={record.isLocked}
+                            disabled={record.isLocked || record.attendanceId === 0}
                             onClick={() => setAdjustModal({ open: true, record })}
                         />
                     </Tooltip>
@@ -183,6 +185,8 @@ const AttendanceTable = () => {
                             { label: "Đi muộn (Late)", value: "Late" },
                             { label: "Vắng mặt (Absent)", value: "Absent" },
                             { label: "Chưa hoàn tất", value: "Incomplete" },
+                            { label: "Nghỉ phép có lương", value: "PaidLeave" },
+                            { label: "Nghỉ phép không lương", value: "UnpaidLeave" },
                         ]}
                     />
                     <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
@@ -202,7 +206,7 @@ const AttendanceTable = () => {
                 columns={columns}
                 dataSource={records}
                 loading={loading}
-                rowKey="attendanceId"
+                rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}-${record.employeeId}`}
                 pagination={{ pageSize: 15 }}
                 bordered
             />
