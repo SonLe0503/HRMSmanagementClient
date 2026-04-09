@@ -88,7 +88,6 @@ const Sidebar = () => {
             { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
             { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
             { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
-            { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
             { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
             { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
