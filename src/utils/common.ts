@@ -8,11 +8,10 @@ import type { Location } from 'react-router-dom';
 export const breadcrumbNameMap: Record<string, string> = {
     [URL.DashboardAdmin]: "Admin Dashboard",
     [URL.DashboardManage]: "Manager Dashboard",
-    [URL.DashboardEmployee]: "Employee Dashboard",
     [URL.DashboardHR]: "HR Dashboard",
     [URL.ManageUser]: "User Management",
     [URL.ManageRole]: "Role Management",
-    [URL.ManageWorkflow]: "Workflow Management",
+
     [URL.ManageCategory]: "Category Management",
     [URL.ManageProduct]: "Product Management",
 };

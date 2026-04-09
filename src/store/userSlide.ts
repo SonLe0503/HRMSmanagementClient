@@ -6,6 +6,7 @@ export interface IUser {
     userId: number;
     username: string;
     email: string;
+    employeeId: number | null;
     isActive: boolean;
     roles: string[];
 }

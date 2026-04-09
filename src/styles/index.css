@@ -84,3 +84,39 @@ body,
     align-items: center !important;
     justify-content: center !important;
 }
+
+/* Custom Table Styles */
+.shift-table .ant-table-thead > tr > th,
+.assignment-table .ant-table-thead > tr > th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+}
+
+.shift-table .ant-table-row:hover {
+    cursor: default !important;
+}
+
+/* Custom Search Input */
+.custom-search .ant-input-wrapper .ant-input {
+    border-radius: 8px 0 0 8px !important;
+}
+
+.custom-search .ant-input-group-addon .ant-btn {
+    border-radius: 0 8px 8px 0 !important;
+}
+
+/* Custom Tabs */
+.custom-tabs .ant-tabs-nav {
+    background: white !important;
+    padding: 0 16px !important;
+    border-radius: 12px !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.custom-tabs .ant-tabs-ink-bar {
+    height: 3px !important;
+    border-radius: 3px 3px 0 0 !important;
+}

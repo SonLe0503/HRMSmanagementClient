@@ -9,14 +9,38 @@ import DefaultLayout from "./DefaultLayout"
 
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
-const DashboardEmployee = lazy(() => import("../app/pages/dashboard/DashboardEmployee"))
 const DashboardHR = lazy(() => import("../app/pages/dashboard/DashboardHR"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const ManageUser = lazy(() => import("../app/pages/manageAccount"))
 const ManageRole = lazy(() => import("../app/pages/manageRole"))
-const ManageWorkflow = lazy(() => import("../app/pages/manageWorkflow"))
 const ManageTask = lazy(() => import("../app/pages/manageTask"))
 const ManagePayrollPolicy = lazy(() => import("../app/pages/managePayrollPolicy"))
+const ManageEmployee = lazy(() => import("../app/pages/manageEmployee"))
+const EmployeeDetail = lazy(() => import("../app/pages/manageEmployee/EmployeeDetail"))
+const MyAttendance = lazy(() => import("../app/pages/myAttendance"))
+const ManageAttendance = lazy(() => import("../app/pages/manageAttendance"))
+const ManageHRProcedure = lazy(() => import("../app/pages/manageHRProcedure"))
+
+const ManageDepartment = lazy(() => import("../app/pages/manageDepartment"));
+const DepartmentDetail = lazy(() => import("../app/pages/manageDepartment/DepartmentDetail"));
+const ManagePosition = lazy(() => import("../app/pages/managePosition"));
+const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
+const ManageShift = lazy(() => import("../app/pages/manageShift"));
+const ManageShiftAssignment = lazy(() => import("../app/pages/manageShiftAssignment"));
+const MyLeaveRequest = lazy(() => import("../app/pages/myLeaveRequest/index"));
+const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/index"));
+const LeaveConfiguration = lazy(() => import("../app/pages/leaveConfiguration/index"));
+const MyOvertimeRequest = lazy(() => import("../app/pages/myOvertimeRequest/index"));
+const ManageOvertimeRequest = lazy(() => import("../app/pages/manageOvertimeRequest/index"));
+const WorkforceAnalytics = lazy(() => import("../app/pages/analytics/WorkforceAnalytics"));
+const CompetencyReport = lazy(() => import("../app/pages/competency/CompetencyReport"));
+const PerformanceTemplates = lazy(() => import("../app/pages/performanceEvaluation/PerformanceTemplates"));
+const PerformanceCriteria = lazy(() => import("../app/pages/performanceEvaluation/PerformanceCriteria"));
+const PerformanceCycles = lazy(() => import("../app/pages/performanceEvaluation/PerformanceCycles"));
+const EvaluatorAssignments = lazy(() => import("../app/pages/performanceEvaluation/EvaluatorAssignments"));
+const EvaluationList = lazy(() => import("../app/pages/performanceEvaluation/EvaluationList"));
+const ManageSystemSettings = lazy(() => import("../app/pages/manageSystemSettings/index"));
+
 
 const shareResourceItem = [
     {
@@ -30,12 +54,6 @@ const privateResourceItem = [
     {
         key: URL.DashboardAdmin,
         element: <DashboardAdmin />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardEmployee,
-        element: <DashboardEmployee />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -64,12 +82,6 @@ const privateResourceItem = [
         private: true,
     },
     {
-        key: URL.ManageWorkflow,
-        element: <ManageWorkflow />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
         key: URL.ManageTask,
         element: <ManageTask />,
         layout: DEFAULT_LAYOUT,
@@ -80,7 +92,151 @@ const privateResourceItem = [
         element: <ManagePayrollPolicy />,
         layout: DEFAULT_LAYOUT,
         private: true,
-    }
+    },
+    {
+        key: URL.ManageEmployee,
+        element: <ManageEmployee />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EmployeeDetail,
+        element: <EmployeeDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageDepartment,
+        element: <ManageDepartment />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.DepartmentDetail,
+        element: <DepartmentDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManagePosition,
+        element: <ManagePosition />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PositionDetail,
+        element: <PositionDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyAttendance,
+        element: <MyAttendance />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageAttendance,
+        element: <ManageAttendance />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageHRProcedure,
+        element: <ManageHRProcedure />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageShift,
+        element: <ManageShift />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageShiftAssignment,
+        element: <ManageShiftAssignment />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyLeaveRequest,
+        element: <MyLeaveRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageLeaveRequest,
+        element: <ManageLeaveRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.LeaveConfiguration,
+        element: <LeaveConfiguration />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyOvertimeRequest,
+        element: <MyOvertimeRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageOvertimeRequest,
+        element: <ManageOvertimeRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.WorkforceAnalytics,
+        element: <WorkforceAnalytics />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.CompetencyReport,
+        element: <CompetencyReport />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PerformanceTemplates,
+        element: <PerformanceTemplates />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PerformanceCriteria,
+        element: <PerformanceCriteria />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PerformanceCycles,
+        element: <PerformanceCycles />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EvaluatorAssignments,
+        element: <EvaluatorAssignments />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EvaluationList,
+        element: <EvaluationList />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageSystemSettings,
+        element: <ManageSystemSettings />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
 ]
 const menus = [...shareResourceItem, ...privateResourceItem]
 

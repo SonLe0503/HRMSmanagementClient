@@ -5,9 +5,15 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     TeamOutlined,
-    // SafetyOutlined,
-    NodeIndexOutlined,
-    DollarOutlined
+    DollarOutlined,
+    IdcardOutlined,
+    BankOutlined,
+    SolutionOutlined,
+    ClockCircleOutlined,
+    CalendarOutlined,
+    RiseOutlined,
+    PieChartOutlined,
+    SettingOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -29,24 +35,70 @@ const Sidebar = () => {
     const menuByRole: Record<EUserRole, any[]> = {
         [EUserRole.ADMIN]: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
-            { key: URL.ManageWorkflow, icon: <NodeIndexOutlined />, label: "Quản lý quy trình" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
+            { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
+            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
+            { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
+            { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
+            { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.WorkforceAnalytics, icon: <RiseOutlined />, label: "Phân tích Nhân sự" },
+            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
+            { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
+            { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
+            { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
+            { key: URL.ManageSystemSettings, icon: <SettingOutlined />, label: "Cấu hình hệ thống" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
+            { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
+            { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý tài khoản" },
+            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
+            { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
+            { key: URL.WorkforceAnalytics, icon: <RiseOutlined />, label: "Phân tích Nhân sự" },
+            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
         ],
         [EUserRole.EMPLOYEE]: [
-            { key: URL.DashboardEmployee, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá của tôi" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.ManagePayrollPolicy, icon: <DollarOutlined />, label: "Chính sách lương" },
+            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
+            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
+            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
+            { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
+            { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
+            { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
+            { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
+            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
+            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
+            { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
+            { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
+            { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
+            { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
+            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
         ],
     };
 
@@ -64,28 +116,30 @@ const Sidebar = () => {
                 transition={{ duration: 0.3 }}
                 className="h-full flex flex-col justify-between"
             >
-                <div>
-                    <div className="h-16 flex items-center justify-center font-bold text-blue-600 text-xl overflow-hidden whitespace-nowrap">
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                    <div className="h-16 flex items-center justify-center font-bold text-blue-600 text-xl overflow-hidden whitespace-nowrap flex-shrink-0">
                         {collapsed ? "HR" : "HR MANAGEMENT"}
                     </div>
-                    <Menu
-                        mode="inline"
-                        selectedKeys={[location.pathname]}
-                        className="border-r-0 flex-1"
-                        items={
-                            role
-                                ? (menuByRole[role] || []).map((item: any) => ({
-                                    ...item,
-                                    label: collapsed ? null : item.label,
-                                }))
-                                : []
-                        }
-                        onClick={({ key }) => {
-                            if (key.startsWith("/")) {
-                                navigate(key);
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden sidebar-menu-scroll">
+                        <Menu
+                            mode="inline"
+                            selectedKeys={[location.pathname]}
+                            className="border-r-0"
+                            items={
+                                role
+                                    ? (menuByRole[role as EUserRole] || []).map((item: any) => ({
+                                        ...item,
+                                        label: collapsed ? null : item.label,
+                                    }))
+                                    : []
                             }
-                        }}
-                    />
+                            onClick={({ key }) => {
+                                if (key.startsWith("/")) {
+                                    navigate(key);
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
                 <div className="flex justify-center items-center p-3 border-t border-gray-100">
                     <button

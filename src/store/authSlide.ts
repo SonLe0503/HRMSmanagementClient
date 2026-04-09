@@ -31,18 +31,68 @@ const initialState: IInitialState = {
 export const actionLogin = createAsyncThunk(
   "auth/actionLogin",
   async (data: DynamicKeyObject, { rejectWithValue }) => {
-    const { ...payload } = data;
     try {
       return await request({
         url: `/Auth/login`,
         method: "POST",
-        data: payload,
-      })
-    } catch (error) {
-      return rejectWithValue(error);
+        data,
+      });
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Login failed");
     }
   }
-)
+);
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (data: any, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      const response = await request({
+        url: `/Auth/change-password`,
+        method: "POST",
+        data,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to change password");
+    }
+  }
+);
+
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (data: { emailOrUsername: string }, { rejectWithValue }) => {
+    try {
+      const response = await request({
+        url: `/Auth/forgot-password`,
+        method: "POST",
+        data,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to send OTP");
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      const response = await request({
+        url: `/Auth/reset-password`,
+        method: "POST",
+        data,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to reset password");
+    }
+  }
+);
 
 export const slice = createSlice({
   name: "auth",
