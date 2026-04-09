@@ -7,6 +7,7 @@ import roleSlide from "./roleSlide";
 import userSlide from "./userSlide";
 
 import taskSlide from "./taskSlide";
+import payrollPolicySlide from "./payrollPolicySlice";
 import employeeSlide from "./employeeSlide";
 import employeeDocumentSlide from "./employeeDocumentSlide";
 import departmentSlide from "./departmentSlide";
@@ -41,6 +42,7 @@ const reducers = {
   role: roleSlide,
   user: userSlide,
   task: taskSlide,
+  payrollPolicy: payrollPolicySlide,
   employee: employeeSlide,
   employeeDocument: employeeDocumentSlide,
   department: departmentSlide,

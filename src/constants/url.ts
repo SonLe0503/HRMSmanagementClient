@@ -13,8 +13,8 @@ const URL = {
     ManageRole: "/admin/manage-role",
     ManageCategory: "/admin/manage-category",
     ManageProduct: "/admin/manage-product",
-
     ManageTask: "/manage-task",
+    ManagePayrollPolicy: "/admin/manage-payroll-policy",
     ManageEmployee: "/hr/manage-employee",
     EmployeeDetail: "/hr/manage-employee/:id",
     ManageDepartment: "/hr/manage-department",
