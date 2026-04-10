@@ -66,7 +66,33 @@ const AttendanceTable = () => {
         { title: "Ngày", dataIndex: "attendanceDate", key: "attendanceDate", render: (val: string) => dayjs(val).format("DD/MM/YYYY") },
         { title: "Giờ vào", dataIndex: "checkInTime", key: "checkInTime", render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
         { title: "Giờ ra", dataIndex: "checkOutTime", key: "checkOutTime", render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
-        { title: "Tổng h", dataIndex: "workingHours", key: "workingHours", align: 'center' as const, render: (val: number) => val ?? "0" },
+        { title: "Tổng h", dataIndex: "workingHours", key: "workingHours", width: 80, align: 'center' as const, render: (val: number) => val ?? "0" },
+        {
+            title: "OT (h)",
+            dataIndex: "payrollOvertimeHours",
+            key: "overtime",
+            width: 80,
+            align: 'center' as const,
+            render: (_: any, record: any) => {
+                const payroll = record.payrollOvertimeHours || 0;
+                const actual = record.actualOvertimeHours || 0;
+                const approved = record.approvedOvertimeHours || 0;
+
+                return (
+                    <Tooltip title={
+                        <div style={{ fontSize: '12px' }}>
+                            <p>Đã duyệt: {approved}h</p>
+                            <p>Làm thực: {actual}h</p>
+                            <p className="border-t mt-1 pt-1 font-bold">Tính lương: {payroll}h</p>
+                        </div>
+                    }>
+                        <Tag color={payroll > 0 ? "orange" : "default"} style={{ margin: 0 }}>
+                            {payroll}
+                        </Tag>
+                    </Tooltip>
+                );
+            }
+        },
         {
             title: "Trạng thái",
             dataIndex: "status",

@@ -34,6 +34,7 @@ const ManualCreateModal = ({ open, onClose }: ManualCreateModalProps) => {
                 checkInTime: values.checkInTime ? values.attendanceDate.format("YYYY-MM-DD") + "T" + values.checkInTime.format("HH:mm:ss") : undefined,
                 checkOutTime: values.checkOutTime ? values.attendanceDate.format("YYYY-MM-DD") + "T" + values.checkOutTime.format("HH:mm:ss") : undefined,
                 status: values.status,
+                source: values.source,
                 remarks: values.remarks
             })).unwrap();
             
@@ -98,11 +99,24 @@ const ManualCreateModal = ({ open, onClose }: ManualCreateModalProps) => {
                 </Form.Item>
 
                 <Form.Item
+                    name="source"
+                    label="Nguồn gốc / Lý do chính"
+                    rules={[{ required: true, message: "Chọn nguồn gốc" }]}
+                >
+                    <Select options={[
+                        { label: "Lỗi thiết bị (Device Failure)", value: "Device Failure" },
+                        { label: "Ngoại lệ Overtime (OT Exception)", value: "OT Exception" },
+                        { label: "Công tác / Đi ngoài", value: "Business Trip" },
+                        { label: "Khác", value: "Other" },
+                    ]} />
+                </Form.Item>
+
+                <Form.Item
                     name="remarks"
-                    label="Lý do tạo thủ công"
+                    label="Ghi chú chi tiết"
                     rules={[{ required: true, message: "Nhập lý do" }]}
                 >
-                    <Input.TextArea rows={3} placeholder="VD: Quên chấm công do máy lỗi bận họp..." />
+                    <Input.TextArea rows={3} placeholder="Mô tả chi tiết nguyên nhân..." />
                 </Form.Item>
             </Form>
         </Modal>

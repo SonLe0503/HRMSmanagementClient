@@ -35,6 +35,9 @@ export interface AttendanceResponseDto {
     checkOutTime?: string; 
     workingHours?: number; 
     overtimeHours?: number; 
+    actualOvertimeHours?: number;
+    approvedOvertimeHours?: number;
+    payrollOvertimeHours?: number;
     lateMinutes?: number;
     earlyLeaveMinutes?: number;
     status: string;
@@ -67,6 +70,7 @@ export interface ManualAdjustAttendanceDto {
     checkInTime?: string;
     checkOutTime?: string;
     status: string;
+    source?: string;
     remarks?: string;
 }
 
@@ -77,6 +81,7 @@ export interface ManualCreateAttendanceDto {
     checkInTime?: string;
     checkOutTime?: string;
     status: string;
+    source?: string;
     remarks?: string;
 }
 

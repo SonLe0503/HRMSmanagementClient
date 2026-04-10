@@ -6,9 +6,9 @@ import type { RootState } from "./index";
 
 export interface CreateOvertimeRequestDto {
   overtimeDate: string;
-  startTime: string;
-  endTime: string;
-  totalHours: number;
+  startTime?: string | null;
+  endTime?: string | null;
+  otMode?: string;
   reason: string;
   taskDescription?: string;
 }
@@ -32,6 +32,8 @@ export interface MyOvertimeRequestDto {
   startTime: string;
   endTime: string;
   totalHours: number;
+  otType?: string;
+  otMode?: string;
   reason?: string;
   status: string;
   submittedDate: string;
@@ -46,6 +48,8 @@ export interface PendingOvertimeRequestDto {
   startTime: string;
   endTime: string;
   totalHours: number;
+  otType?: string;
+  otMode?: string;
   reason?: string;
   taskDescription?: string;
   status: string;
