@@ -1,70 +1,99 @@
 import React, { useEffect, useState } from "react";
-import { Card, Form, InputNumber, Button, Typography, message, Space, Divider, Row, Col, Alert } from "antd";
-import { EnvironmentOutlined, SaveOutlined, ReloadOutlined, AimOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
+import { Form, Typography, message, Row, Col, Space, Tabs, Badge } from "antd";
+import { 
+    SafetyCertificateOutlined, 
+    EnvironmentOutlined, 
+    AimOutlined, 
+    SettingOutlined,
+    QuestionCircleOutlined 
+} from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { fetchLocationSettings, selectLocationSettings, selectSystemSettingLoading, updateLocationSettings, fetchApprovalSettings, selectApprovalSettings, updateApprovalSettings } from "../../../store/systemSettingSlide";
+import { 
+    fetchLocationSettings, selectLocationSettings, selectSystemSettingLoading, 
+    updateLocationSettings, fetchApprovalSettings, selectApprovalSettings, 
+    updateApprovalSettings 
+} from "../../../store/systemSettingSlide";
 import { fetchAllUsers, selectUsers } from "../../../store/userSlide";
-import { Select } from "antd";
+import { fetchApprovalAnalysis, selectApprovalAnalysis } from "../../../store/employeeSlide";
 
-const { Title, Text, Paragraph } = Typography;
-const { Option } = Select;
+// Import modular components (will be redesigned next)
+import TopLevelApprovalCard from "./components/TopLevelApprovalCard";
+import DefaultFallbackApprovalCard from "./components/DefaultFallbackApprovalCard";
+import LocationConfigurationCard from "./components/LocationConfigurationCard";
+import ApprovalAnalysisTable from "./components/ApprovalAnalysisTable";
+import GuidanceCard from "./components/GuidanceCard";
+
+const { Title, Paragraph, Text } = Typography;
 
 const SystemSettingPage: React.FC = () => {
+    const [topLevelForm] = Form.useForm();
+    const [defaultFallbackForm] = Form.useForm();
     const [locationForm] = Form.useForm();
-    const [approvalForm] = Form.useForm();
     const dispatch = useAppDispatch();
     
     const locationSettings = useAppSelector(selectLocationSettings);
     const approvalSettings = useAppSelector(selectApprovalSettings);
+    const approvalAnalysis = useAppSelector(selectApprovalAnalysis);
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectSystemSettingLoading);
     
     const [detecting, setDetecting] = useState(false);
 
+    // Initial data fetch
     useEffect(() => {
         dispatch(fetchLocationSettings());
         dispatch(fetchApprovalSettings());
         dispatch(fetchAllUsers());
+        dispatch(fetchApprovalAnalysis());
     }, [dispatch]);
 
+    // Update form values
     useEffect(() => {
-        if (locationSettings) {
-            locationForm.setFieldsValue(locationSettings);
-        }
+        if (locationSettings) locationForm.setFieldsValue(locationSettings);
     }, [locationSettings, locationForm]);
 
     useEffect(() => {
         if (approvalSettings) {
-            approvalForm.setFieldsValue(approvalSettings);
+            topLevelForm.setFieldsValue({
+                topLevelFallbackUserId: approvalSettings.topLevelFallbackUserId
+            });
+            defaultFallbackForm.setFieldsValue({
+                defaultFallbackUserId: approvalSettings.defaultFallbackUserId
+            });
         }
-    }, [approvalSettings, approvalForm]);
+    }, [approvalSettings, topLevelForm, defaultFallbackForm]);
 
+    // Handlers
     const onLocationFinish = async (values: any) => {
         try {
             await dispatch(updateLocationSettings(values)).unwrap();
-            message.success("Cập nhật cấu hình vị trí thành công");
+            message.success("Cấu hình vị trí đã được lưu");
             dispatch(fetchLocationSettings());
         } catch (error: any) {
-            message.error(error || "Lỗi cập nhật cấu hình vị trí");
+            message.error(error || "Lỗi lưu cấu hình vị trí");
         }
     };
 
     const onApprovalFinish = async (values: any) => {
         try {
-            await dispatch(updateApprovalSettings(values)).unwrap();
-            message.success("Cập nhật cấu hình phê duyệt thành công");
+            const payload = {
+                ...(approvalSettings || {}),
+                ...values
+            };
+            await dispatch(updateApprovalSettings(payload)).unwrap();
+            message.success("Cấu hình phê duyệt đã được lưu");
             dispatch(fetchApprovalSettings());
+            dispatch(fetchApprovalAnalysis());
         } catch (error: any) {
-            message.error(error || "Lỗi cập nhật cấu hình phê duyệt");
+            message.error(error || "Lỗi lưu cấu hình phê duyệt");
         }
     };
 
     const handleGetCurrentLocation = () => {
         if (!navigator.geolocation) {
-            message.error("Trình duyệt của bạn không hỗ trợ Geolocation");
+            message.error("Trình duyệt không hỗ trợ Geolocation");
             return;
         }
-
         setDetecting(true);
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -73,183 +102,152 @@ const SystemSettingPage: React.FC = () => {
                     officeLongitude: position.coords.longitude
                 });
                 setDetecting(false);
-                message.info("Đã cập nhật toạ độ hiện tại vào form. Nhấn lưu để áp dụng.");
+                message.info("Đã cập nhật toạ độ hiện tại.");
             },
             (error) => {
                 setDetecting(false);
-                message.error("Không thể lấy vị trí: " + error.message);
+                message.error("Lỗi lấy vị trí: " + error.message);
             }
         );
     };
 
+    // Tab Items Definition
+    const tabItems = [
+        {
+            key: "1",
+            label: <Space className="px-4"><SafetyCertificateOutlined />Quy trình Phê duyệt</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500">
+                    <Row gutter={[32, 32]}>
+                        <Col xs={24} lg={16}>
+                            <Space direction="vertical" style={{ width: '100%' }}>
+                                <TopLevelApprovalCard 
+                                    form={topLevelForm}
+                                    users={users}
+                                    loading={loading}
+                                    onFinish={onApprovalFinish}
+                                    onRefresh={() => dispatch(fetchApprovalSettings())}
+                                />
+                                <DefaultFallbackApprovalCard 
+                                    form={defaultFallbackForm}
+                                    users={users}
+                                    loading={loading}
+                                    onFinish={onApprovalFinish}
+                                    onRefresh={() => dispatch(fetchApprovalSettings())}
+                                />
+                            </Space>
+                        </Col>
+                        <Col xs={24} lg={8}>
+                            <GuidanceCard />
+                        </Col>
+                    </Row>
+                </div>
+            )
+        },
+        {
+            key: "2",
+            label: <Space className="px-4"><EnvironmentOutlined />Vị trí & Điểm danh</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500">
+                    <Row gutter={[32, 32]}>
+                        <Col xs={24} lg={16}>
+                            <LocationConfigurationCard 
+                                form={locationForm}
+                                loading={loading}
+                                detecting={detecting}
+                                onFinish={onLocationFinish}
+                                onRefresh={() => dispatch(fetchLocationSettings())}
+                                onDetect={handleGetCurrentLocation}
+                            />
+                        </Col>
+                        <Col xs={24} lg={8}>
+                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 h-full">
+                                <Title level={4} className="mb-4">Thông tin bổ trợ</Title>
+                                <Paragraph className="text-slate-500">
+                                    Hệ thống sử dụng tọa độ vệ tinh để xác minh tính trung thực khi điểm danh.
+                                </Paragraph>
+                                <Badge status="processing" text="Bán kính ổn định nhất: 50m" />
+                            </div>
+                        </Col>
+                    </Row>
+                </div>
+            )
+        },
+        {
+            key: "3",
+            label: <Space className="px-4"><AimOutlined />Phân tích (Audit)</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500">
+                    <ApprovalAnalysisTable 
+                        data={approvalAnalysis}
+                        loading={loading}
+                        onRefresh={() => dispatch(fetchApprovalAnalysis())}
+                    />
+                </div>
+            )
+        }
+    ];
+
     return (
-        <div className="p-6">
-            <div className="mb-6">
-                <Title level={2}>Cấu hình Hệ thống</Title>
-                <Paragraph type="secondary">
-                    Quản lý các tham số vận hành của hệ thống HR Management.
-                </Paragraph>
+        <div className="p-8 lg:p-12 bg-[#f8fafc] min-h-screen">
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-10 flex justify-between items-end">
+                    <div>
+                        <Title level={2} style={{ marginBottom: 4, fontWeight: 700, color: '#1e293b' }}>
+                            <SettingOutlined className="mr-3 text-indigo-600" />Thiết lập Hệ thống
+                        </Title>
+                        <Paragraph type="secondary" className="text-lg">
+                            Cấu hình tham số lõi và quản lý quy tắc phê duyệt tự động.
+                        </Paragraph>
+                    </div>
+                    <div className="hidden md:block">
+                        <Badge count="Admin Control Center" style={{ backgroundColor: '#4f46e5', padding: '0 12px' }} />
+                    </div>
+                </div>
+
+                <Tabs 
+                    defaultActiveKey="1" 
+                    items={tabItems} 
+                    className="custom-minimal-tabs"
+                    tabBarStyle={{ 
+                        marginBottom: 32,
+                        borderBottom: '1px solid #e2e8f0'
+                    }}
+                    size="large"
+                />
+
+                <div className="mt-16 text-center opacity-40">
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                        <QuestionCircleOutlined className="mr-1" />
+                        Mọi thay đổi sẽ có hiệu lực ngay lập tức. Liên hệ hỗ trợ nếu cần hướng dẫn nâng cao.
+                    </Text>
+                </div>
             </div>
 
-            <Row gutter={[24, 24]}>
-                <Col xs={24} lg={16}>
-                    <Space orientation="vertical" size="large" style={{ width: '100%' }}>
-                        {/* Approval Configuration */}
-                        <Card 
-                            title={<Space><SafetyCertificateOutlined /><span>Cấu hình Phê duyệt (Approval)</span></Space>}
-                            extra={
-                                <Button 
-                                    icon={<ReloadOutlined />} 
-                                    onClick={() => dispatch(fetchApprovalSettings())}
-                                    loading={loading}
-                                >
-                                    Làm mới
-                                </Button>
-                            }
-                        >
-                            <Alert 
-                                title="Thông báo về quy trình phê duyệt"
-                                description="Thiết lập người phê duyệt dự phòng cho các cấp quản lý cao nhất (Top-level Management). Khi một nhân viên cấp cao nhất gửi yêu cầu, hệ thống sẽ gửi yêu cầu đó đến người được chỉ định dưới đây."
-                                type="warning"
-                                showIcon
-                                className="mb-6"
-                            />
-
-                            <Form
-                                form={approvalForm}
-                                layout="vertical"
-                                onFinish={onApprovalFinish}
-                            >
-                                <Form.Item
-                                    label="Người duyệt dự phòng cho cấp cao nhất (Top-Level Fallback)"
-                                    name="topLevelFallbackUserId"
-                                    tooltip="Chọn người sẽ phê duyệt cho các nhân sự thuộc vị trí Top-level."
-                                    rules={[{ required: true, message: 'Vui lòng chọn người duyệt' }]}
-                                >
-                                    <Select 
-                                        showSearch 
-                                        placeholder="Chọn một tài khoản người dùng"
-                                        optionFilterProp="children"
-                                    >
-                                        {users.filter(u => u.isActive).map(user => (
-                                            <Option key={user.userId} value={user.userId}>
-                                                {user.username} ({user.email})
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-
-                                <Button 
-                                    type="primary" 
-                                    htmlType="submit" 
-                                    icon={<SaveOutlined />}
-                                    loading={loading}
-                                >
-                                    Lưu cấu hình phê duyệt
-                                </Button>
-                            </Form>
-                        </Card>
-
-                        {/* Location Configuration */}
-                        <Card 
-                            title={<Space><EnvironmentOutlined /><span>Cấu hình Vị trí Văn phòng</span></Space>}
-                            extra={
-                                <Button 
-                                    icon={<ReloadOutlined />} 
-                                    onClick={() => dispatch(fetchLocationSettings())}
-                                    loading={loading}
-                                >
-                                    Làm mới
-                                </Button>
-                            }
-                        >
-                            <Alert 
-                                title="Lưu ý về điểm danh"
-                                description="Tọa độ này sẽ được dùng để xác minh vị trí khi nhân viên thực hiện Check-in/Check-out. Nhân viên phải nằm trong bán kính cho phép mới có thể điểm danh."
-                                type="info"
-                                showIcon
-                                className="mb-6"
-                            />
-
-                            <Form
-                                form={locationForm}
-                                layout="vertical"
-                                onFinish={onLocationFinish}
-                                initialValues={{
-                                    officeLatitude: 0,
-                                    officeLongitude: 0,
-                                    attendanceAllowedRadius: 50
-                                }}
-                            >
-                                <Row gutter={16}>
-                                    <Col span={12}>
-                                        <Form.Item
-                                            label="Vĩ độ (Latitude)"
-                                            name="officeLatitude"
-                                            rules={[{ required: true, message: 'Vui lòng nhập vĩ độ' }]}
-                                        >
-                                            <InputNumber style={{ width: '100%' }} precision={15} step={0.000001} />
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={12}>
-                                        <Form.Item
-                                            label="Kinh độ (Longitude)"
-                                            name="officeLongitude"
-                                            rules={[{ required: true, message: 'Vui lòng nhập kinh độ' }]}
-                                        >
-                                            <InputNumber style={{ width: '100%' }} precision={15} step={0.000001} />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-
-                                <Form.Item
-                                    label="Bán kính cho phép (Mét)"
-                                    name="attendanceAllowedRadius"
-                                    tooltip="Nhân viên phải đứng trong vòng tròn có bán kính này để được phép điểm danh."
-                                    rules={[{ required: true, message: 'Vui lòng nhập bán kính' }]}
-                                >
-                                    <InputNumber style={{ width: '100%' }} min={1} max={10000} />
-                                </Form.Item>
-
-                                <Divider />
-
-                                <Space>
-                                    <Button 
-                                        type="primary" 
-                                        htmlType="submit" 
-                                        icon={<SaveOutlined />}
-                                        loading={loading}
-                                    >
-                                        Lưu cấu hình vị trí
-                                    </Button>
-                                    <Button 
-                                        icon={<AimOutlined />} 
-                                        onClick={handleGetCurrentLocation}
-                                        loading={detecting}
-                                    >
-                                        Lấy toạ độ tại đây
-                                    </Button>
-                                </Space>
-                            </Form>
-                        </Card>
-                    </Space>
-                </Col>
-                
-                <Col xs={24} lg={8}>
-                    <Card title="Hướng dẫn">
-                        <Text strong>Cấu hình Phê duyệt là gì?</Text>
-                        <Paragraph className="mt-2 text-gray-600">
-                            Hệ thống tự động xác định cấp quản lý. Đối với những nhân sự có chức vụ cao nhất (CEO, Director), hệ thống sẽ lấy "Người duyệt dự phòng" này để làm cấp phê duyệt cuối cùng.
-                        </Paragraph>
-                        <Divider />
-                        <Text strong>Làm sao để lấy tọa độ?</Text>
-                        <ul className="mt-2 text-gray-600">
-                            <li>Cách 1: Nhấn nút "Lấy toạ độ tại đây" nếu bạn đang ngồi tại văn phòng.</li>
-                            <li>Cách 2: Truy cập Google Maps, chuột phải vào vị trí văn phòng và copy tọa độ.</li>
-                        </ul>
-                    </Card>
-                </Col>
-            </Row>
+            <style dangerouslySetInnerHTML={{ __html: `
+                .custom-minimal-tabs .ant-tabs-nav-list {
+                    background: transparent !important;
+                }
+                .custom-minimal-tabs .ant-tabs-tab {
+                    margin: 0 12px 0 0 !important;
+                    padding: 12px 0 !important;
+                    transition: all 0.3s ease !important;
+                }
+                .custom-minimal-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+                    color: #4f46e5 !important;
+                    font-weight: 600 !important;
+                }
+                .custom-minimal-tabs .ant-tabs-ink-bar {
+                    background: #4f46e5 !important;
+                    height: 3px !important;
+                }
+                .ant-btn-primary { 
+                    background: #4f46e5 !important; 
+                    border-radius: 12px !important; 
+                    height: 42px !important;
+                    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2) !important;
+                }
+            `}} />
         </div>
     );
 };

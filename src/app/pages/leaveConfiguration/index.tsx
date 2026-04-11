@@ -1,4 +1,4 @@
-import { Layout, Typography, Row, Col, Card, Form, Select, Input, InputNumber, Button, Table, message, DatePicker, Tag, Space, Popconfirm, Tooltip, Modal, Checkbox, Statistic } from "antd";
+import { Layout, Typography, Row, Col, Card, Form, Select, Input, InputNumber, Button, Table, message, DatePicker, Tag, Space, Popconfirm, Tooltip, Modal, Checkbox, Statistic, Tabs, Alert } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
@@ -37,7 +37,7 @@ import CreateBalanceModal from "./CreateBalanceModal";
 import EmployeeBalanceDetailsModal from "./EmployeeBalanceDetailsModal";
 
 const { Content } = Layout;
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
 const LeaveConfiguration = () => {
@@ -270,179 +270,108 @@ const LeaveConfiguration = () => {
         }
     ];
 
-    return (
-        <Layout className="bg-transparent p-6 min-h-screen">
-            <Content>
-                <div className="mb-8 flex justify-between items-end">
-                    <div>
-                        <Title level={2} className="m-0 text-slate-800 font-bold">Cấu hình Nghỉ phép</Title>
-                        <p className="text-slate-500 mt-2 text-lg">Quản lý các loại phép, quy tắc và điều chỉnh số dư nghỉ phép.</p>
-                    </div>
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={handleAddLeaveType}
-                        className="h-10 px-6 rounded-lg font-semibold shadow-lg shadow-blue-200"
-                    >
-                        Thêm Loại Phép
-                    </Button>
-                </div>
-
-                <Row gutter={[24, 24]}>
-                    <Col xs={24} xl={8}>
-                        <Card
-                            title={
+    const tabItems = [
+        {
+            key: "1",
+            label: <Space className="px-4"><CalendarOutlined />Loại Nghỉ Phép</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500">
+                    <Card
+                        title={
+                            <div className="flex justify-between items-center w-full">
                                 <Space>
-                                    <SolutionOutlined className="text-blue-500" />
-                                    <span>Điều chỉnh số dư ngày nghỉ</span>
+                                    <SolutionOutlined className="text-indigo-500 text-lg" />
+                                    <span className="font-bold text-slate-800">Danh sách Loại Nghỉ phép</span>
                                 </Space>
-                            }
-                            className="shadow-xl border-none rounded-2xl bg-white/70 backdrop-blur-lg overflow-hidden"
-                            styles={{ header: { borderBottom: '1px solid #f1f5f9' } }}
-                        >
-                            <Form form={adjustmentForm} layout="vertical" onFinish={onFinishAdjustment}>
-                                <Form.Item name="employeeId" label="Nhân viên" rules={[{ required: true, message: "Chọn nhân viên" }]}>
-                                    <Select
-                                        showSearch
-                                        placeholder="Chọn nhân viên"
-                                        optionFilterProp="children"
-                                        className="rounded-lg h-10 w-full"
-                                    >
-                                        {(employees || []).map((e: any) => (
-                                            <Option key={e.employeeId} value={e.employeeId}>
-                                                {e.fullName} ({e.employeeCode})
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-
-                                <Form.Item name="leaveTypeId" label="Loại phép" rules={[{ required: true, message: "Chọn loại phép" }]}>
-                                    <Select placeholder="Chọn loại phép" className="h-10 w-full">
-                                        {(leaveTypes || []).filter((lt: any) => lt.isActive).map((lt: any) => (
-                                            <Option key={lt.leaveTypeId} value={lt.leaveTypeId}>
-                                                {lt.leaveTypeName}
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-
-                                <Row gutter={16}>
-                                    <Col span={12}>
-                                        <Form.Item name="adjustmentType" label="Thao tác" rules={[{ required: true }]}>
-                                            <Select placeholder="Thao tác" className="h-10 w-full">
-                                                <Option value="Add">Cộng thêm (+)</Option>
-                                                <Option value="Deduct">Trừ đi (-)</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                    <Col span={12}>
-                                        <Form.Item name="numberOfDays" label="Số ngày" rules={[{ required: true }]}>
-                                            <InputNumber min={0.5} step={0.5} className="w-full h-10 flex items-center rounded-lg" />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-
-                                <Form.Item name="effectiveDate" label="Ngày hiệu lực" rules={[{ required: true }]} initialValue={dayjs()}>
-                                    <DatePicker className="w-full h-10 rounded-lg" />
-                                </Form.Item>
-
-                                <Form.Item name="reason" label="Lý do điều chỉnh" rules={[{ required: true }]}>
-                                    <Input.TextArea rows={3} placeholder="Nhập lý do điều chỉnh..." className="rounded-lg" />
-                                </Form.Item>
-
                                 <Button
                                     type="primary"
-                                    htmlType="submit"
-                                    block
-                                    loading={leaveBalanceLoading}
-                                    className="h-12 text-md font-semibold mt-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 border-none hover:opacity-90 shadow-md"
+                                    icon={<PlusOutlined />}
+                                    onClick={handleAddLeaveType}
+                                    className="h-10 px-6 rounded-lg font-semibold shadow-lg shadow-indigo-200"
                                 >
-                                    Thực hiện điều chỉnh
+                                    Thêm Loại Phép
                                 </Button>
-                            </Form>
-                        </Card>
-
-                        <Card
-                            className="!mt-6 shadow-xl border-none rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white overflow-hidden"
-                            styles={{ body: { padding: '24px' } }}
-                        >
-                            <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <Title level={4} style={{ color: '#1e293b', marginBottom: '8px' }}>Khởi tạo tự động theo năm</Title>
-                                    <p style={{ color: '#475569', margin: 0, fontSize: 13 }}>
-                                        Tự động tạo số dư cho toàn bộ nhân viên dựa trên số ngày mặc định của từng loại phép.
-                                    </p>
-                                </div>
-                                <ThunderboltOutlined style={{ fontSize: '32px', color: '#64748b' }} />
                             </div>
-
-                            <div className="mb-3">
-                                <p style={{ color: '#374151', marginBottom: 8, fontSize: 13, fontWeight: 600 }}>Năm khởi tạo</p>
-                                <DatePicker
-                                    picker="year"
-                                    value={dayjs().year(generateYear)}
-                                    onChange={(d) => d && setGenerateYear(d.year())}
-                                    className="w-full rounded-lg"
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <Checkbox
-                                    checked={carryForward}
-                                    onChange={(e) => setCarryForward(e.target.checked)}
-                                    style={{ color: '#374151' }}
-                                >
-                                    Cộng dồn số ngày dư từ năm trước
-                                </Checkbox>
-                            </div>
-
-                            <Popconfirm
-                                title={`Khởi tạo số dư cho năm ${generateYear}?`}
-                                description="Thao tác an toàn: các bản ghi đã tồn tại sẽ được giữ nguyên (bỏ qua)."
-                                onConfirm={handleGenerateBalances}
-                                okText="Khởi tạo"
-                                cancelText="Hủy"
-                            >
-                                <Button
-                                    type="primary"
-                                    icon={<ThunderboltOutlined />}
-                                    loading={isGenerating}
-                                    className="w-full h-10 rounded-lg font-bold"
-                                >
-                                    Khởi tạo số dư năm {generateYear}
-                                </Button>
-                            </Popconfirm>
-                        </Card>
-                    </Col>
-
-                    <Col xs={24} xl={16}>
-                        <Space orientation="vertical" size={24} className="w-full">
+                        }
+                        className="shadow-sm border-none rounded-2xl bg-white overflow-hidden"
+                    >
+                        <Table
+                            columns={leaveTypeColumns}
+                            dataSource={leaveTypes || []}
+                            rowKey="leaveTypeId"
+                            pagination={{ pageSize: 8 }}
+                            loading={leaveTypeLoading}
+                            className="custom-table"
+                        />
+                    </Card>
+                </div>
+            )
+        },
+        {
+            key: "2",
+            label: <Space className="px-4"><HistoryOutlined />Quản lý Theo Dõi Số Dư</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500">
+                    <Row gutter={[24, 24]}>
+                        <Col xs={24} lg={8}>
                             <Card
-                                title={
-                                    <Space>
-                                        <CalendarOutlined className="text-indigo-500" />
-                                        <span>Danh sách Loại Nghỉ phép</span>
-                                    </Space>
-                                }
-                                className="shadow-xl border-none rounded-2xl bg-white/70 backdrop-blur-lg overflow-hidden"
-                                styles={{ header: { borderBottom: '1px solid #f1f5f9' } }}
+                                className="shadow-sm border-none rounded-2xl overflow-hidden h-full bg-white"
+                                styles={{ body: { padding: '24px' } }}
                             >
-                                <Table
-                                    columns={leaveTypeColumns}
-                                    dataSource={leaveTypes || []}
-                                    rowKey="leaveTypeId"
-                                    pagination={{ pageSize: 5 }}
-                                    loading={leaveTypeLoading}
-                                    className="custom-table"
-                                />
+                                <div className="flex items-start justify-between mb-4">
+                                    <div>
+                                        <Title level={4} style={{ color: '#1e293b', marginBottom: '8px' }}>Khởi tạo tự động</Title>
+                                        <p style={{ color: '#64748b', margin: 0, fontSize: 13 }}>
+                                            Tạo số dư cho toàn bộ nhân viên theo năm.
+                                        </p>
+                                    </div>
+                                    <ThunderboltOutlined style={{ fontSize: '32px', color: '#6366f1' }} />
+                                </div>
+                                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '24px' }}>
+                                    <div className="mb-4">
+                                        <p style={{ color: '#475569', marginBottom: '8px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 'bold' }}>Năm khởi tạo</p>
+                                        <DatePicker
+                                            picker="year"
+                                            value={dayjs().year(generateYear)}
+                                            onChange={(d) => d && setGenerateYear(d.year())}
+                                            className="w-full h-10 rounded-lg"
+                                        />
+                                    </div>
+                                    <div className="mb-6">
+                                        <Checkbox
+                                            checked={carryForward}
+                                            onChange={(e) => setCarryForward(e.target.checked)}
+                                            style={{ color: '#334155' }}
+                                        >
+                                            Cộng dồn phép dư năm trước
+                                        </Checkbox>
+                                    </div>
+                                    <Popconfirm
+                                        title={<span className="font-bold">Khởi tạo năm {generateYear}?</span>}
+                                        description="Bản ghi đã tồn tại sẽ được bỏ qua."
+                                        onConfirm={handleGenerateBalances}
+                                        okText="Thực hiện"
+                                        cancelText="Hủy"
+                                    >
+                                        <Button
+                                            type="primary"
+                                            icon={<ThunderboltOutlined />}
+                                            loading={isGenerating}
+                                            style={{ width: '100%', height: '44px', borderRadius: '12px', fontWeight: 'bold' }}
+                                        >
+                                            Khởi tạo số dư năm {generateYear}
+                                        </Button>
+                                    </Popconfirm>
+                                </div>
                             </Card>
-
+                        </Col>
+                        <Col xs={24} lg={16}>
                             <Card
                                 title={
                                     <div className="flex justify-between items-center w-full">
                                         <Space>
-                                            <HistoryOutlined className="text-emerald-500" />
-                                            <span>Danh sách Số dư Nghỉ phép của Nhân viên</span>
+                                            <HistoryOutlined className="text-emerald-500 text-lg" />
+                                            <span className="font-bold text-slate-800">Danh sách Số dư Nhân viên</span>
                                         </Space>
                                         <Button
                                             size="small"
@@ -450,25 +379,140 @@ const LeaveConfiguration = () => {
                                             onClick={() => setIsBalanceModalVisible(true)}
                                             className="text-emerald-600 hover:text-emerald-700 bg-emerald-50 border-emerald-100 rounded-md font-medium"
                                         >
-                                            Khởi tạo số dư
+                                            Tạo thủ công
                                         </Button>
                                     </div>
                                 }
-                                className="shadow-xl border-none rounded-2xl bg-white/70 backdrop-blur-lg overflow-hidden"
-                                styles={{ header: { borderBottom: '1px solid #f1f5f9' } }}
+                                className="shadow-sm border-none rounded-2xl bg-white h-full"
                             >
                                 <Table
                                     columns={balanceColumns}
                                     dataSource={allBalances || []}
                                     rowKey="balanceId"
-                                    pagination={{ pageSize: 5 }}
+                                    pagination={{ pageSize: 8 }}
                                     loading={leaveBalanceLoading}
                                     className="custom-table"
                                 />
                             </Card>
-                        </Space>
-                    </Col>
-                </Row>
+                        </Col>
+                    </Row>
+                </div>
+            )
+        },
+        {
+            key: "3",
+            label: <Space className="px-4"><EditOutlined />Cộng Trừ Phép Chuyên Sâu</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500 w-full max-w-2xl mx-auto">
+                    <Card
+                        title={
+                            <Space size="middle">
+                                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                                    <PlusOutlined className="text-indigo-600 text-lg" />
+                                </div>
+                                <span className="font-bold text-slate-800">Phiếu điều chỉnh số dư</span>
+                            </Space>
+                        }
+                        className="shadow-sm border-none rounded-2xl bg-white"
+                    >
+                        <Alert 
+                            message="Lưu ý"
+                            description="Thao tác này sẽ trực tiếp thay đổi số phép còn lại của nhân viên. Hành động này sẽ được ghi log toàn hệ thống."
+                            type="warning"
+                            showIcon
+                            className="mb-8 border-none bg-amber-50 rounded-xl text-amber-800"
+                        />
+                        <Form form={adjustmentForm} layout="vertical" onFinish={onFinishAdjustment} requiredMark={false}>
+                            <Row gutter={24}>
+                                <Col span={24}>
+                                    <Form.Item name="employeeId" label={<span className="text-slate-500 font-semibold text-xs uppercase tracking-wider">Nhân viên</span>} rules={[{ required: true, message: "Chọn nhân viên" }]}>
+                                        <Select
+                                            showSearch
+                                            placeholder="Chọn nhân viên"
+                                            optionFilterProp="children"
+                                            className="h-11 rounded-lg"
+                                        >
+                                            {(employees || []).map((e: any) => (
+                                                <Option key={e.employeeId} value={e.employeeId}>
+                                                    {e.fullName} ({e.employeeCode})
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={24}>
+                                    <Form.Item name="leaveTypeId" label={<span className="text-slate-500 font-semibold text-xs uppercase tracking-wider">Loại phép</span>} rules={[{ required: true, message: "Chọn loại phép" }]}>
+                                        <Select placeholder="Chọn loại phép" className="h-11 rounded-lg">
+                                            {(leaveTypes || []).filter((lt: any) => lt.isActive).map((lt: any) => (
+                                                <Option key={lt.leaveTypeId} value={lt.leaveTypeId}>
+                                                    {lt.leaveTypeName}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item name="adjustmentType" label={<span className="text-slate-500 font-semibold text-xs uppercase tracking-wider">Thao tác</span>} rules={[{ required: true }]}>
+                                        <Select placeholder="Thao tác" className="h-11 rounded-lg">
+                                            <Option value="Add"><span className="text-emerald-600 font-bold">Cộng thêm (+)</span></Option>
+                                            <Option value="Deduct"><span className="text-rose-600 font-bold">Trừ đi (-)</span></Option>
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <Form.Item name="numberOfDays" label={<span className="text-slate-500 font-semibold text-xs uppercase tracking-wider">Số ngày</span>} rules={[{ required: true }]}>
+                                        <InputNumber min={0.5} step={0.5} style={{ width: '100%' }} className="h-11 rounded-lg pt-1" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={24}>
+                                    <Form.Item name="effectiveDate" label={<span className="text-slate-500 font-semibold text-xs uppercase tracking-wider">Ngày hiệu lực</span>} rules={[{ required: true }]} initialValue={dayjs()}>
+                                        <DatePicker className="w-full h-11 rounded-lg" />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={24}>
+                                    <Form.Item name="reason" label={<span className="text-slate-500 font-semibold text-xs uppercase tracking-wider">Lý do điều chỉnh (Bắt buộc)</span>} rules={[{ required: true }]}>
+                                        <Input.TextArea rows={3} placeholder="Ví dụ: Thưởng phép do làm OT dự án A..." className="rounded-xl" />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                block
+                                loading={leaveBalanceLoading}
+                                className="h-12 mt-4 rounded-xl font-bold tracking-wide shadow-indigo-200 shadow-xl"
+                            >
+                                Xác nhận Điều chỉnh
+                            </Button>
+                        </Form>
+                    </Card>
+                </div>
+            )
+        }
+    ];
+
+    return (
+        <Layout className="bg-[#f8fafc] p-8 lg:p-12 min-h-screen">
+            <Content className="max-w-7xl mx-auto w-full">
+                <div className="mb-10">
+                    <Title level={2} style={{ marginBottom: 4, fontWeight: 700, color: '#1e293b' }}>
+                        <SolutionOutlined className="mr-3 text-indigo-600" />Cấu hình Nghỉ Phép
+                    </Title>
+                    <Paragraph type="secondary" className="text-lg text-slate-500">
+                        Phân bổ hạng mục nghỉ phép, thiết lập tự động hóa số dư và điều chỉnh thủ công.
+                    </Paragraph>
+                </div>
+
+                <Tabs 
+                    defaultActiveKey="1" 
+                    items={tabItems} 
+                    className="custom-minimal-tabs"
+                    tabBarStyle={{ 
+                        marginBottom: 32,
+                        borderBottom: '1px solid #e2e8f0'
+                    }}
+                    size="large"
+                />
             </Content>
 
             <LeaveTypeModal
@@ -513,38 +557,20 @@ const LeaveConfiguration = () => {
                     <div className="py-4">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <Statistic
-                                    title="Bản ghi đã tạo"
-                                    value={generateResult.created}
-                                    styles={{ content: { color: '#10b981', fontWeight: 700 } }}
-                                    suffix="bản ghi"
-                                />
+                                <Statistic title="Bản ghi đã tạo" value={generateResult.created} styles={{ content: { color: '#10b981', fontWeight: 700 } }} suffix="bản ghi" />
                             </Col>
                             <Col span={12}>
-                                <Statistic
-                                    title="Đã bỏ qua (tồn tại)"
-                                    value={generateResult.skipped}
-                                    styles={{ content: { color: '#f59e0b', fontWeight: 700 } }}
-                                    suffix="bản ghi"
-                                />
+                                <Statistic title="Đã bỏ qua (tồn tại)" value={generateResult.skipped} styles={{ content: { color: '#f59e0b', fontWeight: 700 } }} suffix="bản ghi" />
                             </Col>
                             <Col span={12}>
-                                <Statistic
-                                    title="Nhân viên được xử lý"
-                                    value={generateResult.totalEmployees}
-                                    suffix="người"
-                                />
+                                <Statistic title="Nhân viên được xử lý" value={generateResult.totalEmployees} suffix="người" />
                             </Col>
                             <Col span={12}>
-                                <Statistic
-                                    title="Loại phép được áp dụng"
-                                    value={generateResult.totalLeaveTypes}
-                                    suffix="loại"
-                                />
+                                <Statistic title="Loại phép được áp dụng" value={generateResult.totalLeaveTypes} suffix="loại" />
                             </Col>
                             {generateResult.carriedForward > 0 && (
                                 <Col span={24}>
-                                    <div className="bg-blue-50 rounded-lg p-3 text-blue-700 text-sm">
+                                    <div className="bg-blue-50 rounded-lg p-3 text-blue-700 text-sm mt-2">
                                         ✅ <strong>{generateResult.carriedForward}</strong> bản ghi được cộng dồn ngày dư từ năm {generateResult.year - 1}.
                                     </div>
                                 </Col>
@@ -553,35 +579,6 @@ const LeaveConfiguration = () => {
                     </div>
                 )}
             </Modal>
-
-            <style>{`
-                .ant-card-head {
-                    padding: 18px 24px;
-                }
-                .ant-card-head-title {
-                    font-size: 1.1rem;
-                    font-weight: 700 !important;
-                    color: #1e293b !important;
-                }
-                .custom-table .ant-table-thead > tr > th {
-                    background: #f8fafc;
-                    color: #64748b;
-                    font-weight: 600;
-                    border-bottom: 2px solid #f1f5f9;
-                    padding: 16px;
-                }
-                .custom-table .ant-table-tbody > tr > td {
-                    padding: 16px;
-                }
-                .custom-table .ant-table-row:hover {
-                    cursor: pointer;
-                }
-                .ant-btn-primary {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-            `}</style>
         </Layout>
     );
 };
