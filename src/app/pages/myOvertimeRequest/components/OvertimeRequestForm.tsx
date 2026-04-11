@@ -1,16 +1,149 @@
-import { Button, Form, Input, DatePicker, TimePicker, message, Card, Typography, Radio } from "antd";
+import { Button, Form, Input, DatePicker, TimePicker, message, Card, Typography, Radio, Row, Col, Alert } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { createOvertimeRequest, selectOvertimeLoading, fetchMyOvertimeRequests } from "../../../../store/overtimeSlide";
+import { fetchMySchedule, selectMySchedule } from "../../../../store/shiftAssignmentSlide";
 import dayjs from "dayjs";
+import { useEffect, useMemo } from "react";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const OvertimeRequestForm = () => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectOvertimeLoading);
+    const mySchedule = useAppSelector(selectMySchedule);
+    
+    // Watch values in form
+    const overtimeDate = Form.useWatch("overtimeDate", form);
     const otMode = Form.useWatch("otMode", form);
+
+    // Check if the selected date has an active shift assignment
+    const selectedDateShift = useMemo(() => {
+        if (!overtimeDate) return null;
+        const dateStr = overtimeDate.format("YYYY-MM-DD");
+        return mySchedule.find(s => 
+            dayjs(s.assignmentDate).format("YYYY-MM-DD") === dateStr && 
+            s.status === "Active"
+        );
+    }, [overtimeDate, mySchedule]);
+
+    // Cleanup and reset mode when date changes
+    useEffect(() => {
+        if (overtimeDate) {
+            if (selectedDateShift) {
+                form.setFieldValue("otMode", "AfterShift");
+            } else {
+                form.setFieldValue("otMode", "FullRange");
+            }
+        }
+    }, [overtimeDate, selectedDateShift, form]);
+
+    // Initial load for schedule
+    useEffect(() => {
+        if (mySchedule.length === 0) {
+            dispatch(fetchMySchedule({ 
+                fromDate: dayjs().startOf('month').format("YYYY-MM-DD"),
+                toDate: dayjs().endOf('month').format("YYYY-MM-DD")
+            }));
+        }
+    }, [dispatch, mySchedule.length]);
+
+    // Sync anchor times when mode or shift changes
+    useEffect(() => {
+        if (selectedDateShift) {
+            const shiftStart = dayjs(selectedDateShift.startTime, "HH:mm:ss");
+            const shiftEnd = dayjs(selectedDateShift.endTime, "HH:mm:ss");
+
+            if (otMode === "BeforeShift") {
+                form.setFieldValue("endTime", shiftStart);
+                // Clear startTime if it's invalid
+                const currentStart = form.getFieldValue("startTime");
+                if (currentStart && currentStart.isAfter(shiftStart)) {
+                    form.setFieldValue("startTime", null);
+                }
+            } else if (otMode === "AfterShift") {
+                form.setFieldValue("startTime", shiftEnd);
+                // Clear endTime if it's invalid
+                const currentEnd = form.getFieldValue("endTime");
+                if (currentEnd && currentEnd.isBefore(shiftEnd)) {
+                    form.setFieldValue("endTime", null);
+                }
+            }
+        }
+    }, [otMode, selectedDateShift, form]);
+
+    // Validation Logic for TimePickers
+    const getDisabledStartTime = () => {
+        if (!selectedDateShift || otMode !== "BeforeShift") return {};
+        const shiftStart = dayjs(selectedDateShift.startTime, "HH:mm:ss");
+        const startHour = shiftStart.hour();
+        
+        // Allowed range: (startHour - 4) to startHour
+        // We need to handle wrap-around for shifts starting at 00:00, 01:00, etc.
+        const allowedHours: number[] = [];
+        for (let i = 1; i <= 4; i++) {
+            allowedHours.push((startHour - i + 24) % 24);
+        }
+
+        return {
+            disabledHours: () => {
+                const hours = [];
+                for (let i = 0; i < 24; i++) {
+                    if (!allowedHours.includes(i)) hours.push(i);
+                }
+                return hours;
+            },
+            disabledMinutes: (selectedHour: number) => {
+                // For the anchor hour (startHour), we don't allow any minutes 
+                // because OT must be BEFORE the shift.
+                if (selectedHour === startHour) {
+                    const minutes = [];
+                    for (let i = 0; i < 60; i++) minutes.push(i);
+                    return minutes;
+                }
+                return [];
+            }
+        };
+    };
+
+    const getDisabledEndTime = () => {
+        if (!selectedDateShift || otMode !== "AfterShift") return {};
+        const shiftEnd = dayjs(selectedDateShift.endTime, "HH:mm:ss");
+        const endHour = shiftEnd.hour();
+
+        // Allowed range: endHour to (endHour + 4)
+        const allowedHours: number[] = [];
+        for (let i = 0; i <= 4; i++) {
+            allowedHours.push((endHour + i) % 24);
+        }
+
+        return {
+            disabledHours: () => {
+                const hours = [];
+                for (let i = 0; i < 24; i++) {
+                    if (!allowedHours.includes(i)) hours.push(i);
+                }
+                return hours;
+            },
+            disabledMinutes: (selectedHour: number) => {
+                // In the shift end hour, can only pick minutes AFTER the shift ends
+                if (selectedHour === endHour) {
+                    const minutes = [];
+                    for (let i = 0; i <= shiftEnd.minute(); i++) minutes.push(i);
+                    return minutes;
+                }
+                // In the limit hour (end+4), can only pick minutes BEFORE the limit
+                const limitHour = (endHour + 4) % 24;
+                if (selectedHour === limitHour) {
+                    const minutes = [];
+                    for (let i = shiftEnd.minute() + 1; i < 60; i++) minutes.push(i);
+                    return minutes;
+                }
+                return [];
+            }
+        };
+    };
 
     const onFinish = (values: any) => {
         const overtimeDate = values.overtimeDate.format("YYYY-MM-DD");
@@ -19,9 +152,13 @@ const OvertimeRequestForm = () => {
         let endTime = null;
 
         if (values.otMode === "AfterShift") {
+            // Note: In AfterShift, startTime is fixed to ShiftEnd
+            startTime = dayjs(selectedDateShift?.endTime, "HH:mm:ss").format("HH:mm:ss");
             endTime = values.endTime?.format("HH:mm:ss");
         } else if (values.otMode === "BeforeShift") {
+            // In BeforeShift, endTime is fixed to ShiftStart
             startTime = values.startTime?.format("HH:mm:ss");
+            endTime = dayjs(selectedDateShift?.startTime, "HH:mm:ss").format("HH:mm:ss");
         } else {
             startTime = values.startTime?.format("HH:mm:ss");
             endTime = values.endTime?.format("HH:mm:ss");
@@ -50,67 +187,145 @@ const OvertimeRequestForm = () => {
     };
 
     const disabledDate = (current: any) => {
-        // Can only select from 3 days ago until 30 days in future
         return current && (current < dayjs().subtract(3, 'day').startOf('day') || current > dayjs().add(30, 'day').endOf('day'));
     };
 
     return (
-        <Card className="rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <Title level={4} className="mb-6 flex items-center">
-                <span className="w-1.5 h-6 bg-blue-500 rounded-full mr-3"></span>
-                Gửi yêu cầu tăng ca
+        <Card className="rounded-2xl shadow-md border-0 bg-white">
+            <Title level={4} className="mb-6 flex items-center text-slate-800">
+                <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+                Đăng ký tăng ca (OT)
             </Title>
+            
             <Form 
                 form={form} 
                 layout="vertical" 
                 onFinish={onFinish}
                 initialValues={{ otMode: "AfterShift" }}
             >
-                <Form.Item name="overtimeDate" label="Ngày tăng ca" rules={[{ required: true, message: "Vui lòng chọn ngày!" }]}>
-                    <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" disabledDate={disabledDate} />
+                <Form.Item 
+                    name="overtimeDate" 
+                    label={<Text strong>1. Chọn ngày tăng ca</Text>} 
+                    rules={[{ required: true, message: "Vui lòng chọn ngày!" }]}
+                >
+                    <DatePicker 
+                        style={{ width: "100%" }} 
+                        format="DD/MM/YYYY" 
+                        disabledDate={disabledDate} 
+                        className="h-10 rounded-lg"
+                        placeholder="Chọn ngày đăng ký OT"
+                    />
                 </Form.Item>
 
-                <Form.Item name="otMode" label="Chế độ tăng ca" rules={[{ required: true }]}>
-                    <Radio.Group buttonStyle="solid" className="w-full flex">
-                        <Radio.Button value="AfterShift" className="flex-1 text-center">Sau ca</Radio.Button>
-                        <Radio.Button value="BeforeShift" className="flex-1 text-center">Trước ca</Radio.Button>
-                        <Radio.Button value="FullRange" className="flex-1 text-center">Cả ngày/Nghỉ</Radio.Button>
-                    </Radio.Group>
-                </Form.Item>
+                {overtimeDate && (
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 animate-in fade-in duration-500">
+                        <div className="mb-4">
+                            {selectedDateShift ? (
+                                <Alert
+                                    message={`Bạn có lịch làm việc: ${selectedDateShift.shiftName}`}
+                                    description={`Thời gian: ${selectedDateShift.startTime?.substring(0, 5)} - ${selectedDateShift.endTime?.substring(0, 5)}`}
+                                    type="info"
+                                    showIcon
+                                    className="rounded-lg"
+                                />
+                            ) : (
+                                <Alert
+                                    message="Ngày nghỉ / Không có ca làm chính"
+                                    description="Bạn đang đăng ký tăng ca cho ngày không có lịch làm việc chính thức."
+                                    type="warning"
+                                    showIcon
+                                    className="rounded-lg"
+                                />
+                            )}
+                        </div>
 
-                <div className="flex gap-4">
-                    {(otMode === "BeforeShift" || otMode === "FullRange") && (
                         <Form.Item 
-                            name="startTime" 
-                            label="Giờ bắt đầu" 
-                            className="flex-1"
-                            rules={[{ required: true, message: "Chọn giờ bắt đầu!" }]}
+                            name="otMode" 
+                            label={<Text strong>2. Chế độ tăng ca phù hợp</Text>} 
+                            rules={[{ required: true }]}
                         >
-                            <TimePicker style={{ width: "100%" }} format="HH:mm" />
+                            <Radio.Group buttonStyle="solid" className="w-full">
+                                <Row gutter={[8, 8]}>
+                                    {selectedDateShift ? (
+                                        <>
+                                            <Col span={12}>
+                                                <Radio.Button value="BeforeShift" className="w-full text-center h-10 leading-10 rounded-l-lg">Trước ca</Radio.Button>
+                                            </Col>
+                                            <Col span={12}>
+                                                <Radio.Button value="AfterShift" className="w-full text-center h-10 leading-10 rounded-r-lg">Sau ca</Radio.Button>
+                                            </Col>
+                                        </>
+                                    ) : (
+                                        <Col span={24}>
+                                            <Radio.Button value="FullRange" className="w-full text-center h-10 leading-10 rounded-lg">Tăng ca ngày nghỉ/lễ</Radio.Button>
+                                        </Col>
+                                    )}
+                                </Row>
+                            </Radio.Group>
                         </Form.Item>
-                    )}
-                    {(otMode === "AfterShift" || otMode === "FullRange") && (
-                        <Form.Item 
-                            name="endTime" 
-                            label="Giờ kết thúc" 
-                            className="flex-1"
-                            rules={[{ required: true, message: "Chọn giờ kết thúc!" }]}
-                        >
-                            <TimePicker style={{ width: "100%" }} format="HH:mm" />
-                        </Form.Item>
-                    )}
-                </div>
 
-                <Form.Item name="reason" label="Lý do tăng ca" rules={[{ required: true, message: "Vui lòng nhập lý do!" }]}>
-                    <TextArea rows={3} placeholder="Mô tả lý do..." />
+                        <div className="flex gap-4 mt-4">
+                            {(otMode === "BeforeShift" || otMode === "FullRange") && (
+                                <Form.Item 
+                                    name="startTime" 
+                                    label={<Text strong>{otMode === "BeforeShift" ? "Giờ bắt đầu OT" : "Giờ bắt đầu"}</Text>} 
+                                    className="flex-1"
+                                    rules={[{ required: true, message: "Chọn giờ bắt đầu!" }]}
+                                    tooltip={otMode === "BeforeShift" ? "Phải bắt đầu trước giờ vào ca làm việc" : ""}
+                                >
+                                    <TimePicker 
+                                        style={{ width: "100%" }} 
+                                        format="HH:mm" 
+                                        className="h-10 rounded-lg"
+                                        disabled={otMode === "AfterShift"}
+                                        disabledTime={() => getDisabledStartTime()}
+                                        hideDisabledOptions
+                                    />
+                                </Form.Item>
+                            )}
+                            {(otMode === "AfterShift" || otMode === "FullRange") && (
+                                <Form.Item 
+                                    name="endTime" 
+                                    label={<Text strong>{otMode === "AfterShift" ? "Giờ kết thúc OT" : "Giờ kết thúc"}</Text>} 
+                                    className="flex-1"
+                                    rules={[{ required: true, message: "Chọn giờ kết thúc!" }]}
+                                    tooltip={otMode === "AfterShift" ? "Phải kết thúc sau giờ ra ca làm việc" : ""}
+                                >
+                                    <TimePicker 
+                                        style={{ width: "100%" }} 
+                                        format="HH:mm" 
+                                        className="h-10 rounded-lg"
+                                        disabled={otMode === "BeforeShift"}
+                                        disabledTime={() => getDisabledEndTime()}
+                                        hideDisabledOptions
+                                    />
+                                </Form.Item>
+                            )}
+                        </div>
+                        
+                        {selectedDateShift && (
+                            <div className="mt-2 text-xs text-slate-400 italic">
+                                * Lưu ý: Giờ tăng ca tối đa là 4 tiếng/ngày và không được trùng với giờ làm việc chính.
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <Form.Item name="reason" label={<Text strong>Lý do tăng ca</Text>} rules={[{ required: true, message: "Vui lòng nhập lý do!" }]}>
+                    <TextArea rows={3} placeholder="Ví dụ: Hoàn thành báo cáo tháng..." className="rounded-lg" />
                 </Form.Item>
 
-                <Form.Item name="taskDescription" label="Nội dung công việc">
-                    <TextArea rows={3} placeholder="Mô tả công việc thực hiện..." />
+                <Form.Item name="taskDescription" label={<Text strong>Nội dung công việc</Text>}>
+                    <TextArea rows={3} placeholder="Mô tả chi tiết các đầu việc sẽ thực hiện..." className="rounded-lg" />
                 </Form.Item>
 
-                <Button type="primary" htmlType="submit" className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 mt-2" loading={loading}>
-                    Gửi yêu cầu
+                <Button 
+                    type="primary" 
+                    htmlType="submit" 
+                    className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 mt-4 text-base font-semibold shadow-lg shadow-indigo-100" 
+                    loading={loading}
+                >
+                    Gửi yêu cầu đăng ký
                 </Button>
             </Form>
         </Card>
