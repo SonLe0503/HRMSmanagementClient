@@ -129,3 +129,14 @@ body,
 .ant-picker-cell-today .ant-picker-cell-inner {
     color: inherit !important;
 }
+
+/* Forgot Password Modal Styles */
+.forgot-password-modal .ant-modal-content {
+    border-radius: 24px;
+    padding: 24px 32px;
+}
+
+.forgot-password-modal .ant-steps-item-title {
+    font-size: 13px;
+    font-weight: 600;
+}
