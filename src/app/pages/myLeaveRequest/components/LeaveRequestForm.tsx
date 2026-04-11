@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { 
     createLeaveRequest, 
     fetchMyLeaveRequests,
+    selectMyLeaveRequests,
     selectLeaveRequestLoading, 
     selectLeaveRequestLastResponse,
     selectLeaveRequestError,
@@ -13,6 +14,11 @@ import {
 import { fetchMyBalance } from "../../../../store/leaveBalanceSlide";
 import { fetchActiveLeaveTypes, selectActiveLeaveTypes } from "../../../../store/leaveTypeSlide";
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -25,11 +31,13 @@ const LeaveRequestForm = () => {
     const lastResponse = useAppSelector(selectLeaveRequestLastResponse);
     const error = useAppSelector(selectLeaveRequestError);
     const leaveTypes = useAppSelector(selectActiveLeaveTypes);
+    const myRequests = useAppSelector(selectMyLeaveRequests);
     const [submitAnywayModal, setSubmitAnywayModal] = useState(false);
     const [formData, setFormData] = useState<any>(null);
 
     useEffect(() => {
         dispatch(fetchActiveLeaveTypes());
+        dispatch(fetchMyLeaveRequests());
     }, [dispatch]);
 
     useEffect(() => {
@@ -92,6 +100,52 @@ const LeaveRequestForm = () => {
         }
     };
 
+    // Hàm kiểm tra ngày đã được đăng ký chưa
+    const isDateRequested = (current: dayjs.Dayjs) => {
+        return myRequests.some(req => {
+            if (req.status === "Cancelled" || req.status === "Rejected") return false;
+            const start = dayjs(req.startDate).startOf('day');
+            const end = dayjs(req.endDate).startOf('day');
+            return current.isSameOrAfter(start) && current.isSameOrBefore(end);
+        });
+    };
+
+    const disabledDate = (current: dayjs.Dayjs) => {
+        // Disable ngày trong quá khứ
+        if (current && current < dayjs().startOf('day')) return true;
+        // Disable ngày đã có đơn gửi đi (Approved hoặc Pending)
+        return isDateRequested(current);
+    };
+
+    // Render custom ô ngày để đổi màu những ngày đã đăng ký
+    const cellRender = (current: any, info: any) => {
+        if (info.type !== 'date') return info.originNode;
+        
+        const dateDayjs = dayjs(current);
+        const isRequested = isDateRequested(dateDayjs);
+        const isToday = dateDayjs.isSame(dayjs(), 'day');
+
+        if (isRequested) {
+            return (
+                <div className="ant-picker-cell-inner relative" style={{ backgroundColor: '#fff1f0', color: '#ff4d4f', border: '1px solid #ffa39e', borderRadius: '4px' }}>
+                    {dateDayjs.date()}
+                    {isToday && <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full" />}
+                </div>
+            );
+        }
+
+        if (isToday) {
+            return (
+                <div className="ant-picker-cell-inner relative">
+                    {dateDayjs.date()}
+                    <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full" />
+                </div>
+            );
+        }
+
+        return info.originNode;
+    };
+
     return (
         <Card title="Đăng ký nghỉ phép" className="shadow-lg border-none rounded-2xl bg-white/70 backdrop-blur-md">
             <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -108,8 +162,10 @@ const LeaveRequestForm = () => {
                 <Form.Item name="range" label="Thời gian" rules={[{ required: true, message: 'Vui lòng chọn thời gian' }]}>
                     <RangePicker 
                         className="w-full h-12 rounded-lg" 
+                        popupClassName="custom-range-picker"
                         onChange={handleDateChange}
-                        disabledDate={(current) => current && current < dayjs().startOf('day')}
+                        disabledDate={disabledDate}
+                        cellRender={cellRender}
                         size="large"
                     />
                 </Form.Item>

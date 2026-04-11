@@ -56,13 +56,30 @@ const ManageOvertimeRequest = () => {
             render: (date: string) => dayjs(date).format("DD/MM/YYYY"),
         },
         {
+            title: "Phân loại",
+            key: "typeMode",
+            render: (_: any, record: any) => (
+                <div className="flex flex-col gap-1">
+                    <Tag color={record.otType === "NormalDay" ? "blue" : "orange"} className="w-fit border-none font-bold text-[10px] uppercase">
+                        {record.otType === "NormalDay" ? "Ngày thường" : "Ngày nghỉ"}
+                    </Tag>
+                    <Text className="text-xs text-slate-500 font-medium">
+                        {record.otMode === "AfterShift" ? "Sau ca" : 
+                         record.otMode === "BeforeShift" ? "Trước ca" : "Linh hoạt"}
+                    </Text>
+                </div>
+            )
+        },
+        {
             title: "Thời gian",
             key: "time",
             render: (_: any, record: any) => (
                 <div className="flex items-center gap-2">
                     <ClockCircleOutlined className="text-slate-400" />
-                    <span>{record.startTime.slice(0, 5)} - {record.endTime.slice(0, 5)}</span>
-                    <Tag color="orange">{record.totalHours}h</Tag>
+                    <span className="font-medium text-slate-700">
+                        {record.startTime?.slice(0, 5) || "—"} - {record.endTime?.slice(0, 5) || "—"}
+                    </span>
+                    <Tag color="orange" className="border-none font-bold">{record.totalHours}h</Tag>
                 </div>
             ),
         },

@@ -89,6 +89,31 @@ const MyAttendanceHistoryTable = () => {
             render: (val: number) => val ?? "0"
         },
         {
+            title: "Overtime (h)",
+            dataIndex: "payrollOvertimeHours",
+            key: "overtime",
+            align: 'center' as const,
+            render: (_: any, record: any) => {
+                const payroll = record.payrollOvertimeHours || 0;
+                const actual = record.actualOvertimeHours || 0;
+                const approved = record.approvedOvertimeHours || 0;
+
+                return (
+                    <Tooltip title={
+                        <div>
+                            <p>Phê duyệt: {approved}h</p>
+                            <p>Thực tế làm: {actual}h</p>
+                            <p className="border-t mt-1 pt-1 font-bold">Tính lương: {payroll}h</p>
+                        </div>
+                    }>
+                        <Tag color={payroll > 0 ? "orange" : "default"}>
+                            {payroll}
+                        </Tag>
+                    </Tooltip>
+                );
+            }
+        },
+        {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
@@ -98,6 +123,8 @@ const MyAttendanceHistoryTable = () => {
                 if (status === "Late") color = "warning";
                 if (status === "Absent") color = "error";
                 if (status === "Incomplete") color = "blue";
+                if (status === "PaidLeave") color = "cyan";
+                if (status === "UnpaidLeave") color = "purple";
                 
                 const isInvalidLocation = record.location?.includes("[INVALID]");
 
@@ -164,7 +191,7 @@ const MyAttendanceHistoryTable = () => {
             <Table 
                 columns={columns} 
                 dataSource={records} 
-                rowKey="attendanceId" 
+                rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}`} 
                 loading={loading}
                 pagination={{ pageSize: 15 }}
                 bordered
