@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import ChangePasswordModal from '../../pages/auth/ChangePasswordModal';
 
 import { stringToColor, getInitial } from '../../../utils/common';
+import { request } from '../../../utils/request';
 
 const { Header } = Layout;
 
@@ -45,6 +46,25 @@ const HeaderBar = () => {
 
         return () => clearInterval(timer);
     }, [infoLogin?.expiresTime]);
+
+    useEffect(() => {
+        if (!infoLogin?.accessToken) return;
+
+        // Automatically ping the server to check if the session is still valid (detects concurrent logins)
+        const pingTimer = setInterval(async () => {
+            try {
+                await request({
+                    url: '/Auth/ping',
+                    method: 'GET',
+                    headers: { Authorization: `Bearer ${infoLogin.accessToken}` }
+                });
+            } catch (error) {
+                clearInterval(pingTimer);
+            }
+        }, 10000); // Ping every 10 seconds
+
+        return () => clearInterval(pingTimer);
+    }, [infoLogin?.accessToken]);
 
     const userInitial = getInitial(infoLogin?.userName);
     const avatarColor = infoLogin?.userName ? stringToColor(infoLogin.userName) : "#bfbfbf";
