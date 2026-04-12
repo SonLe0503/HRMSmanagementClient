@@ -34,9 +34,10 @@ const Condition = ({
                 style={{ width: 150 }}
                 allowClear
             >
-                <Option value="Pending">Pending</Option>
-                <Option value="Approved">Approved</Option>
-                <Option value="Rejected">Rejected</Option>
+                <Option value="Pending">Chờ duyệt</Option>
+                <Option value="Approved">Đã duyệt</Option>
+                <Option value="Rejected">Từ chối</Option>
+                <Option value="Applied">Đã áp dụng</Option>
             </Select>
             <Select
                 placeholder="Lọc theo loại"
@@ -45,11 +46,11 @@ const Condition = ({
                 style={{ width: 150 }}
                 allowClear
             >
-                <Option value="Appointment">Appointment</Option>
-                <Option value="Transfer">Transfer</Option>
-                <Option value="Promotion">Promotion</Option>
-                <Option value="Resignation">Resignation</Option>
-                <Option value="Termination">Termination</Option>
+                <Option value="Appointment">Bổ nhiệm</Option>
+                <Option value="Transfer">Điều chuyển</Option>
+                <Option value="Promotion">Thăng tiến</Option>
+                <Option value="Resignation">Thôi việc</Option>
+                <Option value="Termination">Sa thải</Option>
             </Select>
         </Space>
     );

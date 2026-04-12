@@ -29,6 +29,8 @@ export interface IHRProcedureResponse {
     newPositionId: number | null;
     newPositionName: string | null;
     newSalary: number | null;
+    newManagerId: number | null;
+    newManagerName: string | null;
     reason: string | null;
     status: string;
     rejectionReason: string | null;
@@ -41,6 +43,9 @@ export interface IHRProcedureResponse {
     approvedDate: string | null;
     approvedBy: number | null;
     approvedByName: string | null;
+    appliedDate: string | null;
+    appliedBy: number | null;
+    appliedByName: string | null;
 }
 
 interface IHRProcedureState {
@@ -185,6 +190,20 @@ export const rejectProcedure = createAsyncThunk(
     }
 );
 
+export const applyProcedure = createAsyncThunk(
+    "hrProcedure/apply",
+    async (id: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: `/HRProcedure/${id}/apply`, method: "POST", headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
 export const deleteProcedure = createAsyncThunk(
     "hrProcedure/delete",
     async (id: number, { rejectWithValue, getState }) => {
@@ -268,6 +287,19 @@ export const hrProcedureSlice = createSlice({
             .addCase(rejectProcedure.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(rejectProcedure.fulfilled, (state) => { state.loading = false; })
             .addCase(rejectProcedure.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            // applyProcedure
+            .addCase(applyProcedure.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(applyProcedure.fulfilled, (state, action) => {
+                state.loading = false;
+                state.selectedProcedure = action.payload;
+                // update in list as well
+                const idx = state.procedures.findIndex(p => p.procedureId === action.payload.procedureId);
+                if (idx !== -1) {
+                    state.procedures[idx].status = action.payload.status;
+                }
+            })
+            .addCase(applyProcedure.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
 
             // deleteProcedure
             .addCase(deleteProcedure.pending, (state) => { state.loading = true; state.error = null; })
