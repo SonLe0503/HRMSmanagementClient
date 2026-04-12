@@ -303,6 +303,28 @@ export const evaluationSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchEvaluationsByEmployee.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchEvaluationsByEmployee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.evaluations = action.payload;
+      })
+      .addCase(fetchEvaluationsByEmployee.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchEvaluationsByEvaluator.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchEvaluationsByEvaluator.fulfilled, (state, action) => {
+        state.loading = false;
+        state.evaluations = action.payload;
+      })
+      .addCase(fetchEvaluationsByEvaluator.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchEvaluationById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedEvaluation = action.payload;

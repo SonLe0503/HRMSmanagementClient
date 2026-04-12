@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Card, Space, Select, message, Tooltip, Typography, Tag, Modal } from "antd";
+import { Table, Button, Card, Space, Select, message, Tooltip, Typography, Tag, Modal, Form } from "antd";
 import { UserAddOutlined, RobotOutlined, DeploymentUnitOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchActiveCycles, selectCycles } from "../../../store/evaluationCycleSlide";
 import { fetchActiveTemplates, selectTemplates } from "../../../store/evaluationTemplateSlide";
-import { 
-    fetchAssignmentPreview, 
-    selectAssignmentPreview, 
+import { fetchAllEmployees, selectEmployees } from "../../../store/employeeSlide";
+import {
+    fetchAssignmentPreview,
+    selectAssignmentPreview,
     selectEvaluationLoading,
-    autoAssignEvaluators
+    autoAssignEvaluators,
+    assignEvaluators
 } from "../../../store/evaluationSlide";
 
 const { Title, Text } = Typography;
@@ -17,15 +19,21 @@ const EvaluatorAssignments = () => {
     const dispatch = useAppDispatch();
     const cycles = useAppSelector(selectCycles);
     const templates = useAppSelector(selectTemplates);
+    const employeesList = useAppSelector(selectEmployees);
     const previewData = useAppSelector(selectAssignmentPreview);
     const loading = useAppSelector(selectEvaluationLoading);
-    
+
     const [selectedCycleId, setSelectedCycleId] = useState<number | null>(null);
     const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+
+    const [isManualModalVisible, setIsManualModalVisible] = useState(false);
+    const [selectedEmployeeForManual, setSelectedEmployeeForManual] = useState<any>(null);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         dispatch(fetchActiveCycles());
         dispatch(fetchActiveTemplates());
+        dispatch(fetchAllEmployees());
     }, [dispatch]);
 
     const handleFetchPreview = () => {
@@ -48,14 +56,20 @@ const EvaluatorAssignments = () => {
                 dispatch(autoAssignEvaluators({
                     cycleId: selectedCycleId,
                     templateId: selectedTemplateId,
-                    includeSecondaryEvaluator: true
+                    includeSecondaryEvaluator: false
                 }))
-                .unwrap()
-                .then((res) => {
-                    message.success(`Assigned ${res.successCount} employees successfully`);
-                    dispatch(fetchAssignmentPreview(selectedCycleId));
-                })
-                .catch(err => message.error(err?.message || "Failed to auto-assign"));
+                    .unwrap()
+                    .then((res: any) => {
+                        if (res.errors && res.errors.length > 0) {
+                            message.warning(`Assigned ${res.successCount} employees, but failed for ${res.failedCount}. Error: ${res.errors[0].errorMessage}`);
+                        } else if (res.successCount > 0) {
+                            message.success(`Assigned ${res.successCount} employees successfully`);
+                        } else {
+                            message.info("No new employees were assigned.");
+                        }
+                        dispatch(fetchAssignmentPreview(selectedCycleId));
+                    })
+                    .catch(err => message.error(err?.message || "Failed to auto-assign"));
             }
         });
     };
@@ -67,8 +81,8 @@ const EvaluatorAssignments = () => {
             key: "employeeName",
             render: (name: string, record: any) => (
                 <div>
-                   <div style={{ fontWeight: 500 }}>{name}</div>
-                   <div style={{ fontSize: "0.85em", color: "#666" }}>{record.department}</div>
+                    <div style={{ fontWeight: 500 }}>{name}</div>
+                    <div style={{ fontSize: "0.85em", color: "#666" }}>{record.department}</div>
                 </div>
             )
         },
@@ -76,12 +90,6 @@ const EvaluatorAssignments = () => {
             title: "Suggested Primary",
             dataIndex: "suggestedPrimaryEvaluatorName",
             key: "primary",
-            render: (name: string) => name || <Tag color="gray">None</Tag>
-        },
-        {
-            title: "Suggested Secondary",
-            dataIndex: "suggestedSecondaryEvaluatorName",
-            key: "secondary",
             render: (name: string) => name || <Tag color="gray">None</Tag>
         },
         {
@@ -94,14 +102,20 @@ const EvaluatorAssignments = () => {
             title: "Action",
             key: "action",
             width: 100,
-            render: () => (
+            render: (_: any, record: any) => (
                 <Space size="middle">
                     <Tooltip title="Assign Manually">
-                        <Button 
+                        <Button
                             disabled={!selectedTemplateId}
                             size="small"
-                            icon={<UserAddOutlined />} 
-                            onClick={() => message.info("Manual assignment coming soon")}
+                            icon={<UserAddOutlined />}
+                            onClick={() => {
+                                setSelectedEmployeeForManual(record);
+                                form.setFieldsValue({
+                                    primaryEvaluatorId: record.suggestedPrimaryEvaluatorId || undefined
+                                });
+                                setIsManualModalVisible(true);
+                            }}
                         />
                     </Tooltip>
                 </Space>
@@ -119,7 +133,7 @@ const EvaluatorAssignments = () => {
                 <div style={{ display: "flex", gap: 16, marginBottom: 24, padding: 16, backgroundColor: "#f9f9f9", borderRadius: 8 }}>
                     <div style={{ flex: 1 }}>
                         <Text strong>Select Active Cycle</Text>
-                        <Select 
+                        <Select
                             style={{ width: "100%", marginTop: 8 }}
                             placeholder="Select cycle"
                             onChange={(val) => setSelectedCycleId(val)}
@@ -131,7 +145,7 @@ const EvaluatorAssignments = () => {
                     </div>
                     <div style={{ flex: 1 }}>
                         <Text strong>Apply Template</Text>
-                        <Select 
+                        <Select
                             style={{ width: "100%", marginTop: 8 }}
                             placeholder="Select template"
                             onChange={(val) => setSelectedTemplateId(val)}
@@ -145,9 +159,9 @@ const EvaluatorAssignments = () => {
                         <Button type="primary" ghost onClick={handleFetchPreview}>
                             Load Employees
                         </Button>
-                        <Button 
-                            type="primary" 
-                            icon={<RobotOutlined />} 
+                        <Button
+                            type="primary"
+                            icon={<RobotOutlined />}
                             onClick={handleAutoAssign}
                             disabled={!selectedCycleId || !selectedTemplateId}
                         >
@@ -169,6 +183,59 @@ const EvaluatorAssignments = () => {
                     locale={{ emptyText: "Select a cycle and click Load Employees to see suggestions" }}
                 />
             </Card>
+
+            <Modal
+                title={`Manual Assignment - ${selectedEmployeeForManual?.employeeName}`}
+                open={isManualModalVisible}
+                onOk={() => {
+                    form.validateFields().then(values => {
+                        if (!selectedCycleId || !selectedTemplateId || !selectedEmployeeForManual) return;
+                        dispatch(assignEvaluators({
+                            cycleId: selectedCycleId,
+                            assignments: [{
+                                employeeId: selectedEmployeeForManual.employeeId,
+                                templateId: selectedTemplateId,
+                                primaryEvaluatorId: values.primaryEvaluatorId
+                            }]
+                        })).unwrap().then((res: any) => {
+                            if (res.errors && res.errors.length > 0) {
+                                message.error(res.errors[0].errorMessage);
+                            } else {
+                                message.success("Assigned successfully");
+                                setIsManualModalVisible(false);
+                            }
+                            dispatch(fetchAssignmentPreview(selectedCycleId));
+                        }).catch(err => {
+                            message.error(err?.message || "Failed to assign");
+                        });
+                    });
+                }}
+                onCancel={() => {
+                    setIsManualModalVisible(false);
+                    form.resetFields();
+                }}
+                destroyOnClose
+            >
+                <Form layout="vertical" form={form}>
+                    <Form.Item
+                        label="Primary Evaluator"
+                        name="primaryEvaluatorId"
+                        rules={[{ required: true, message: "Please select primary evaluator" }]}
+                    >
+                        <Select
+                            showSearch
+                            optionFilterProp="children"
+                            placeholder="Select primary evaluator"
+                        >
+                            {employeesList.map(emp => (
+                                <Select.Option key={emp.employeeId} value={emp.employeeId}>
+                                    {emp.fullName} ({emp.departmentName})
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };

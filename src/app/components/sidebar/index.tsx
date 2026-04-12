@@ -50,6 +50,8 @@ const Sidebar = () => {
             { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
             { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
             { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
+            { key: URL.PendingEvaluations, icon: <SolutionOutlined />, label: "Đánh giá nhân viên" },
+            { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
             { key: URL.ManageSystemSettings, icon: <SettingOutlined />, label: "Cấu hình hệ thống" },
         ],
         [EUserRole.MANAGE]: [
@@ -64,6 +66,8 @@ const Sidebar = () => {
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
             { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
+            { key: URL.PendingEvaluations, icon: <SolutionOutlined />, label: "Đánh giá nhân viên" },
+            { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
         ],
         [EUserRole.EMPLOYEE]: [
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
@@ -71,6 +75,7 @@ const Sidebar = () => {
             { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá của tôi" },
+            { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
