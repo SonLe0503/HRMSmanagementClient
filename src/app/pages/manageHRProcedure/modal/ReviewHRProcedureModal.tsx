@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { Modal, Descriptions, Tag, Button, Space, Spin, Typography } from "antd";
+import { Modal, Descriptions, Tag, Button, Spin, Typography, message } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { fetchProcedureById, selectHRProcedureSelected, selectHRProcedureLoading } from "../../../../store/hrProcedureSlide";
+import { fetchProcedureById, selectHRProcedureSelected, selectHRProcedureLoading, applyProcedure } from "../../../../store/hrProcedureSlide";
 
 const { Text } = Typography;
 
@@ -18,6 +18,15 @@ const STATUS_COLOR: Record<string, string> = {
     Approved: "green",
     Pending: "orange",
     Rejected: "red",
+    Applied: "blue",
+};
+
+const PROCEDURE_TYPE_MAP: Record<string, string> = {
+    Appointment: "Bổ nhiệm",
+    Transfer: "Điều chuyển",
+    Promotion: "Thăng tiến",
+    Resignation: "Thôi việc",
+    Termination: "Sa thải",
 };
 
 const ReviewHRProcedureModal = ({ open, procedureId, canApprove = false, onCancel, onApprove, onReject }: ReviewHRProcedureModalProps) => {
@@ -32,6 +41,20 @@ const ReviewHRProcedureModal = ({ open, procedureId, canApprove = false, onCance
     }, [open, procedureId, dispatch]);
 
     const isPending = detail?.status === "Pending";
+    const isApprovedNotApplied = detail?.status === "Approved" && !detail.appliedDate;
+
+    const handleApply = () => {
+        if (!detail) return;
+        dispatch(applyProcedure(detail.procedureId))
+            .unwrap()
+            .then(() => {
+                message.success("Đã áp dụng thay đổi vào hồ sơ nhân viên thành công!");
+                dispatch(fetchProcedureById(detail.procedureId));
+            })
+            .catch((err) => {
+                message.error(err?.message || "Lỗi khi áp dụng thủ tục!");
+            });
+    };
 
     return (
         <Modal
@@ -40,24 +63,33 @@ const ReviewHRProcedureModal = ({ open, procedureId, canApprove = false, onCance
             onCancel={onCancel}
             width={800}
             destroyOnHidden
-            footer={
-                <Space>
-                    <Button onClick={onCancel}>Đóng</Button>
-                    {isPending && canApprove && (
-                        <>
-                            <Button danger onClick={onReject}>Từ chối</Button>
-                            <Button type="primary" onClick={onApprove}>Phê duyệt</Button>
-                        </>
-                    )}
-                </Space>
-            }
+            footer={[
+                <Button key="close" onClick={onCancel}>
+                    Đóng
+                </Button>,
+                isPending && canApprove && (
+                    <Button key="reject" danger onClick={onReject}>
+                        Từ chối
+                    </Button>
+                ),
+                isPending && canApprove && (
+                    <Button key="approve" type="primary" onClick={onApprove}>
+                        Phê duyệt
+                    </Button>
+                ),
+                isApprovedNotApplied && (
+                    <Button key="apply" type="primary" style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }} onClick={handleApply}>
+                        Áp dụng hồ sơ
+                    </Button>
+                ),
+            ].filter(Boolean)}
         >
             <Spin spinning={loading}>
                 {detail ? (
                     <Descriptions bordered column={2} style={{ marginTop: 16 }}>
                         <Descriptions.Item label="Mã thủ tục">{detail.procedureNumber}</Descriptions.Item>
                         <Descriptions.Item label="Loại thủ tục">
-                            <Tag color="blue">{detail.procedureType}</Tag>
+                            <Tag color="blue">{PROCEDURE_TYPE_MAP[detail.procedureType] || detail.procedureType}</Tag>
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Nhân viên">
@@ -77,9 +109,12 @@ const ReviewHRProcedureModal = ({ open, procedureId, canApprove = false, onCance
                         <Descriptions.Item label="Lương mới">
                             {detail.newSalary ? `${detail.newSalary.toLocaleString()} VND` : "Không có thay đổi"}
                         </Descriptions.Item>
+                        <Descriptions.Item label="Quản lý mới">
+                            {detail.newManagerId ? `${detail.newManagerName} (ID: ${detail.newManagerId})` : "Không có thay đổi"}
+                        </Descriptions.Item>
                         <Descriptions.Item label="Trạng thái">
                             <Tag color={STATUS_COLOR[detail.status] ?? "default"}>
-                                {detail.status}
+                                {detail.status} {detail.appliedDate ? "(Đã áp dụng)" : ""}
                             </Tag>
                         </Descriptions.Item>
 
@@ -100,9 +135,17 @@ const ReviewHRProcedureModal = ({ open, procedureId, canApprove = false, onCance
 
                         {detail.reviewedBy && (
                             <>
-                                <Descriptions.Item label="Người duyệt">{detail.reviewedBy}</Descriptions.Item>
+                                <Descriptions.Item label="Người duyệt">{detail.reviewedByName || detail.reviewedBy}</Descriptions.Item>
                                 <Descriptions.Item label="Ngày duyệt">
                                     {detail.reviewedDate ? new Date(detail.reviewedDate).toLocaleString("vi-VN") : "N/A"}
+                                </Descriptions.Item>
+                            </>
+                        )}
+                        {detail.appliedBy && (
+                            <>
+                                <Descriptions.Item label="Người áp dụng">{detail.appliedByName || detail.appliedBy}</Descriptions.Item>
+                                <Descriptions.Item label="Ngày áp dụng">
+                                    {detail.appliedDate ? new Date(detail.appliedDate).toLocaleString("vi-VN") : "N/A"}
                                 </Descriptions.Item>
                             </>
                         )}

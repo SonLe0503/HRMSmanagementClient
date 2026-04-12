@@ -86,8 +86,8 @@ body,
 }
 
 /* Custom Table Styles */
-.shift-table .ant-table-thead > tr > th,
-.assignment-table .ant-table-thead > tr > th {
+.shift-table .ant-table-thead>tr>th,
+.assignment-table .ant-table-thead>tr>th {
     background-color: #f8fafc !important;
     color: #475569 !important;
     font-weight: 600 !important;
@@ -145,26 +145,9 @@ body,
 .ant-card-head {
     padding: 18px 24px;
 }
+
 .ant-card-head-title {
     font-size: 1.1rem;
     font-weight: 700 !important;
     color: #1e293b !important;
-}
-.custom-table .ant-table-thead > tr > th {
-    background: #f8fafc;
-    color: #64748b;
-    font-weight: 600;
-    border-bottom: 2px solid #f1f5f9;
-    padding: 16px;
-}
-.custom-table .ant-table-tbody > tr > td {
-    padding: 16px;
-}
-.custom-table .ant-table-row:hover {
-    cursor: pointer;
-}
-.ant-btn-primary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
