@@ -87,6 +87,9 @@ const PositionDetail = () => {
                     <Descriptions.Item label="Position Code">{position.positionCode}</Descriptions.Item>
                     <Descriptions.Item label="Position Name">{position.positionName}</Descriptions.Item>
                     <Descriptions.Item label="Level">{position.level}</Descriptions.Item>
+                    <Descriptions.Item label="Top Level">
+                        {position.isTopLevel ? <Tag color="blue">TOP-LEVEL</Tag> : "No"}
+                    </Descriptions.Item>
                     <Descriptions.Item label="Status">
                         <Tag color={position.isActive ? "green" : "red"}>
                             {position.isActive ? "ACTIVE" : "INACTIVE"}
@@ -105,7 +108,8 @@ const PositionDetail = () => {
                     positionCode: position.positionCode,
                     positionName: position.positionName,
                     description: position.description,
-                    level: position.level
+                    level: position.level,
+                    isTopLevel: position.isTopLevel
                 }}
             />
         </div>

@@ -10,6 +10,8 @@ interface IInfoLogin {
   userId: string;
   userName: string;
   expiresTime: number;
+  isTopLevel: boolean;
+  positionName: string;
 }
 
 type IInitialState = {
@@ -24,6 +26,8 @@ const initialState: IInitialState = {
     userId: "",
     userName: "",
     expiresTime: 0,
+    isTopLevel: false,
+    positionName: "",
   },
   isLogin: false,
 }
@@ -115,6 +119,8 @@ export const slice = createSlice({
           userId: decodedToken["nameid"],
           userName: decodedToken["unique_name"],
           expiresTime: decodedToken["exp"],
+          isTopLevel: decodedToken["IsTopLevel"] === "true",
+          positionName: decodedToken["PositionName"] || "",
         };
         state.isLogin = true;
       }

@@ -49,8 +49,10 @@ const ManageHRProcedure = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     
     const currentRole = infoLogin?.role;
+    const isTopLevel = infoLogin?.isTopLevel ?? false;
+
     const canCreate = currentRole === EUserRole.ADMIN || currentRole === EUserRole.HR;
-    const canApprove = currentRole === EUserRole.MANAGE || currentRole === EUserRole.ADMIN;
+    const canApprove = currentRole === EUserRole.ADMIN || (currentRole === EUserRole.MANAGE && isTopLevel);
     const isHR = currentRole === EUserRole.HR || currentRole === EUserRole.ADMIN;
 
     const [isAddOpen, setIsAddOpen] = useState(false);
