@@ -41,6 +41,7 @@ const URL = {
     MyEvaluationResults: "/performance/my-results",
     ViewEvaluationResultDetail: "/performance/results/:id",
     ManageSystemSettings: "/admin/system-settings",
+    MyProfile: "/my-profile",
 }
 
 export default URL

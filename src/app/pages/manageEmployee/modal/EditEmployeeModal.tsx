@@ -15,6 +15,7 @@ interface EditEmployeeModalProps {
     onCancel: () => void;
     onSuccess: () => void;
     editingEmployee: IEmployeeDetail | null;
+    isSelfEdit?: boolean;
 }
 
 // Đồng bộ với backend UpdateEmployeeDto
@@ -22,7 +23,7 @@ const STATUS_OPTIONS = ["Active", "Inactive", "On Leave", "Resigned", "Terminate
 const TYPE_OPTIONS = ["Full-Time", "Part-Time", "Contract", "Intern"].map(v => ({ label: v, value: v }));
 const GENDER_OPTIONS = ["Male", "Female", "Other"].map(v => ({ label: v, value: v }));
 
-const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditEmployeeModalProps) => {
+const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee, isSelfEdit }: EditEmployeeModalProps) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectEmployeeLoading);
@@ -31,6 +32,9 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
     const activePositions = useAppSelector(selectActivePositions);
     const employees = useAppSelector(selectEmployees);
     const users = useAppSelector(selectUsers);
+
+    // Nếu là self edit, KHÔNG cho phép sửa thông tin work/HR (bất kể role là gì)
+    const isHrFieldDisabled = isSelfEdit;
 
     // Fetch danh sách phòng ban & chức vụ đang active khi modal mở
     useEffect(() => {
@@ -91,8 +95,8 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
 
     const onFinish = (values: any) => {
         if (!editingEmployee) return;
-        // Payload khớp đúng với UpdateEmployeeDto (không gửi employeeCode)
-        const payload = {
+        const payload: any = {
+            employeeCode: editingEmployee.employeeCode,
             firstName: values.firstName,
             lastName: values.lastName,
             email: values.email,
@@ -102,16 +106,28 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
             address: values.address || null,
             city: values.city || null,
             country: values.country || null,
-            departmentId: values.departmentId || null,
-            positionId: values.positionId || null,
-            managerId: values.managerId || null,
-            joinDate: values.joinDate ? values.joinDate.format("YYYY-MM-DD") : null,
-            resignationDate: values.resignationDate ? values.resignationDate.format("YYYY-MM-DD") : null,
-            employmentStatus: values.employmentStatus,
-            employmentType: values.employmentType,
-            baseSalary: values.baseSalary ?? null,
-            modifiedBy: infoLogin?.userId || null,
+            modifiedBy: infoLogin?.userId ? Number(infoLogin.userId) : null,
         };
+
+        if (isHrFieldDisabled) {
+            payload.departmentId = editingEmployee.departmentId;
+            payload.positionId = editingEmployee.positionId;
+            payload.managerId = editingEmployee.managerId;
+            payload.joinDate = editingEmployee.joinDate ? dayjs(editingEmployee.joinDate).format("YYYY-MM-DD") : null;
+            payload.resignationDate = editingEmployee.resignationDate ? dayjs(editingEmployee.resignationDate).format("YYYY-MM-DD") : null;
+            payload.employmentStatus = editingEmployee.employmentStatus;
+            payload.employmentType = editingEmployee.employmentType;
+            payload.baseSalary = editingEmployee.baseSalary;
+        } else {
+            payload.departmentId = values.departmentId || null;
+            payload.positionId = values.positionId || null;
+            payload.managerId = values.managerId || null;
+            payload.joinDate = values.joinDate ? values.joinDate.format("YYYY-MM-DD") : null;
+            payload.resignationDate = values.resignationDate ? values.resignationDate.format("YYYY-MM-DD") : null;
+            payload.employmentStatus = values.employmentStatus;
+            payload.employmentType = values.employmentType;
+            payload.baseSalary = values.baseSalary ?? null;
+        }
         dispatch(updateEmployee({ id: editingEmployee.employeeId, data: payload }))
             .unwrap()
             .then(() => {
@@ -120,7 +136,15 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
                 onSuccess();
             })
             .catch((err: any) => {
-                message.error(typeof err === "string" ? err : err?.message || "Cập nhật thất bại!");
+                let errorMsg = "Cập nhật thất bại!";
+                if (typeof err === "string") {
+                    errorMsg = err;
+                } else if (err?.errors) {
+                    errorMsg = Object.values(err.errors).flat().join(", ");
+                } else if (err?.message) {
+                    errorMsg = err.message;
+                }
+                message.error(errorMsg);
             });
     };
 
@@ -196,78 +220,82 @@ const EditEmployeeModal = ({ open, onCancel, onSuccess, editingEmployee }: EditE
                             <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
-                        <Form.Item name="joinDate" label="Ngày vào làm" rules={[{ required: true, message: "Vui lòng chọn ngày vào làm" }]}>
-                            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
-                        </Form.Item>
-                    </Col>
                 </Row>
-                <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item name="resignationDate" label="Ngày nghỉ việc">
-                            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item name="baseSalary" label="Lương cơ bản">
-                            <InputNumber style={{ width: "100%" }} formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} min={0} />
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item name="employmentStatus" label="Trạng thái" rules={[{ required: true, message: "Vui lòng chọn trạng thái" }]}>
-                            <Select options={STATUS_OPTIONS} />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item name="employmentType" label="Loại hình" rules={[{ required: true, message: "Vui lòng chọn loại hình" }]}>
-                            <Select options={TYPE_OPTIONS} />
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Row gutter={16}>
-                    <Col span={8}>
-                        {/* Bắt buộc chọn — hiển thị tên phòng ban từ API */}
-                        <Form.Item name="departmentId" label="Phòng ban" rules={[{ required: true, message: "Vui lòng chọn phòng ban" }]}>
-                            <Select
-                                options={departmentOptions}
-                                placeholder="Chọn phòng ban"
-                                showSearch
-                                filterOption={(input, option) =>
-                                    (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        {/* Hiển thị tên chức vụ từ API */}
-                        <Form.Item name="positionId" label="Chức vụ">
-                            <Select
-                                options={positionOptions}
-                                placeholder="Chọn chức vụ"
-                                allowClear
-                                showSearch
-                                filterOption={(input, option) =>
-                                    (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="managerId" label="Quản lý">
-                            <Select
-                                options={managerOptions}
-                                placeholder="Chọn quản lý"
-                                allowClear
-                                showSearch
-                                filterOption={(input, option) =>
-                                    (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                {!isHrFieldDisabled && (
+                    <>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item name="joinDate" label="Ngày vào làm" rules={[{ required: true, message: "Vui lòng chọn ngày vào làm" }]}>
+                                    <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item name="resignationDate" label="Ngày nghỉ việc">
+                                    <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item name="baseSalary" label="Lương cơ bản">
+                                    <InputNumber style={{ width: "100%" }} formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} min={0} />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item name="employmentStatus" label="Trạng thái" rules={[{ required: true, message: "Vui lòng chọn trạng thái" }]}>
+                                    <Select options={STATUS_OPTIONS} />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item name="employmentType" label="Loại hình" rules={[{ required: true, message: "Vui lòng chọn loại hình" }]}>
+                                    <Select options={TYPE_OPTIONS} />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={16}>
+                            <Col span={8}>
+                                <Form.Item name="departmentId" label="Phòng ban" rules={[{ required: true, message: "Vui lòng chọn phòng ban" }]}>
+                                    <Select
+                                        options={departmentOptions}
+                                        placeholder="Chọn phòng ban"
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
+                                        }
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <Form.Item name="positionId" label="Chức vụ">
+                                    <Select
+                                        options={positionOptions}
+                                        placeholder="Chọn chức vụ"
+                                        allowClear
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
+                                        }
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <Form.Item name="managerId" label="Quản lý">
+                                    <Select
+                                        options={managerOptions}
+                                        placeholder="Chọn quản lý"
+                                        allowClear
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
+                                        }
+                                    />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </>
+                )}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item name="address" label="Địa chỉ" rules={[{ max: 200 }]}>
