@@ -89,6 +89,7 @@ const HeaderBar = () => {
                             key: 'profile',
                             label: 'My Profile',
                             icon: <UserOutlined />,
+                            onClick: () => navigate(URL.MyProfile),
                         },
                         {
                             key: 'change-password',

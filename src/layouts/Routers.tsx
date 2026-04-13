@@ -39,8 +39,12 @@ const PerformanceCriteria = lazy(() => import("../app/pages/performanceEvaluatio
 const PerformanceCycles = lazy(() => import("../app/pages/performanceEvaluation/PerformanceCycles"));
 const EvaluatorAssignments = lazy(() => import("../app/pages/performanceEvaluation/EvaluatorAssignments"));
 const EvaluationList = lazy(() => import("../app/pages/performanceEvaluation/EvaluationList"));
+const PendingEvaluations = lazy(() => import("../app/pages/performanceEvaluation/PendingEvaluations"));
+const SubmitEvaluation = lazy(() => import("../app/pages/performanceEvaluation/SubmitEvaluation"));
+const MyEvaluationResults = lazy(() => import("../app/pages/performanceEvaluation/MyEvaluationResults"));
+const ViewEvaluationResultDetail = lazy(() => import("../app/pages/performanceEvaluation/ViewEvaluationResultDetail"));
 const ManageSystemSettings = lazy(() => import("../app/pages/manageSystemSettings/index"));
-
+const MyProfile = lazy(() => import("../app/pages/myProfile/index"));
 
 const shareResourceItem = [
     {
@@ -227,8 +231,38 @@ const privateResourceItem = [
         private: true,
     },
     {
+        key: URL.PendingEvaluations,
+        element: <PendingEvaluations />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.SubmitEvaluation,
+        element: <SubmitEvaluation />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyEvaluationResults,
+        element: <MyEvaluationResults />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ViewEvaluationResultDetail,
+        element: <ViewEvaluationResultDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
         key: URL.ManageSystemSettings,
         element: <ManageSystemSettings />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyProfile,
+        element: <MyProfile />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

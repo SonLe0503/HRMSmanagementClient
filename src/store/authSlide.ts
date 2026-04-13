@@ -8,6 +8,7 @@ interface IInfoLogin {
   accessToken: string;
   role: EUserRole;
   userId: string;
+  employeeId?: number;
   userName: string;
   expiresTime: number;
   isTopLevel: boolean;
@@ -24,6 +25,7 @@ const initialState: IInitialState = {
     accessToken: "",
     role: EUserRole.EMPLOYEE,
     userId: "",
+    employeeId: undefined,
     userName: "",
     expiresTime: 0,
     isTopLevel: false,
@@ -117,6 +119,7 @@ export const slice = createSlice({
           accessToken: token,
           role: decodedToken["role"] as EUserRole,
           userId: decodedToken["nameid"],
+          employeeId: decodedToken["employeeId"] ? Number(decodedToken["employeeId"]) : undefined,
           userName: decodedToken["unique_name"],
           expiresTime: decodedToken["exp"],
           isTopLevel: decodedToken["IsTopLevel"] === "true",

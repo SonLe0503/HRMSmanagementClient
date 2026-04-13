@@ -12,13 +12,16 @@ import {
 } from "../../../store/evaluationSlide";
 import { selectInfoLogin } from "../../../store/authSlide";
 import { EUserRole } from "../../../interface/app";
+import { useNavigate } from "react-router-dom";
+import URL from "../../../constants/url";
 
 const { Title } = Typography;
 
 const EvaluationList = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
-    const userId = infoLogin?.userId;
+    const userId = Number(infoLogin?.employeeId || infoLogin?.userId);
     const role = infoLogin?.role;
     
     const cycles = useAppSelector(selectCycles);
@@ -92,7 +95,13 @@ const EvaluationList = () => {
                         <Button 
                             size="small"
                             icon={<EyeOutlined />} 
-                            onClick={() => message.info("Chế độ xem chi tiết đang được phát triển")}
+                            onClick={() => {
+                                if (record.status === "Completed" || record.status === "Acknowledged") {
+                                    navigate(URL.ViewEvaluationResultDetail.replace(':id', record.evaluationId.toString()));
+                                } else {
+                                    navigate(URL.SubmitEvaluation.replace(':id', record.evaluationId.toString()));
+                                }
+                            }}
                         />
                     </Tooltip>
                     {((record.status === "Not Started" && role === EUserRole.EMPLOYEE) ||
@@ -102,7 +111,7 @@ const EvaluationList = () => {
                                 type="primary"
                                 size="small"
                                 icon={<CheckCircleOutlined />} 
-                                onClick={() => message.info("Tính năng thực hiện đánh giá đang được phát triển")}
+                                onClick={() => navigate(URL.SubmitEvaluation.replace(':id', record.evaluationId.toString()))}
                             />
                         </Tooltip>
                     )}
