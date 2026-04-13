@@ -126,7 +126,6 @@ const HeaderBar = () => {
                     </Avatar>
                 </div>
             </Dropdown>
->>>>>>> main
 
             <ChangePasswordModal 
                 open={isChangePasswordOpen}
