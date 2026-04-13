@@ -6,10 +6,20 @@ export interface IDepartmentList {
     departmentId: number;
     departmentCode: string;
     departmentName: string;
-    parentDepartmentName: string | null;
     managerName: string | null;
     employeeCount: number;
     isActive: boolean;
+}
+
+export interface IDepartmentEmployee {
+    employeeId: number;
+    employeeCode: string;
+    fullName: string;
+    positionName: string | null;
+    email: string;
+    phone: string | null;
+    employmentStatus: string;
+    gender: string | null;
 }
 
 export interface IDepartmentResponse {
@@ -17,13 +27,11 @@ export interface IDepartmentResponse {
     departmentCode: string;
     departmentName: string;
     description: string | null;
-    parentDepartmentId: number | null;
-    parentDepartmentName: string | null;
     managerId: number | null;
     managerName: string | null;
     isActive: boolean;
     employeeCount: number;
-    subDepartmentCount: number;
+    employees: IDepartmentEmployee[];
     createdDate: string;
     createdBy: number | null;
     createdByName: string | null;

@@ -223,31 +223,6 @@ const SystemSettingPage: React.FC = () => {
                     </Text>
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{ __html: `
-                .custom-minimal-tabs .ant-tabs-nav-list {
-                    background: transparent !important;
-                }
-                .custom-minimal-tabs .ant-tabs-tab {
-                    margin: 0 12px 0 0 !important;
-                    padding: 12px 0 !important;
-                    transition: all 0.3s ease !important;
-                }
-                .custom-minimal-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
-                    color: #4f46e5 !important;
-                    font-weight: 600 !important;
-                }
-                .custom-minimal-tabs .ant-tabs-ink-bar {
-                    background: #4f46e5 !important;
-                    height: 3px !important;
-                }
-                .ant-btn-primary { 
-                    background: #4f46e5 !important; 
-                    border-radius: 12px !important; 
-                    height: 42px !important;
-                    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2) !important;
-                }
-            `}} />
         </div>
     );
 };

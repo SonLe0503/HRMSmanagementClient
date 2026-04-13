@@ -34,7 +34,6 @@ const Sidebar = () => {
     const menuByRole: Record<EUserRole, any[]> = {
         [EUserRole.ADMIN]: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            // { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
             { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },

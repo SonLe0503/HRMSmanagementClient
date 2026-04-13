@@ -1,6 +1,6 @@
 import { Modal, Form, Input, Select, message } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { createDepartment, selectDepartmentLoading, fetchActiveDepartments, selectActiveDepartments } from "../../../../store/departmentSlide";
+import { createDepartment, selectDepartmentLoading } from "../../../../store/departmentSlide";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
@@ -15,12 +15,10 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const loading = useAppSelector(selectDepartmentLoading);
-    const activeDepartments = useAppSelector(selectActiveDepartments);
     const employees = useAppSelector(selectEmployees);
 
     useEffect(() => {
         if (open) {
-            dispatch(fetchActiveDepartments());
             dispatch(fetchAllEmployees());
         }
     }, [open, dispatch]);
@@ -80,22 +78,13 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
                     <Input.TextArea maxLength={500} />
                 </Form.Item>
 
-                <Form.Item
-                    name="parentDepartmentId"
-                    label="Parent Department"
-                >
-                    <Select allowClear placeholder="Select parent department" showSearch optionFilterProp="children">
-                        {activeDepartments.map(d => (
-                            <Select.Option key={d.departmentId} value={d.departmentId}>{d.departmentName}</Select.Option>
-                        ))}
-                    </Select>
-                </Form.Item>
+
 
                 <Form.Item
                     name="managerId"
                     label="Manager"
                 >
-                    <Select allowClear placeholder="Select manager" showSearch optionFilterProp="children">
+                    <Select disabled allowClear placeholder="Select manager" showSearch optionFilterProp="children">
                         {employees.map(e => (
                             <Select.Option key={e.employeeId} value={e.employeeId}>{e.fullName} ({e.employeeCode})</Select.Option>
                         ))}
