@@ -1,35 +1,4 @@
 import { message } from 'antd';
-import URL from '../constants/url';
-import type { Location } from 'react-router-dom';
-
-/**
- * Mapping URLs to Breadcrumb labels in English
- */
-export const breadcrumbNameMap: Record<string, string> = {
-    [URL.DashboardAdmin]: "Admin Dashboard",
-    [URL.DashboardManage]: "Manager Dashboard",
-    [URL.DashboardHR]: "HR Dashboard",
-    [URL.ManageUser]: "User Management",
-    [URL.ManageRole]: "Role Management",
-
-    [URL.ManageCategory]: "Category Management",
-    [URL.ManageProduct]: "Product Management",
-};
-
-/**
- * Generates breadcrumb items based on current location
- */
-export const getBreadcrumbItems = (location: Location) => {
-    const pathSnippets = location.pathname.split('/').filter(i => i);
-    return pathSnippets.map((_, index) => {
-        const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-        return {
-            key: url,
-            title: breadcrumbNameMap[url] || pathSnippets[index].charAt(0).toUpperCase() + pathSnippets[index].slice(1).replace(/-/g, ' '),
-        };
-    });
-};
-
 /**
  * Standardizes API error handling and notification
  */

@@ -4,6 +4,8 @@ import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { submitProcedure, updateProcedure, selectHRProcedureLoading } from "../../../../store/hrProcedureSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
+import { fetchActiveDepartments, selectActiveDepartments } from "../../../../store/departmentSlide";
+import { fetchActivePositions, selectActivePositions } from "../../../../store/positionSlide";
 
 const { TextArea } = Input;
 
@@ -14,24 +16,38 @@ interface AddHRProcedureModalProps {
     onSuccess: () => void;
 }
 
-const PROCEDURE_TYPES = ["Appointment", "Transfer", "Promotion", "Resignation", "Termination"].map(v => ({ label: v, value: v }));
+const PROCEDURE_TYPES = [
+    { label: "Bổ nhiệm", value: "Appointment" },
+    { label: "Điều chuyển", value: "Transfer" },
+    { label: "Thăng tiến", value: "Promotion" },
+    { label: "Thôi việc", value: "Resignation" },
+    { label: "Sa thải", value: "Termination" }
+];
 
 const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHRProcedureModalProps) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectHRProcedureLoading);
     const employees = useAppSelector(selectEmployees);
+    const departments = useAppSelector(selectActiveDepartments);
+    const positions = useAppSelector(selectActivePositions);
 
     const isEdit = !!initialValues;
 
     // Watch for procedureType changes to conditionally show fields
     const procedureType = Form.useWatch("procedureType", form);
+    const selectedEmployeeId = Form.useWatch("employeeId", form);
+    const newDepartmentId = Form.useWatch("newDepartmentId", form);
+
+    const selectedEmployee = employees.find(e => e.employeeId === selectedEmployeeId);
 
     useEffect(() => {
-        if (open && employees.length === 0) {
-            dispatch(fetchAllEmployees());
+        if (open) {
+            if (employees.length === 0) dispatch(fetchAllEmployees());
+            if (departments.length === 0) dispatch(fetchActiveDepartments());
+            if (positions.length === 0) dispatch(fetchActivePositions());
         }
-    }, [open, dispatch, employees.length]);
+    }, [open, dispatch, employees.length, departments.length, positions.length]);
 
     useEffect(() => {
         if (open && initialValues) {
@@ -51,6 +67,7 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
             effectiveDate: values.effectiveDate.format("YYYY-MM-DD"),
             newDepartmentId: values.newDepartmentId || null,
             newPositionId: values.newPositionId || null,
+            newManagerId: values.newManagerId || null,
             newSalary: values.newSalary || null,
             reason: values.reason || "",
         };
@@ -79,8 +96,9 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
         const isTransfer = procedureType === "Transfer";
         const isPromotion = procedureType === "Promotion";
         const needsDepartment = isAppointment || isTransfer;
-        const needsPosition = isAppointment || isPromotion;
+        const needsPosition = isAppointment || isPromotion || isTransfer;
         const needsSalary = isAppointment || isPromotion || isTransfer;
+        const needsManager = isAppointment || isPromotion || isTransfer;
 
         return (
             <>
@@ -91,7 +109,13 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
                             label="Ngày hiệu lực" 
                             rules={[{ required: true, message: "Vui lòng chọn ngày hiệu lực" }]}
                         >
-                            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+                            <DatePicker 
+                                style={{ width: "100%" }} 
+                                format="DD/MM/YYYY" 
+                                disabledDate={(current) => {
+                                    return current && current < dayjs().startOf('day');
+                                }}
+                            />
                         </Form.Item>
                     </Col>
                     {needsSalary && (
@@ -116,25 +140,63 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
                         <Col span={needsPosition ? 12 : 24}>
                             <Form.Item 
                                 name="newDepartmentId" 
-                                label="Phòng ban mới (ID)"
+                                label="Phòng ban mới"
                                 rules={[
-                                    { required: isTransfer, message: 'Bắt buộc nhập Phòng ban mới cho thủ tục điều chuyển' }
+                                    { required: isTransfer, message: 'Bắt buộc chọn Phòng ban mới cho thủ tục điều chuyển' }
                                 ]}
                             >
-                                <InputNumber style={{ width: "100%" }} min={1} placeholder="Nhập ID phòng ban mới" />
+                                <Select 
+                                    showSearch
+                                    placeholder="Chọn phòng ban mới"
+                                    optionFilterProp="children"
+                                    options={departments.map(d => ({ label: d.departmentName, value: d.departmentId }))}
+                                />
                             </Form.Item>
                         </Col>
                     )}
                     {needsPosition && (
-                        <Col span={needsDepartment ? 12 : 24}>
+                        <Col span={12}>
                             <Form.Item 
                                 name="newPositionId" 
-                                label="Vị trí mới (ID)"
+                                label="Vị trí mới"
                                 rules={[
-                                    { required: isPromotion, message: 'Bắt buộc nhập Vị trí mới cho thủ tục thăng chức' }
+                                    { required: isPromotion, message: 'Bắt buộc chọn Vị trí mới cho thủ tục thăng chức' }
                                 ]}
                             >
-                                <InputNumber style={{ width: "100%" }} min={1} placeholder="Nhập ID vị trí mới" />
+                                <Select 
+                                    showSearch
+                                    placeholder="Chọn vị trí mới"
+                                    optionFilterProp="children"
+                                    options={positions.map(p => ({ label: p.positionName, value: p.positionId }))}
+                                />
+                            </Form.Item>
+                        </Col>
+                    )}
+                    {needsManager && (
+                        <Col span={12}>
+                            <Form.Item 
+                                name="newManagerId" 
+                                label="Quản lý trực tiếp mới"
+                                tooltip="Chỉ hiển thị Quản lý thuộc phòng ban mới đã chọn"
+                            >
+                                <Select 
+                                    showSearch
+                                    placeholder={newDepartmentId ? "Chọn quản lý mới" : "Vui lòng chọn phòng ban mới trước"}
+                                    optionFilterProp="children"
+                                    disabled={!newDepartmentId && !selectedEmployee?.departmentId}
+                                    options={employees
+                                        .filter(e => 
+                                            e.employmentStatus === "Active" && 
+                                            // Lọc theo phòng ban mới hoặc phòng ban hiện tại (nếu mới chưa chọn)
+                                            e.departmentId === (newDepartmentId || selectedEmployee?.departmentId) &&
+                                            // Kiểm tra role là Manager (case-insensitive)
+                                            (e.roleName?.toLowerCase().includes("manager") || e.roleName === "ADMIN")
+                                        )
+                                        .map(emp => ({
+                                            label: `${emp.fullName} - ${emp.positionName}`,
+                                            value: emp.employeeId
+                                        }))}
+                                />
                             </Form.Item>
                         </Col>
                     )}
@@ -190,6 +252,23 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
                         </Form.Item>
                     </Col>
                 </Row>
+                
+                {selectedEmployee && (
+                    <Row gutter={16} style={{ marginBottom: 16, padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <Col span={8}>
+                            <div style={{ fontSize: '12px', color: '#64748b' }}>Phòng ban hiện tại:</div>
+                            <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '13px' }}>{selectedEmployee.departmentName}</div>
+                        </Col>
+                        <Col span={8}>
+                            <div style={{ fontSize: '12px', color: '#64748b' }}>Vị trí hiện tại:</div>
+                            <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '13px' }}>{selectedEmployee.positionName}</div>
+                        </Col>
+                        <Col span={8}>
+                            <div style={{ fontSize: '12px', color: '#64748b' }}>Quản lý hiện tại:</div>
+                            <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '13px' }}>{selectedEmployee.managerName || "Chưa có"}</div>
+                        </Col>
+                    </Row>
+                )}
                 
                 {renderDynamicFields()}
             </Form>

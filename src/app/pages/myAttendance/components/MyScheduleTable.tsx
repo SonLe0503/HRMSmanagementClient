@@ -54,6 +54,15 @@ const MyScheduleTable = () => {
             render: (name: string) => <Text className="font-medium">{name}</Text>
         },
         {
+            title: "Giờ làm việc",
+            key: "time",
+            render: (_: any, record: any) => (
+                <Tag color="orange" className="font-mono border-orange-200">
+                    {record.startTime?.substring(0, 5)} - {record.endTime?.substring(0, 5)}
+                </Tag>
+            )
+        },
+        {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",

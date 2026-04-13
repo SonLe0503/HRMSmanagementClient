@@ -23,15 +23,11 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
     const isUnlimited = Form.useWatch('isUnlimited', form);
 
     useEffect(() => {
-        if (visible) {
-            if (editingLeaveType) {
-                form.setFieldsValue({
-                    ...editingLeaveType,
-                    isUnlimited: editingLeaveType.annualEntitlement === 0
-                });
-            } else {
-                form.resetFields();
-            }
+        if (visible && editingLeaveType) {
+            form.setFieldsValue({
+                ...editingLeaveType,
+                isUnlimited: editingLeaveType.annualEntitlement === 0
+            });
         }
     }, [visible, editingLeaveType, form]);
 
@@ -81,6 +77,7 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
             className="rounded-2xl overflow-hidden"
             okText={editingLeaveType ? "Cập nhật" : "Thêm mới"}
             cancelText="Hủy"
+            destroyOnHidden
         >
             <Form 
                 form={form} 
@@ -96,22 +93,20 @@ const LeaveTypeModal = ({ visible, onClose, editingLeaveType }: LeaveTypeModalPr
                 }}
             >
                 <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item 
-                            name="leaveTypeCode" 
-                            label="Mã loại phép" 
-                            rules={[{ required: true, message: "Vui lòng nhập mã loại phép" }, { max: 50 }]}
-                        >
-                            <Input placeholder="ví dụ: AL, SL,..." className="h-10 rounded-lg uppercase" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={12}>
+                    {editingLeaveType && (
+                        <Col span={24}>
+                            <Form.Item name="leaveTypeCode" label="Mã loại phép (Hệ thống tự sinh)">
+                                <Input disabled className="h-10 rounded-lg bg-slate-50 font-mono" />
+                            </Form.Item>
+                        </Col>
+                    )}
+                    <Col span={24}>
                         <Form.Item 
                             name="leaveTypeName" 
                             label="Tên loại phép" 
                             rules={[{ required: true, message: "Vui lòng nhập tên loại phép" }, { max: 100 }]}
                         >
-                            <Input placeholder="ví dụ: Nghỉ phép năm" className="h-10 rounded-lg" />
+                            <Input placeholder="ví dụ: Nghỉ phép năm, Nghỉ kết hôn..." className="h-10 rounded-lg" />
                         </Form.Item>
                     </Col>
                 </Row>

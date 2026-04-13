@@ -24,6 +24,22 @@ const STATUS_COLOR: Record<string, string> = {
     Approved: "green",
     Pending: "orange",
     Rejected: "red",
+    Applied: "blue",
+};
+
+const STATUS_TEXT: Record<string, string> = {
+    Approved: "Đã duyệt",
+    Pending: "Chờ duyệt",
+    Rejected: "Từ chối",
+    Applied: "Đã áp dụng",
+};
+
+const PROCEDURE_TYPE_MAP: Record<string, string> = {
+    Appointment: "Bổ nhiệm",
+    Transfer: "Điều chuyển",
+    Promotion: "Thăng tiến",
+    Resignation: "Thôi việc",
+    Termination: "Sa thải",
 };
 
 const ManageHRProcedure = () => {
@@ -33,8 +49,10 @@ const ManageHRProcedure = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     
     const currentRole = infoLogin?.role;
+    const isTopLevel = infoLogin?.isTopLevel ?? false;
+
     const canCreate = currentRole === EUserRole.ADMIN || currentRole === EUserRole.HR;
-    const canApprove = currentRole === EUserRole.MANAGE || currentRole === EUserRole.ADMIN;
+    const canApprove = currentRole === EUserRole.ADMIN || (currentRole === EUserRole.MANAGE && isTopLevel);
     const isHR = currentRole === EUserRole.HR || currentRole === EUserRole.ADMIN;
 
     const [isAddOpen, setIsAddOpen] = useState(false);
@@ -116,14 +134,14 @@ const ManageHRProcedure = () => {
         },
         { 
             title: "Loại thủ tục", dataIndex: "procedureType", key: "procedureType", width: 150,
-            render: (type: string) => <Tag color="blue">{type}</Tag>
+            render: (type: string) => <Tag color="blue">{PROCEDURE_TYPE_MAP[type] || type}</Tag>
         },
-        { title: "Ngày hiệu lực", dataIndex: "effectiveDate", key: "effectiveDate", width: 130 },
+        { title: "Ngày hiệu lực", dataIndex: "effectiveDate", key: "effectiveDate", width: 130, render: (date: string) => date ? new Date(date).toLocaleDateString("vi-VN") : "N/A" },
         { 
             title: "Trạng thái", dataIndex: "status", key: "status", width: 130,
             render: (status: string) => (
                 <Tag color={STATUS_COLOR[status] ?? "default"} style={{ margin: 0 }}>
-                    {status}
+                    {STATUS_TEXT[status] ?? status}
                 </Tag>
             ),
         },

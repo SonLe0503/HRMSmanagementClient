@@ -146,7 +146,7 @@ const UploadDocumentModal = ({ open, employeeId, onCancel, onSuccess }: UploadDo
                     {fileError && (
                         <Alert
                             type="error"
-                            message={fileError}
+                            title={fileError}
                             showIcon
                             style={{ marginTop: 8 }}
                             closable

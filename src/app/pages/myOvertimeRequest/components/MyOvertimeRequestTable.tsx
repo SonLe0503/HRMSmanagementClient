@@ -57,6 +57,21 @@ const MyOvertimeRequestTable = () => {
             ),
         },
         {
+            title: "Loại & Chế độ",
+            key: "typeMode",
+            render: (_: any, record: any) => (
+                <div className="flex flex-col gap-1">
+                    <Tag color={record.otType === "NormalDay" ? "blue" : "orange"} className="w-fit">
+                        {record.otType === "NormalDay" ? "Ngày thường" : "Ngày nghỉ"}
+                    </Tag>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                        {record.otMode === "AfterShift" ? "Sau ca" : 
+                         record.otMode === "BeforeShift" ? "Trước ca" : "Linh hoạt"}
+                    </Text>
+                </div>
+            )
+        },
+        {
             title: "Lý do",
             dataIndex: "reason",
             key: "reason",

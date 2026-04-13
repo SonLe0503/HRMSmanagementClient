@@ -9,6 +9,7 @@ interface LocationSettings {
 
 interface ApprovalSettings {
     topLevelFallbackUserId: number | null;
+    defaultFallbackUserId: number | null;
 }
 
 interface SystemSettingState {

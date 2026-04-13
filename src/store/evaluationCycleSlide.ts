@@ -289,7 +289,7 @@ export const evaluationCycleSlice = createSlice({
         if (index !== -1) {
           state.cycles[index] = action.payload;
         }
-        if (state.selectedCycle?.cycleId === action.payload.cycleId) {
+        if (state.selectedCycle && state.selectedCycle.cycleId === action.payload.cycleId) {
           state.selectedCycle = action.payload;
         }
       })
@@ -299,7 +299,7 @@ export const evaluationCycleSlice = createSlice({
         if (index !== -1) {
           state.cycles[index].status = action.payload.status;
         }
-        if (state.selectedCycle?.cycleId === action.payload.cycleId) {
+        if (state.selectedCycle && state.selectedCycle.cycleId === action.payload.cycleId) {
           state.selectedCycle.status = action.payload.status;
         }
       })

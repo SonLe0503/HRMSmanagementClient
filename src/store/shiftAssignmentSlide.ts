@@ -16,6 +16,8 @@ export interface IShiftAssignment {
     status: string;
     createdDate: string;
     createdBy: number;
+    startTime?: string;
+    endTime?: string;
 }
 
 export interface AssignShiftDto {

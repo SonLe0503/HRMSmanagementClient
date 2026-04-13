@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
 
 html,
 body,
@@ -86,8 +86,8 @@ body,
 }
 
 /* Custom Table Styles */
-.shift-table .ant-table-thead > tr > th,
-.assignment-table .ant-table-thead > tr > th {
+.shift-table .ant-table-thead>tr>th,
+.assignment-table .ant-table-thead>tr>th {
     background-color: #f8fafc !important;
     color: #475569 !important;
     font-weight: 600 !important;
@@ -119,4 +119,35 @@ body,
 .custom-tabs .ant-tabs-ink-bar {
     height: 3px !important;
     border-radius: 3px 3px 0 0 !important;
+}
+
+/* Custom Calendar Styling - Global: Hide Ant Design default Today highlight */
+.ant-picker-cell-today .ant-picker-cell-inner::before {
+    border: none !important;
+}
+
+.ant-picker-cell-today .ant-picker-cell-inner {
+    color: inherit !important;
+}
+
+/* Forgot Password Modal Styles */
+.forgot-password-modal .ant-modal-content {
+    border-radius: 24px;
+    padding: 24px 32px;
+}
+
+.forgot-password-modal .ant-steps-item-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* System Settings Custom Styles */
+.ant-card-head {
+    padding: 18px 24px;
+}
+
+.ant-card-head-title {
+    font-size: 1.1rem;
+    font-weight: 700 !important;
+    color: #1e293b !important;
 }

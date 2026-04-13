@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table, Button, Space, DatePicker, Select, Tag, Card, Tooltip } from "antd";
-import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined } from "@ant-design/icons";
+import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { searchAttendance, selectAdminAttendance, selectAttendanceLoading, lockAttendance, unlockAttendance } from "../../../../store/attendanceSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
@@ -66,7 +66,33 @@ const AttendanceTable = () => {
         { title: "Ngày", dataIndex: "attendanceDate", key: "attendanceDate", render: (val: string) => dayjs(val).format("DD/MM/YYYY") },
         { title: "Giờ vào", dataIndex: "checkInTime", key: "checkInTime", render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
         { title: "Giờ ra", dataIndex: "checkOutTime", key: "checkOutTime", render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
-        { title: "Tổng h", dataIndex: "workingHours", key: "workingHours", align: 'center' as const, render: (val: number) => val ?? "0" },
+        { title: "Tổng h", dataIndex: "workingHours", key: "workingHours", width: 80, align: 'center' as const, render: (val: number) => val ?? "0" },
+        {
+            title: "OT (h)",
+            dataIndex: "payrollOvertimeHours",
+            key: "overtime",
+            width: 80,
+            align: 'center' as const,
+            render: (_: any, record: any) => {
+                const payroll = record.payrollOvertimeHours || 0;
+                const actual = record.actualOvertimeHours || 0;
+                const approved = record.approvedOvertimeHours || 0;
+
+                return (
+                    <Tooltip title={
+                        <div style={{ fontSize: '12px' }}>
+                            <p>Đã duyệt: {approved}h</p>
+                            <p>Làm thực: {actual}h</p>
+                            <p className="border-t mt-1 pt-1 font-bold">Tính lương: {payroll}h</p>
+                        </div>
+                    }>
+                        <Tag color={payroll > 0 ? "orange" : "default"} style={{ margin: 0 }}>
+                            {payroll}
+                        </Tag>
+                    </Tooltip>
+                );
+            }
+        },
         {
             title: "Trạng thái",
             dataIndex: "status",
@@ -77,12 +103,35 @@ const AttendanceTable = () => {
                 if (status === "Late") color = "warning";
                 if (status === "Absent") color = "error";
                 if (status === "Incomplete") color = "blue";
+                if (status === "PaidLeave") color = "cyan";
+                if (status === "UnpaidLeave") color = "purple";
                 
+                const isInvalidLocation = record.location?.includes("[INVALID]");
                 return (
                     <Space orientation="vertical" size="small">
-                        <Tag color={color}>{status}</Tag>
+                        <Space>
+                            <Tag color={color}>{status}</Tag>
+                            {isInvalidLocation && (
+                                <Tooltip title="Vị trí check-in/out không hợp lệ">
+                                    <ExclamationCircleOutlined className="text-red-500" />
+                                </Tooltip>
+                            )}
+                        </Space>
                         {record.isManualAdjusted && <Tag color="gold" style={{ fontSize: '10px' }}>Adjusted</Tag>}
                     </Space>
+                );
+            }
+        },
+        {
+            title: "Ghi chú",
+            dataIndex: "remarks",
+            key: "remarks",
+            render: (val: string) => {
+                if (!val) return "—";
+                return (
+                    <Tooltip title={val}>
+                        <div className="max-w-[150px] truncate">{val}</div>
+                    </Tooltip>
                 );
             }
         },
@@ -115,7 +164,7 @@ const AttendanceTable = () => {
                         <Button 
                             size="small" 
                             icon={<EditOutlined />} 
-                            disabled={record.isLocked}
+                            disabled={record.isLocked || record.attendanceId === 0}
                             onClick={() => setAdjustModal({ open: true, record })}
                         />
                     </Tooltip>
@@ -162,6 +211,8 @@ const AttendanceTable = () => {
                             { label: "Đi muộn (Late)", value: "Late" },
                             { label: "Vắng mặt (Absent)", value: "Absent" },
                             { label: "Chưa hoàn tất", value: "Incomplete" },
+                            { label: "Nghỉ phép có lương", value: "PaidLeave" },
+                            { label: "Nghỉ phép không lương", value: "UnpaidLeave" },
                         ]}
                     />
                     <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
@@ -181,7 +232,7 @@ const AttendanceTable = () => {
                 columns={columns}
                 dataSource={records}
                 loading={loading}
-                rowKey="attendanceId"
+                rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}-${record.employeeId}`}
                 pagination={{ pageSize: 15 }}
                 bordered
             />

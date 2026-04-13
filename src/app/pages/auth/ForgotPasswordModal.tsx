@@ -80,13 +80,26 @@ const ForgotPasswordModal = ({ open, onCancel }: ForgotPasswordModalProps) => {
                 />
 
                 {currentStep === 0 ? (
-                    <Form layout="vertical" onFinish={handleSendOtp} requiredMark={false}>
+                    <Form form={form} layout="vertical" onFinish={handleSendOtp} requiredMark={false}>
                         <div className="mb-6 text-gray-500 text-sm">
                             Nhập Email hoặc Tên tài khoản của bạn để nhận mã xác thực OTP.
                         </div>
                         <Form.Item
                             name="emailOrUsername"
-                            rules={[{ required: true, message: "Vui lòng nhập Email hoặc Username" }]}
+                            rules={[
+                                { required: true, message: "Vui lòng nhập Email hoặc Username" },
+                                {
+                                    validator: (_, value) => {
+                                        if (value && value.includes('@')) {
+                                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                            if (!emailRegex.test(value)) {
+                                                return Promise.reject(new Error('Định dạng Email không hợp lệ!'));
+                                            }
+                                        }
+                                        return Promise.resolve();
+                                    }
+                                }
+                            ]}
                         >
                             <Input 
                                 size="large"
@@ -182,16 +195,6 @@ const ForgotPasswordModal = ({ open, onCancel }: ForgotPasswordModalProps) => {
                     </Form>
                 )}
             </div>
-            <style>{`
-                .forgot-password-modal .ant-modal-content {
-                    border-radius: 24px;
-                    padding: 24px 32px;
-                }
-                .forgot-password-modal .ant-steps-item-title {
-                    font-size: 13px;
-                    font-weight: 600;
-                }
-            `}</style>
         </Modal>
     );
 };

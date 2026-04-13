@@ -128,8 +128,15 @@ const AddEmployeeModal = ({ open, onCancel, onSuccess }: AddEmployeeModalProps) 
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item name="phone" label="Số điện thoại" rules={[{ max: 20 }]}>
-                            <Input />
+                        <Form.Item 
+                            name="phone" 
+                            label="Số điện thoại" 
+                            rules={[
+                                { required: true, message: "Vui lòng nhập số điện thoại" },
+                                { pattern: /^0\d{9}$/, message: "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0" }
+                            ]}
+                        >
+                            <Input placeholder="09xxxxxxxx" maxLength={10} />
                         </Form.Item>
                     </Col>
                 </Row>
@@ -155,7 +162,6 @@ const AddEmployeeModal = ({ open, onCancel, onSuccess }: AddEmployeeModalProps) 
                             <DatePicker
                                 style={{ width: "100%" }}
                                 format="DD/MM/YYYY"
-                                disabledDate={d => d && d > dayjs()}
                             />
                         </Form.Item>
                     </Col>
@@ -184,11 +190,12 @@ const AddEmployeeModal = ({ open, onCancel, onSuccess }: AddEmployeeModalProps) 
                 </Row>
                 <Row gutter={16}>
                     <Col span={8}>
-                        {/* Bắt buộc chọn — hiển thị tên phòng ban từ API */}
-                        <Form.Item name="departmentId" label="Phòng ban" rules={[{ required: true, message: "Vui lòng chọn phòng ban" }]}>
+                        {/* Không bắt buộc chọn phòng ban */}
+                        <Form.Item name="departmentId" label="Phòng ban">
                             <Select
                                 options={departmentOptions}
                                 placeholder="Chọn phòng ban"
+                                allowClear
                                 showSearch
                                 filterOption={(input, option) =>
                                     (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())

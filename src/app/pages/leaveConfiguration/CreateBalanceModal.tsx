@@ -1,5 +1,4 @@
 import { Modal, Form, Select, InputNumber, message, Alert } from "antd";
-import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { 
     createLeaveBalance, 
@@ -23,12 +22,6 @@ const CreateBalanceModal = ({ visible, onClose }: CreateBalanceModalProps) => {
     const [form] = Form.useForm();
 
     const activeLeaveTypes = (leaveTypes || []).filter(lt => lt.isActive && lt.annualEntitlement > 0);
-
-    useEffect(() => {
-        if (!visible) {
-            form.resetFields();
-        }
-    }, [visible, form]);
 
     const handleLeaveTypeChange = (value: number) => {
         const lt = activeLeaveTypes.find(t => t.leaveTypeId === value);
@@ -58,9 +51,10 @@ const CreateBalanceModal = ({ visible, onClose }: CreateBalanceModalProps) => {
             className="rounded-2xl overflow-hidden"
             okText="Khởi tạo"
             cancelText="Hủy"
+            destroyOnHidden
         >
             <Alert 
-                message="Lưu ý: Bạn nên khởi tạo số dư trước khi thực hiện điều chỉnh hoặc đăng ký nghỉ phép nếu hệ thống báo không tìm thấy số dư."
+                title="Lưu ý: Bạn nên khởi tạo số dư trước khi thực hiện điều chỉnh hoặc đăng ký nghỉ phép nếu hệ thống báo không tìm thấy số dư."
                 type="info"
                 showIcon
                 className="mb-6 rounded-xl"

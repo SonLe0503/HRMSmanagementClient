@@ -11,6 +11,8 @@ interface IInfoLogin {
   employeeId?: number;
   userName: string;
   expiresTime: number;
+  isTopLevel: boolean;
+  positionName: string;
 }
 
 type IInitialState = {
@@ -26,6 +28,8 @@ const initialState: IInitialState = {
     employeeId: undefined,
     userName: "",
     expiresTime: 0,
+    isTopLevel: false,
+    positionName: "",
   },
   isLogin: false,
 }
@@ -118,6 +122,8 @@ export const slice = createSlice({
           employeeId: decodedToken["employeeId"] ? Number(decodedToken["employeeId"]) : undefined,
           userName: decodedToken["unique_name"],
           expiresTime: decodedToken["exp"],
+          isTopLevel: decodedToken["IsTopLevel"] === "true",
+          positionName: decodedToken["PositionName"] || "",
         };
         state.isLogin = true;
       }

@@ -10,7 +10,21 @@ const instance = axios.create({
   headers: {
     "Content-Type": "application/json"
   }
-})
+});
+
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      if (window.location.pathname !== "/login") {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const request = async(config: AxiosRequestConfig) => {
   return instance({

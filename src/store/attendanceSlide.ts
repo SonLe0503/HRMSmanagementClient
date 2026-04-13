@@ -35,6 +35,9 @@ export interface AttendanceResponseDto {
     checkOutTime?: string; 
     workingHours?: number; 
     overtimeHours?: number; 
+    actualOvertimeHours?: number;
+    approvedOvertimeHours?: number;
+    payrollOvertimeHours?: number;
     lateMinutes?: number;
     earlyLeaveMinutes?: number;
     status: string;
@@ -67,6 +70,7 @@ export interface ManualAdjustAttendanceDto {
     checkInTime?: string;
     checkOutTime?: string;
     status: string;
+    source?: string;
     remarks?: string;
 }
 
@@ -77,6 +81,7 @@ export interface ManualCreateAttendanceDto {
     checkInTime?: string;
     checkOutTime?: string;
     status: string;
+    source?: string;
     remarks?: string;
 }
 
@@ -214,6 +219,25 @@ export const fetchMyHistory = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Lỗi lấy lịch sử chấm công");
+        }
+    }
+);
+
+export const addLocationReason = createAsyncThunk(
+    "attendance/addLocationReason",
+    async ({ attendanceId, reason }: { attendanceId: number; reason: string }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Attendance/${attendanceId}/location-reason`,
+                method: "PUT",
+                data: { reason },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi cập nhật lý do vị trí");
         }
     }
 );

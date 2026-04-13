@@ -38,7 +38,7 @@ const MyOvertimeRequest = () => {
                             <Statistic
                                 title={<span className="text-slate-500 font-semibold uppercase tracking-wider text-xs">Tổng số yêu cầu</span>}
                                 value={stats.total}
-                                valueStyle={{ color: '#2563eb', fontWeight: 800, fontSize: '2rem' }}
+                                styles={{ content: { color: '#2563eb', fontWeight: 800, fontSize: '2rem' } }}
                             />
                         </Card>
                     </Col>
@@ -47,7 +47,7 @@ const MyOvertimeRequest = () => {
                             <Statistic
                                 title={<span className="text-slate-500 font-semibold uppercase tracking-wider text-xs">Đã phê duyệt</span>}
                                 value={stats.approved}
-                                valueStyle={{ color: '#059669', fontWeight: 800, fontSize: '2rem' }}
+                                styles={{ content: { color: '#059669', fontWeight: 800, fontSize: '2rem' } }}
                             />
                             <div className="mt-2 flex items-center gap-1 opacity-80">
                                 <Badge status="success" />
@@ -60,7 +60,7 @@ const MyOvertimeRequest = () => {
                             <Statistic
                                 title={<span className="text-slate-500 font-semibold uppercase tracking-wider text-xs">Đang chờ duyệt</span>}
                                 value={stats.pending}
-                                valueStyle={{ color: '#d97706', fontWeight: 800, fontSize: '2rem' }}
+                                styles={{ content: { color: '#d97706', fontWeight: 800, fontSize: '2rem' } }}
                             />
                             <div className="mt-2 flex items-center gap-1 opacity-80">
                                 <Badge status="warning" />
@@ -73,7 +73,7 @@ const MyOvertimeRequest = () => {
                             <Statistic
                                 title={<span className="text-slate-500 font-semibold uppercase tracking-wider text-xs">Đã từ chối/hủy</span>}
                                 value={stats.rejected}
-                                valueStyle={{ color: '#e11d48', fontWeight: 800, fontSize: '2rem' }}
+                                styles={{ content: { color: '#e11d48', fontWeight: 800, fontSize: '2rem' } }}
                             />
                         </Card>
                     </Col>

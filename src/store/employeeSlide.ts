@@ -14,6 +14,9 @@ export interface IEmployeeList {
     employmentStatus: string;
     departmentName: string;
     positionName: string;
+    managerName: string | null;
+    departmentId?: number;
+    roleName?: string;
 }
 
 export interface IEmployeeDetail {
@@ -42,9 +45,23 @@ export interface IEmployeeDetail {
     baseSalary: number | null;
 }
 
+export interface IEmployeeApprovalAnalysis {
+    employeeId: number;
+    employeeCode: string;
+    fullName: string;
+    managerId: number | null;
+    managerName: string | null;
+    isTopLevel: boolean;
+    targetApproverId: number | null;
+    targetApproverName: string | null;
+    approvalRouteType: string;
+    isValid: boolean;
+}
+
 interface IEmployeeState {
     employees: IEmployeeList[];
     selectedEmployee: IEmployeeDetail | null;
+    approvalAnalysis: IEmployeeApprovalAnalysis[];
     loading: boolean;
     error: string | null;
 }
@@ -52,6 +69,7 @@ interface IEmployeeState {
 const initialState: IEmployeeState = {
     employees: [],
     selectedEmployee: null,
+    approvalAnalysis: [],
     loading: false,
     error: null,
 };
@@ -130,6 +148,20 @@ export const updateEmployeeStatus = createAsyncThunk(
     }
 );
 
+export const fetchApprovalAnalysis = createAsyncThunk(
+    "employee/fetchApprovalAnalysis",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: "/Employee/approval-analysis", method: "GET", headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
 // ── Slice ─────────────────────────────────────────────────────────────────────
 
 export const employeeSlice = createSlice({
@@ -167,6 +199,15 @@ export const employeeSlice = createSlice({
             .addCase(updateEmployeeStatus.fulfilled, (state, action) => {
                 const emp = state.employees.find(e => e.employeeId === action.payload.id);
                 if (emp) emp.employmentStatus = action.payload.status;
+            })
+            .addCase(fetchApprovalAnalysis.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(fetchApprovalAnalysis.fulfilled, (state, action) => {
+                state.loading = false;
+                state.approvalAnalysis = action.payload;
+            })
+            .addCase(fetchApprovalAnalysis.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 });
@@ -175,6 +216,7 @@ export const { clearSelectedEmployee } = employeeSlice.actions;
 
 export const selectEmployees = (state: RootState) => state.employee.employees;
 export const selectSelectedEmployee = (state: RootState) => state.employee.selectedEmployee;
+export const selectApprovalAnalysis = (state: RootState) => state.employee.approvalAnalysis;
 export const selectEmployeeLoading = (state: RootState) => state.employee.loading;
 export const selectEmployeeError = (state: RootState) => state.employee.error;
 

@@ -21,6 +21,7 @@ const ManualAdjustModal = ({ open, onClose, record }: ManualAdjustModalProps) =>
                 checkInTime: record.checkInTime ? dayjs(record.checkInTime) : null,
                 checkOutTime: record.checkOutTime ? dayjs(record.checkOutTime) : null,
                 status: record.status || "Present",
+                source: record.source || "Manual",
                 remarks: record.remarks || ""
             });
         }
@@ -32,6 +33,7 @@ const ManualAdjustModal = ({ open, onClose, record }: ManualAdjustModalProps) =>
                 checkInTime: values.checkInTime ? values.checkInTime.format("YYYY-MM-DDTHH:mm:ss") : undefined,
                 checkOutTime: values.checkOutTime ? values.checkOutTime.format("YYYY-MM-DDTHH:mm:ss") : undefined,
                 status: values.status,
+                source: values.source,
                 remarks: values.remarks
             };
 
@@ -76,8 +78,21 @@ const ManualAdjustModal = ({ open, onClose, record }: ManualAdjustModalProps) =>
                 </Form.Item>
 
                 <Form.Item
+                    name="source"
+                    label="Nguồn gốc lý do"
+                    rules={[{ required: true, message: "Chọn nguồn gốc" }]}
+                >
+                    <Select options={[
+                        { label: "Lỗi thiết bị (Device Failure)", value: "Device Failure" },
+                        { label: "Ngoại lệ Overtime (OT Exception)", value: "OT Exception" },
+                        { label: "Công tác / Đi ngoài", value: "Business Trip" },
+                        { label: "Khác", value: "Other" },
+                    ]} />
+                </Form.Item>
+
+                <Form.Item
                     name="remarks"
-                    label="Lý do điều chỉnh (bắt buộc)"
+                    label="Ghi chú chi tiết"
                     rules={[{ required: true, message: "Nhập lý do điều chỉnh" }]}
                 >
                     <Input.TextArea rows={3} placeholder="VD: Sửa ca do nhân viên quên chấm công..." />
