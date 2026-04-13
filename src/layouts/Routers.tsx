@@ -16,6 +16,8 @@ const ManageRole = lazy(() => import("../app/pages/manageRole"))
 
 const ManageTask = lazy(() => import("../app/pages/manageTask"))
 const ManageEmployee = lazy(() => import("../app/pages/manageEmployee"))
+const AddEmployee = lazy(() => import("../app/pages/manageEmployee/AddEmployee"))
+const EditEmployee = lazy(() => import("../app/pages/manageEmployee/EditEmployee"))
 const EmployeeDetail = lazy(() => import("../app/pages/manageEmployee/EmployeeDetail"))
 const MyAttendance = lazy(() => import("../app/pages/myAttendance"))
 const ManageAttendance = lazy(() => import("../app/pages/manageAttendance"))
@@ -26,6 +28,8 @@ const DepartmentDetail = lazy(() => import("../app/pages/manageDepartment/Depart
 const ManagePosition = lazy(() => import("../app/pages/managePosition"));
 const PositionDetail = lazy(() => import("../app/pages/managePosition/PositionDetail"));
 const ManageShift = lazy(() => import("../app/pages/manageShift"));
+const AddShift = lazy(() => import("../app/pages/manageShift/AddShift"));
+const EditShift = lazy(() => import("../app/pages/manageShift/EditShift"));
 const ManageShiftAssignment = lazy(() => import("../app/pages/manageShiftAssignment"));
 const MyLeaveRequest = lazy(() => import("../app/pages/myLeaveRequest/index"));
 const ManageLeaveRequest = lazy(() => import("../app/pages/manageLeaveRequest/index"));
@@ -99,6 +103,18 @@ const privateResourceItem = [
         private: true,
     },
     {
+        key: URL.AddEmployee,
+        element: <AddEmployee />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditEmployee,
+        element: <EditEmployee />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
         key: URL.EmployeeDetail,
         element: <EmployeeDetail />,
         layout: DEFAULT_LAYOUT,
@@ -149,6 +165,18 @@ const privateResourceItem = [
     {
         key: URL.ManageShift,
         element: <ManageShift />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.AddShift,
+        element: <AddShift />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditShift,
+        element: <EditShift />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

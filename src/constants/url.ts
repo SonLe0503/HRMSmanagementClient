@@ -16,6 +16,8 @@ const URL = {
 
     ManageTask: "/manage-task",
     ManageEmployee: "/hr/manage-employee",
+    AddEmployee: "/hr/manage-employee/add",
+    EditEmployee: "/hr/manage-employee/edit/:id",
     EmployeeDetail: "/hr/manage-employee/:id",
     ManageDepartment: "/hr/manage-department",
     DepartmentDetail: "/hr/manage-department/:id",
@@ -25,6 +27,8 @@ const URL = {
     ManageAttendance: "/attendance/manage",
     ManageHRProcedure: "/hr/manage-procedure",
     ManageShift: "/hr/manage-shift",
+    AddShift: "/hr/manage-shift/add",
+    EditShift: "/hr/manage-shift/edit/:id",
     ManageShiftAssignment: "/hr/manage-shift-assignment",
     MyLeaveRequest: "/leave/my",
     ManageLeaveRequest: "/leave/manage",

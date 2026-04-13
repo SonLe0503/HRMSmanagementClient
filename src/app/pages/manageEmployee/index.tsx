@@ -7,11 +7,9 @@ import {
     fetchAllEmployees, updateEmployeeStatus,
     selectEmployees, selectEmployeeLoading,
 } from "../../../store/employeeSlide";
-import type { IEmployeeList, IEmployeeDetail } from "../../../store/employeeSlide";
-import { fetchEmployeeById } from "../../../store/employeeSlide";
+import type { IEmployeeList } from "../../../store/employeeSlide";
 import Condition from "./Condition";
-import AddEmployeeModal from "./modal/AddEmployeeModal";
-import EditEmployeeModal from "./modal/EditEmployeeModal";
+import URL from "../../../constants/url";
 
 const { Title } = Typography;
 
@@ -31,23 +29,14 @@ const ManageEmployee = () => {
     const employees = useAppSelector(selectEmployees);
     const loading = useAppSelector(selectEmployeeLoading);
 
-    const [isAddOpen, setIsAddOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
-    const [editingEmployee, setEditingEmployee] = useState<IEmployeeDetail | null>(null);
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState<string | null>(null);
     const [genderFilter, setGenderFilter] = useState<string | null>(null);
 
     useEffect(() => { dispatch(fetchAllEmployees()); }, [dispatch]);
 
-    const handleEdit = async (record: IEmployeeList) => {
-        const result = await dispatch(fetchEmployeeById(record.employeeId));
-        if (fetchEmployeeById.fulfilled.match(result)) {
-            setEditingEmployee(result.payload as IEmployeeDetail);
-            setIsEditOpen(true);
-        } else {
-            message.error("Không thể tải thông tin nhân viên!");
-        }
+    const handleEdit = (record: IEmployeeList) => {
+        navigate(URL.EditEmployee.replace(":id", record.employeeId.toString()));
     };
 
     const handleStatusChange = (record: IEmployeeList, newStatus: string) => {
@@ -77,7 +66,7 @@ const ManageEmployee = () => {
         {
             title: "Họ và tên", dataIndex: "fullName", key: "fullName", width: 170,
             render: (name: string, record: IEmployeeList) => (
-                <a onClick={() => navigate(`/hr/manage-employee/${record.employeeId}`)} style={{ fontWeight: 500 }}>
+                <a onClick={() => navigate(URL.EmployeeDetail.replace(":id", record.employeeId.toString()))} style={{ fontWeight: 500 }}>
                     {name}
                 </a>
             ),
@@ -111,7 +100,7 @@ const ManageEmployee = () => {
                 <Space>
                     <Tooltip title="Xem chi tiết">
                         <Button icon={<EyeOutlined />}
-                            onClick={() => navigate(`/hr/manage-employee/${record.employeeId}`)} />
+                            onClick={() => navigate(URL.EmployeeDetail.replace(":id", record.employeeId.toString()))} />
                     </Tooltip>
                     <Tooltip title="Chỉnh sửa">
                         <Button type="primary" icon={<EditOutlined />}
@@ -128,7 +117,7 @@ const ManageEmployee = () => {
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <Title level={4} style={{ margin: 0 }}>Quản lý nhân viên</Title>
-                        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddOpen(true)}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(URL.AddEmployee)}>
                             Thêm nhân viên
                         </Button>
                     </div>
@@ -154,13 +143,6 @@ const ManageEmployee = () => {
                     }}
                 />
             </Card>
-
-            <AddEmployeeModal open={isAddOpen} onCancel={() => setIsAddOpen(false)}
-                onSuccess={() => { setIsAddOpen(false); dispatch(fetchAllEmployees()); }} />
-
-            <EditEmployeeModal open={isEditOpen} onCancel={() => setIsEditOpen(false)}
-                onSuccess={() => { setIsEditOpen(false); dispatch(fetchAllEmployees()); }}
-                editingEmployee={editingEmployee} />
         </div>
     );
 };
