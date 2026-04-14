@@ -218,7 +218,7 @@ const CompetencyReport = () => {
             {loading && <div style={{ textAlign: "center", padding: "50px" }}><Spin size="large" tip="Đang phân tích dữ liệu..." /></div>}
 
             {report && (
-                <Space direction="vertical" size={24} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={24} style={{ width: "100%" }}>
                     <Row gutter={24}>
                         <Col span={12}>
                             <Card 

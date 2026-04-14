@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-    Card, Tabs, Descriptions, Tag, Spin, Button, Space,
+    Card, Tabs, Descriptions, Tag, Spin, Space,
     Typography, Avatar, Divider, Row, Col,
 } from "antd";
 import {
-    UserOutlined, EditOutlined, FileTextOutlined, MailOutlined, PhoneOutlined,
+    UserOutlined, FileTextOutlined, MailOutlined, PhoneOutlined,
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
@@ -14,7 +14,6 @@ import {
 } from "../../../store/employeeSlide";
 import { selectInfoLogin } from "../../../store/authSlide";
 import DocumentsTab from "../manageEmployee/tabs/DocumentsTab";
-import EditEmployeeModal from "../manageEmployee/modal/EditEmployeeModal";
 import { EUserRole } from "../../../interface/app";
 
 const { Title, Text } = Typography;
@@ -38,7 +37,6 @@ const MyProfile = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     const employee = useAppSelector(selectSelectedEmployee);
     const loading = useAppSelector(selectEmployeeLoading);
-    const [isEditOpen, setIsEditOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("info");
 
     useEffect(() => {
@@ -47,12 +45,7 @@ const MyProfile = () => {
         }
     }, [infoLogin, dispatch]);
 
-    const handleEditSuccess = () => {
-        setIsEditOpen(false);
-        if (infoLogin?.employeeId) {
-            dispatch(fetchEmployeeById(infoLogin.employeeId));
-        }
-    };
+
 
     if (loading && !employee) {
         return (
@@ -98,7 +91,7 @@ const MyProfile = () => {
                                 </Descriptions.Item>
                                 <Descriptions.Item label="Ngày sinh">{formatDate(employee.dateOfBirth)}</Descriptions.Item>
                                 <Descriptions.Item label="Giới tính">{employee.gender ?? "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Địa chỉ" span={2}>{employee.address ?? "—"}</Descriptions.Item>
+                                <Descriptions.Item label="Địa chỉ">{employee.address ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Thành phố">{employee.city ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Quốc gia">{employee.country ?? "—"}</Descriptions.Item>
                             </Descriptions>
@@ -169,11 +162,6 @@ const MyProfile = () => {
                             </div>
                         </Space>
                     </Col>
-                    <Col>
-                        <Button type="primary" icon={<EditOutlined />} onClick={() => setIsEditOpen(true)}>
-                            Sửa thông tin
-                        </Button>
-                    </Col>
                 </Row>
             </Card>
 
@@ -186,13 +174,7 @@ const MyProfile = () => {
                 />
             </Card>
 
-            <EditEmployeeModal
-                open={isEditOpen}
-                onCancel={() => setIsEditOpen(false)}
-                onSuccess={handleEditSuccess}
-                editingEmployee={employee}
-                isSelfEdit={true}
-            />
+
         </div>
     );
 };

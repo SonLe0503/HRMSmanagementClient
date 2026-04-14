@@ -4,7 +4,7 @@ import { Card, Typography, Button, Divider, Row, Col, Spin, Table, Tag, Progress
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchEvaluationResultDetail, acknowledgeEvaluation, requestReview, selectResultDetail, selectEvaluationResultLoading } from "../../../store/evaluationResultSlide";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const ViewEvaluationResultDetail = () => {

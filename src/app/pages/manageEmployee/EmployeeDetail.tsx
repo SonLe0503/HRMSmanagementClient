@@ -81,7 +81,7 @@ const EmployeeDetail = () => {
                                 </Descriptions.Item>
                                 <Descriptions.Item label="Ngày sinh">{formatDate(employee.dateOfBirth)}</Descriptions.Item>
                                 <Descriptions.Item label="Giới tính">{employee.gender ?? "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Địa chỉ" span={2}>{employee.address ?? "—"}</Descriptions.Item>
+                                <Descriptions.Item label="Địa chỉ">{employee.address ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Thành phố">{employee.city ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Quốc gia">{employee.country ?? "—"}</Descriptions.Item>
                             </Descriptions>

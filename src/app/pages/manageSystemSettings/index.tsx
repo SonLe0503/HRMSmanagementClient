@@ -120,7 +120,7 @@ const SystemSettingPage: React.FC = () => {
                 <div className="animate-in fade-in duration-500">
                     <Row gutter={[32, 32]}>
                         <Col xs={24} lg={16}>
-                            <Space direction="vertical" style={{ width: '100%' }}>
+                            <Space orientation="vertical" style={{ width: '100%' }}>
                                 <TopLevelApprovalCard 
                                     form={topLevelForm}
                                     users={users}

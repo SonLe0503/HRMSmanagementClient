@@ -214,7 +214,7 @@ const EvaluatorAssignments = () => {
                     setIsManualModalVisible(false);
                     form.resetFields();
                 }}
-                destroyOnClose
+                destroyOnHidden
             >
                 <Form layout="vertical" form={form}>
                     <Form.Item

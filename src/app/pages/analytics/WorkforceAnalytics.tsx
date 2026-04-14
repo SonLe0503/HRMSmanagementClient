@@ -199,7 +199,7 @@ const WorkforceAnalytics = () => {
             )}
 
             {analytics && (
-                <Space direction="vertical" size={24} style={{ width: '100%' }}>
+                <Space orientation="vertical" size={24} style={{ width: '100%' }}>
                     {/* Header Statistics */}
                     <Row gutter={16}>
                         <Col span={6}>
@@ -300,7 +300,7 @@ const WorkforceAnalytics = () => {
             {/* AI Insights Drawer */}
             <Drawer
                 title={<Space><BulbOutlined /> AI Workforce Insights & Forecast</Space>}
-                width={500}
+                size="large"
                 onClose={() => setShowAIInsights(false)}
                 open={showAIInsights}
                 extra={

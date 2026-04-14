@@ -162,7 +162,7 @@ const LeaveRequestForm = () => {
                 <Form.Item name="range" label="Thời gian" rules={[{ required: true, message: 'Vui lòng chọn thời gian' }]}>
                     <RangePicker 
                         className="w-full h-12 rounded-lg" 
-                        popupClassName="custom-range-picker"
+                        classNames={{ popup: "custom-range-picker" }}
                         onChange={handleDateChange}
                         disabledDate={disabledDate}
                         cellRender={cellRender}

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Table, Button, Card, Typography, Tag, Space } from "antd";
+import { Table, Button, Card, Typography, Tag } from "antd";
 import { EditOutlined, FileSearchOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchPendingEvaluations, selectPendingEvaluations, selectSubmitEvaluationLoading } from "../../../store/submitEvaluationSlide";

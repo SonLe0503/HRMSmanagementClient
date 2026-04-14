@@ -36,7 +36,7 @@ const AddTemplateModal = ({ open, onCancel, onSuccess }: AddTemplateModalProps) 
             onOk={handleOk}
             onCancel={onCancel}
             confirmLoading={loading}
-            destroyOnClose
+            destroyOnHidden
         >
             <Form form={form} layout="vertical">
                 <Form.Item

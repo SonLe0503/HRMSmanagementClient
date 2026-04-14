@@ -95,8 +95,8 @@ const PositionDetail = () => {
                             {position.isActive ? "ACTIVE" : "INACTIVE"}
                         </Tag>
                     </Descriptions.Item>
-                    <Descriptions.Item label="Employee Count" span={2}>{position.employeeCount}</Descriptions.Item>
-                    <Descriptions.Item label="Description" span={2}>{position.description || "—"}</Descriptions.Item>
+                    <Descriptions.Item label="Employee Count">{position.employeeCount}</Descriptions.Item>
+                    <Descriptions.Item label="Description">{position.description || "—"}</Descriptions.Item>
                 </Descriptions>
             </Card>
 
