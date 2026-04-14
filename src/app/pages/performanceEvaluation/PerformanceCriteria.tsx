@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Card, Space, Input, message, Tooltip, Typography, Tag, Modal, Form, InputNumber } from "antd";
+import { Table, Button, Card, Space, Input, message, Tooltip, Typography, Tag, Modal, Form, Select } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { 
@@ -32,6 +32,13 @@ const PerformanceCriteria = () => {
     }, [dispatch, templateId]);
 
     const totalWeightage = (criteria || []).reduce((acc, curr) => acc + curr.weightage, 0);
+    const editingWeightage = editingRecord ? editingRecord.weightage : 0;
+    const maxAllowedWeightage = 100 - totalWeightage + editingWeightage;
+
+    const weightageOptions = Array.from({ length: maxAllowedWeightage }, (_, i) => ({
+        value: i + 1,
+        label: `${i + 1}%`
+    }));
 
     const handleSave = async () => {
         try {
@@ -141,13 +148,16 @@ const PerformanceCriteria = () => {
                             <Tag color={totalWeightage === 100 ? "green" : "orange"} style={{ fontSize: "1em", padding: "4px 12px" }}>
                                 Tổng trọng số: {totalWeightage}% / 100%
                             </Tag>
-                            <Button type="primary" icon={<PlusOutlined />} onClick={() => {
-                                setEditingRecord(null);
-                                form.resetFields();
-                                // Set default display order
-                                form.setFieldsValue({ displayOrder: criteria.length + 1 });
-                                setIsModalOpen(true);
-                            }}>
+                            <Button 
+                                type="primary" 
+                                icon={<PlusOutlined />} 
+                                disabled={totalWeightage >= 100}
+                                onClick={() => {
+                                    setEditingRecord(null);
+                                    form.resetFields();
+                                    setIsModalOpen(true);
+                                }}
+                            >
                                 Thêm tiêu chí
                             </Button>
                         </Space>
@@ -190,17 +200,26 @@ const PerformanceCriteria = () => {
                             name="weightage"
                             label="Trọng số (%)"
                             className="flex-1"
-                            rules={[{ required: true, message: "Cần nhập trọng số" }]}
+                            extra={`Bạn có thể phân bổ tối đa ${maxAllowedWeightage}%`}
+                            rules={[
+                                { required: true, message: "Cần nhập trọng số" },
+                                { 
+                                    validator: (_, value) => {
+                                        if (value !== undefined && value > maxAllowedWeightage) {
+                                            return Promise.reject(new Error(`Tối đa cho phép là ${maxAllowedWeightage}%`));
+                                        }
+                                        return Promise.resolve();
+                                    }
+                                }
+                            ]}
                         >
-                            <InputNumber min={0} max={100} style={{ width: "100%" }} />
-                        </Form.Item>
-                        <Form.Item
-                            name="displayOrder"
-                            label="Thứ tự hiển thị"
-                            className="flex-1"
-                            rules={[{ required: true, message: "Cần số thứ tự" }]}
-                        >
-                            <InputNumber min={1} style={{ width: "100%" }} />
+                            <Select 
+                                showSearch
+                                placeholder="Chọn phần trăm"
+                                options={weightageOptions}
+                                style={{ width: "100%" }} 
+                                optionFilterProp="label"
+                            />
                         </Form.Item>
                     </div>
                     <Form.Item

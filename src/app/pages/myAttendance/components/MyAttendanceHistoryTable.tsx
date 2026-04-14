@@ -83,7 +83,7 @@ const MyAttendanceHistoryTable = () => {
         }
     };
 
-    const requiredCount = records.filter(r => r.explanationStatus === "Required" || r.location?.includes("[INVALID]") && !r.explanationStatus).length;
+    const requiredCount = records.filter(r => r.explanationStatus === "Required" || r.location?.includes("[INVALID]") && !r.explanationStatus || (r.status === "Absent" || r.status === "Incomplete") && !r.explanationStatus).length;
 
     const columns = [
         {
@@ -101,7 +101,7 @@ const MyAttendanceHistoryTable = () => {
         {
             title: "Giờ công (h)", dataIndex: "workingHours", key: "workingHours", align: 'center' as const,
             render: (val: number, record: AttendanceResponseDto) => {
-                const blocked = ["Required", "Pending", "Rejected"].includes(record.explanationStatus || "") || (record.location?.includes("[INVALID]") && !record.explanationStatus);
+                const blocked = ["Required", "Pending", "Rejected"].includes(record.explanationStatus || "") || (record.location?.includes("[INVALID]") && !record.explanationStatus) || ((record.status === "Absent" || record.status === "Incomplete") && !record.explanationStatus);
                 return blocked
                     ? <Tooltip title="Giờ công bị tạm khóa chờ giải trình được duyệt"><Tag color="red">0 🔒</Tag></Tooltip>
                     : (val ?? "0");
@@ -134,8 +134,8 @@ const MyAttendanceHistoryTable = () => {
         {
             title: "Giải trình", key: "explanation", align: 'center' as const,
             render: (_: any, record: AttendanceResponseDto) => {
-                let { explanationStatus, explanationResponse, location } = record;
-                if (location?.includes("[INVALID]") && !explanationStatus) explanationStatus = "Required";
+                let { explanationStatus, explanationResponse, location, status } = record;
+                if ((location?.includes("[INVALID]") || status === "Absent" || status === "Incomplete") && !explanationStatus) explanationStatus = "Required";
 
                 if (!explanationStatus) return <Text type="secondary">—</Text>;
                 const cfg = EXPLANATION_STATUS_CONFIG[explanationStatus];
@@ -151,7 +151,7 @@ const MyAttendanceHistoryTable = () => {
                 let s = record.explanationStatus;
                 if (record.location?.includes("[INVALID]") && !s) s = "Required";
 
-                if (record.status === "Absent" && !s) {
+                if ((record.status === "Absent" || record.status === "Incomplete") && !s) {
                     return (
                         <Button
                             type="dashed"
@@ -206,7 +206,7 @@ const MyAttendanceHistoryTable = () => {
                 pagination={{ pageSize: 15 }}
                 bordered
                 rowClassName={(r) => {
-                    const isRequired = r.explanationStatus === "Required" || (r.location?.includes("[INVALID]") && !r.explanationStatus);
+                    const isRequired = r.explanationStatus === "Required" || (r.location?.includes("[INVALID]") && !r.explanationStatus) || ((r.status === "Absent" || r.status === "Incomplete") && !r.explanationStatus);
                     if (isRequired) return "ant-table-row-danger";
                     if (r.explanationStatus === "Pending") return "ant-table-row-warning";
                     if (r.explanationStatus === "Rejected") return "ant-table-row-error";
