@@ -3,19 +3,17 @@ import { Table, Button, Card, Space, Input, message, Tooltip, Typography, Tag } 
 import { PlusOutlined, EditOutlined, ClockCircleOutlined, SettingOutlined, StopOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchAllShifts, selectShifts, selectShiftLoading, deactivateShift, activateShift, type IShift } from "../../../store/shiftSlide";
-import AddShiftModal from "./modal/AddShiftModal";
-import EditShiftModal from "./modal/EditShiftModal";
+import { useNavigate } from "react-router-dom";
+import URL from "../../../constants/url";
 
 const { Title, Text } = Typography;
 
 const ManageShift = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const shifts = useAppSelector(selectShifts);
     const loading = useAppSelector(selectShiftLoading);
     
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedShift, setSelectedShift] = useState<IShift | null>(null);
     const [searchText, setSearchText] = useState("");
     const [togglingId, setTogglingId] = useState<number | null>(null);
 
@@ -42,8 +40,7 @@ const ManageShift = () => {
     };
 
     const handleEdit = (record: IShift) => {
-        setSelectedShift(record);
-        setIsEditModalOpen(true);
+        navigate(URL.EditShift.replace(":id", record.shiftId.toString()));
     };
 
     const filteredShifts = shifts.filter((shift) => {
@@ -166,7 +163,7 @@ const ManageShift = () => {
                             type="primary" 
                             size="large"
                             icon={<PlusOutlined />} 
-                            onClick={() => setIsAddModalOpen(true)}
+                            onClick={() => navigate(URL.AddShift)}
                             className="bg-indigo-600 hover:bg-indigo-700 rounded-lg h-10 px-6"
                         >
                             Thêm Ca Mới
@@ -207,21 +204,6 @@ const ManageShift = () => {
                     }}
                 />
             </Card>
-
-            <AddShiftModal
-                open={isAddModalOpen}
-                onCancel={() => setIsAddModalOpen(false)}
-            />
-
-            <EditShiftModal
-                open={isEditModalOpen}
-                onCancel={() => {
-                    setIsEditModalOpen(false);
-                    setSelectedShift(null);
-                }}
-                shift={selectedShift}
-            />
-
         </div>
     );
 };

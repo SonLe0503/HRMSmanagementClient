@@ -60,7 +60,7 @@ const AttendanceLogsModal = ({ open, onClose, employeeId, employeeName, date }: 
         <Drawer
             title={`Lịch sử Audit / Chấm công - ${employeeName} - ${dayjs(date).format("DD/MM/YYYY")}`}
             placement="right"
-            size={700}
+            size="large"
             onClose={onClose}
             open={open}
         >

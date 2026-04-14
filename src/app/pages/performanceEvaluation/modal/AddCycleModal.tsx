@@ -53,7 +53,7 @@ const AddCycleModal = ({ open, onCancel, onSuccess }: AddCycleModalProps) => {
             onCancel={onCancel}
             confirmLoading={loading}
             width={800}
-            destroyOnClose
+            destroyOnHidden
         >
             <Form form={form} layout="vertical">
                 <Row gutter={16}>

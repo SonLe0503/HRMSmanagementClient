@@ -6,7 +6,7 @@ import {
 } from "antd";
 import {
     ArrowLeftOutlined, UserOutlined,
-    FileTextOutlined, MailOutlined, PhoneOutlined,
+    FileTextOutlined, MailOutlined, PhoneOutlined, EditOutlined
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
@@ -15,7 +15,6 @@ import {
     selectEmployeeLoading,
 } from "../../../store/employeeSlide";
 import DocumentsTab from "./tabs/DocumentsTab";
-import EditEmployeeModal from "./modal/EditEmployeeModal";
 import URL from "../../../constants/url";
 
 const { Title, Text } = Typography;
@@ -40,17 +39,11 @@ const EmployeeDetail = () => {
     const dispatch = useAppDispatch();
     const employee = useAppSelector(selectSelectedEmployee);
     const loading = useAppSelector(selectEmployeeLoading);
-    const [isEditOpen, setIsEditOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("info");
 
     useEffect(() => {
         if (id) dispatch(fetchEmployeeById(Number(id)));
     }, [id, dispatch]);
-
-    const handleEditSuccess = () => {
-        setIsEditOpen(false);
-        if (id) dispatch(fetchEmployeeById(Number(id)));
-    };
 
     if (loading && !employee) {
         return (
@@ -88,7 +81,7 @@ const EmployeeDetail = () => {
                                 </Descriptions.Item>
                                 <Descriptions.Item label="Ngày sinh">{formatDate(employee.dateOfBirth)}</Descriptions.Item>
                                 <Descriptions.Item label="Giới tính">{employee.gender ?? "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Địa chỉ" span={2}>{employee.address ?? "—"}</Descriptions.Item>
+                                <Descriptions.Item label="Địa chỉ">{employee.address ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Thành phố">{employee.city ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Quốc gia">{employee.country ?? "—"}</Descriptions.Item>
                             </Descriptions>
@@ -166,6 +159,15 @@ const EmployeeDetail = () => {
                             </div>
                         </Space>
                     </Col>
+                    <Col>
+                        <Button 
+                            type="primary" 
+                            icon={<EditOutlined />} 
+                            onClick={() => navigate(URL.EditEmployee.replace(":id", employee.employeeId.toString()))}
+                        >
+                            Chỉnh sửa
+                        </Button>
+                    </Col>
                 </Row>
             </Card>
 
@@ -178,14 +180,6 @@ const EmployeeDetail = () => {
                     size="large"
                 />
             </Card>
-
-            {/* Edit modal */}
-            <EditEmployeeModal
-                open={isEditOpen}
-                onCancel={() => setIsEditOpen(false)}
-                onSuccess={handleEditSuccess}
-                editingEmployee={employee}
-            />
         </div>
     );
 };

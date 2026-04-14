@@ -1,4 +1,6 @@
 import { Modal, Form, Input, Button, message, Descriptions, Divider } from "antd";
+import { useEffect } from "react";
+import { ClockCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { approveOvertimeRequest, rejectOvertimeRequest, selectOvertimeLoading, fetchPendingOvertimeRequests } from "../../../../store/overtimeSlide";
 import dayjs from "dayjs";
@@ -16,7 +18,11 @@ const ReviewOvertimeModal = ({ open, onCancel, record }: ReviewOvertimeModalProp
     const loading = useAppSelector(selectOvertimeLoading);
     const [form] = Form.useForm();
 
-    if (!record) return null;
+    useEffect(() => {
+        if (open && record) {
+            form.resetFields();
+        }
+    }, [open, record, form]);
 
     const handleApprove = () => {
         dispatch(approveOvertimeRequest({ id: record.overtimeRequestId, data: { comments: form.getFieldValue("comments") } }))
@@ -54,14 +60,16 @@ const ReviewOvertimeModal = ({ open, onCancel, record }: ReviewOvertimeModalProp
 
     return (
         <Modal
-            title="Duyệt yêu cầu làm thêm giờ"
+            title={<div className="flex items-center gap-2 text-indigo-600 font-bold"><ClockCircleOutlined /> Chi Tiết Yêu Cầu Tăng Ca</div>}
             open={open}
             onCancel={onCancel}
             footer={null}
             width={700}
-            className="rounded-2xl overflow-hidden"
+            centered
+            destroyOnHidden
         >
-            <div className="p-2">
+            {record ? (
+               <div className="p-2">
                 <Descriptions bordered column={2} className="bg-slate-50/50 rounded-xl overflow-hidden shadow-sm">
                     <Descriptions.Item label="Nhân viên" span={2}>
                         <span className="font-bold text-slate-800">{record.employeeName}</span>
@@ -72,7 +80,7 @@ const ReviewOvertimeModal = ({ open, onCancel, record }: ReviewOvertimeModalProp
                         {record.startTime.slice(0, 5)} - {record.endTime.slice(0, 5)}
                     </Descriptions.Item>
                     <Descriptions.Item label="Tổng giờ">{record.totalHours} giờ</Descriptions.Item>
-                    <Descriptions.Item label="Lý do" span={2}>{record.reason}</Descriptions.Item>
+                    <Descriptions.Item label="Lý do">{record.reason}</Descriptions.Item>
                     <Descriptions.Item label="Nội dung công việc" span={2}>
                         <div className="bg-white p-3 rounded-lg border border-slate-100 italic text-slate-500 whitespace-pre-wrap min-h-[60px]">
                             {record.taskDescription || "Không có mô tả chi tiết"}
@@ -112,7 +120,8 @@ const ReviewOvertimeModal = ({ open, onCancel, record }: ReviewOvertimeModalProp
                         </Button>
                     </div>
                 </Form>
-            </div>
+            </div> 
+            ) : null}
         </Modal>
     );
 };

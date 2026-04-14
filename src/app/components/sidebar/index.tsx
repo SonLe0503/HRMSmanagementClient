@@ -3,14 +3,12 @@ import {
     AppstoreOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined,
-    UserOutlined,
     TeamOutlined,
     IdcardOutlined,
     BankOutlined,
     SolutionOutlined,
     ClockCircleOutlined,
     CalendarOutlined,
-    RiseOutlined,
     PieChartOutlined,
     SettingOutlined,
 } from "@ant-design/icons";
@@ -34,70 +32,149 @@ const Sidebar = () => {
     const menuByRole: Record<EUserRole, any[]> = {
         [EUserRole.ADMIN]: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            // { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
-            { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
-            { key: URL.ManageRole, icon: <UserOutlined />, label: "Quản lý vai trò" },
+            {
+                key: "admin-system", icon: <SettingOutlined />, label: "Hệ thống",
+                children: [
+                    { key: URL.ManageUser, label: "Quản lý người dùng" },
+                    { key: URL.ManageRole, label: "Quản lý vai trò" },
+                    { key: URL.ManageSystemSettings, label: "Cấu hình hệ thống" },
+                ]
+            },
+            {
+                key: "admin-org", icon: <BankOutlined />, label: "Tổ chức",
+                children: [
+                    { key: URL.ManageDepartment, label: "Quản lý phòng ban" },
+                    { key: URL.ManagePosition, label: "Quản lý chức vụ" },
+                    { key: URL.ManageEmployee, label: "Quản lý nhân viên" },
+                ]
+            },
+            {
+                key: "admin-time", icon: <ClockCircleOutlined />, label: "Chấm công & Ca làm",
+                children: [
+                    { key: URL.ManageShift, label: "Quản lý ca" },
+                    { key: URL.ManageShiftAssignment, label: "Phân ca làm việc" },
+                ]
+            },
+            {
+                key: "admin-leave", icon: <CalendarOutlined />, label: "Nghỉ phép & Tăng ca",
+                children: [
+                    { key: URL.ManageLeaveRequest, label: "Duyệt nghỉ phép" },
+                    { key: URL.LeaveConfiguration, label: "Cấu hình nghỉ phép" },
+                    { key: URL.ManageOvertimeRequest, label: "Duyệt tăng ca" },
+                ]
+            },
+            {
+                key: "admin-perf", icon: <SolutionOutlined />, label: "Đánh giá Năng lực",
+                children: [
+                    { key: URL.PerformanceTemplates, label: "Mẫu đánh giá" },
+                    { key: URL.PerformanceCycles, label: "Đợt đánh giá" },
+                    { key: URL.EvaluatorAssignments, label: "Phân công đánh giá" },
+                    { key: URL.EvaluationList, label: "Phiếu đánh giá" },
+                    { key: URL.PendingEvaluations, label: "Đánh giá nhân viên" },
+                    { key: URL.MyEvaluationResults, label: "Kết quả đánh giá" },
+                ]
+            },
+            {
+                key: "admin-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
+                children: [
+                    { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
+                    { key: URL.CompetencyReport, label: "Báo cáo Năng lực" },
+                ]
+            },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
-            { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
-            { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
-            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
-            { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
-            { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
-            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
-            { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
-            { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
-            { key: URL.WorkforceAnalytics, icon: <RiseOutlined />, label: "Phân tích Nhân sự" },
-            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
-            { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
-            { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
-            { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
-            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
-            { key: URL.PendingEvaluations, icon: <SolutionOutlined />, label: "Đánh giá nhân viên" },
-            { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
-            { key: URL.ManageSystemSettings, icon: <SettingOutlined />, label: "Cấu hình hệ thống" },
         ],
         [EUserRole.MANAGE]: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
-            { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
-            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
+            {
+                key: "manage-time", icon: <ClockCircleOutlined />, label: "Chấm công & Ca làm",
+                children: [
+                    { key: URL.MyAttendance, label: "Chấm công của tôi" },
+                    { key: URL.ManageAttendance, label: "Quản lý chấm công" },
+                ]
+            },
+            {
+                key: "manage-leave", icon: <CalendarOutlined />, label: "Nghỉ phép & Tăng ca",
+                children: [
+                    { key: URL.MyLeaveRequest, label: "Nghỉ phép của tôi" },
+                    { key: URL.ManageLeaveRequest, label: "Duyệt nghỉ phép" },
+                    { key: URL.MyOvertimeRequest, label: "Tăng ca của tôi" },
+                    { key: URL.ManageOvertimeRequest, label: "Duyệt tăng ca" },
+                ]
+            },
+            {
+                key: "manage-hr", icon: <IdcardOutlined />, label: "Dịch vụ Nhân sự",
+                children: [
+                    { key: URL.ManageHRProcedure, label: "Quản lý thủ tục" },
+                ]
+            },
+            {
+                key: "manage-perf", icon: <SolutionOutlined />, label: "Đánh giá Năng lực",
+                children: [
+                    { key: URL.EvaluationList, label: "Phiếu đánh giá" },
+                    { key: URL.PendingEvaluations, label: "Đánh giá nhân viên" },
+                    { key: URL.MyEvaluationResults, label: "Kết quả đánh giá" },
+                ]
+            },
+            {
+                key: "manage-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
+                children: [
+                    { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
+                    { key: URL.CompetencyReport, label: "Báo cáo Năng lực" },
+                ]
+            },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
-            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
-            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
-            { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
-            { key: URL.ManageOvertimeRequest, icon: <ClockCircleOutlined />, label: "Duyệt tăng ca" },
-            { key: URL.WorkforceAnalytics, icon: <RiseOutlined />, label: "Phân tích Nhân sự" },
-            { key: URL.CompetencyReport, icon: <PieChartOutlined />, label: "Báo cáo Năng lực" },
-            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
-            { key: URL.PendingEvaluations, icon: <SolutionOutlined />, label: "Đánh giá nhân viên" },
-            { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
         ],
         [EUserRole.EMPLOYEE]: [
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
-            { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
-            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá của tôi" },
+            { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            { key: URL.EvaluationList, icon: <SolutionOutlined />, label: "Phiếu đánh giá của tôi" },
             { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageAttendance, icon: <ClockCircleOutlined />, label: "Quản lý chấm công" },
-            { key: URL.ManageEmployee, icon: <IdcardOutlined />, label: "Quản lý nhân viên" },
-            { key: URL.ManageHRProcedure, icon: <IdcardOutlined />, label: "Quản lý thủ tục" },
-            { key: URL.ManageDepartment, icon: <BankOutlined />, label: "Quản lý phòng ban" },
-            { key: URL.ManagePosition, icon: <SolutionOutlined />, label: "Quản lý chức vụ" },
+            {
+                key: "hr-org", icon: <BankOutlined />, label: "Tổ chức",
+                children: [
+                    { key: URL.ManageDepartment, label: "Quản lý phòng ban" },
+                    { key: URL.ManagePosition, label: "Quản lý chức vụ" },
+                    { key: URL.ManageEmployee, label: "Quản lý nhân viên" },
+                ]
+            },
+            {
+                key: "hr-time", icon: <ClockCircleOutlined />, label: "Chấm công & Ca làm",
+                children: [
+                    { key: URL.ManageAttendance, label: "Quản lý chấm công" },
+                    { key: URL.ManageShift, label: "Quản lý ca" },
+                    { key: URL.ManageShiftAssignment, label: "Phân ca làm việc" },
+                ]
+            },
+            {
+                key: "hr-leave", icon: <CalendarOutlined />, label: "Nghỉ phép & Tăng ca",
+                children: [
+                    { key: URL.MyLeaveRequest, label: "Nghỉ phép của tôi" },
+                    { key: URL.ManageLeaveRequest, label: "Duyệt nghỉ phép" },
+                    { key: URL.LeaveConfiguration, label: "Cấu hình nghỉ phép" },
+                    { key: URL.MyOvertimeRequest, label: "Tăng ca của tôi" },
+                ]
+            },
+            {
+                key: "hr-services", icon: <IdcardOutlined />, label: "Dịch vụ Nhân sự",
+                children: [
+                    { key: URL.ManageHRProcedure, label: "Quản lý thủ tục" },
+                ]
+            },
+            {
+                key: "hr-perf", icon: <SolutionOutlined />, label: "Đánh giá Năng lực",
+                children: [
+                    { key: URL.PerformanceTemplates, label: "Mẫu đánh giá" },
+                    { key: URL.PerformanceCycles, label: "Đợt đánh giá" },
+                    { key: URL.EvaluatorAssignments, label: "Phân công đánh giá" },
+                    { key: URL.EvaluationList, label: "Phiếu đánh giá" },
+                ]
+            },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
-            { key: URL.ManageShift, icon: <ClockCircleOutlined />, label: "Quản lý ca" },
-            { key: URL.ManageShiftAssignment, icon: <CalendarOutlined />, label: "Phân ca làm việc" },
-            { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
-            { key: URL.ManageLeaveRequest, icon: <CalendarOutlined />, label: "Duyệt nghỉ phép" },
-            { key: URL.LeaveConfiguration, icon: <IdcardOutlined />, label: "Cấu hình nghỉ phép" },
-            { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
-            { key: URL.PerformanceTemplates, icon: <SolutionOutlined />, label: "Mẫu đánh giá" },
-            { key: URL.PerformanceCycles, icon: <CalendarOutlined />, label: "Đợt đánh giá" },
-            { key: URL.EvaluatorAssignments, icon: <TeamOutlined />, label: "Phân công đánh giá" },
-            { key: URL.EvaluationList, icon: <TeamOutlined />, label: "Phiếu đánh giá" },
         ],
     };
 

@@ -169,7 +169,7 @@ const PerformanceCriteria = () => {
                 open={isModalOpen}
                 onOk={handleSave}
                 onCancel={() => setIsModalOpen(false)}
-                destroyOnClose
+                destroyOnHidden
             >
                 <Form form={form} layout="vertical">
                     <Form.Item
