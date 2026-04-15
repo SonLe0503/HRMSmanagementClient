@@ -85,12 +85,12 @@ const HeaderBar = () => {
             <Dropdown
                 menu={{
                     items: [
-                        {
+                        ...(infoLogin?.employeeId ? [{
                             key: 'profile',
                             label: 'My Profile',
                             icon: <UserOutlined />,
                             onClick: () => navigate(URL.MyProfile),
-                        },
+                        }] : []),
                         {
                             key: 'change-password',
                             label: 'Đổi mật khẩu',

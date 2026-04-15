@@ -58,7 +58,11 @@ const MyProfile = () => {
     if (!employee) {
         return (
             <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
-                <Typography.Text type="danger">Không thể tải thông tin hồ sơ. Hãy thử đăng nhập lại.</Typography.Text>
+                <Typography.Text type={infoLogin?.employeeId ? "danger" : "secondary"}>
+                    {!infoLogin?.employeeId 
+                        ? "Tài khoản của bạn là tài khoản hệ thống và không có hồ sơ cá nhân để hiển thị."
+                        : "Không thể tải thông tin hồ sơ. Hãy thử đăng nhập lại."}
+                </Typography.Text>
             </div>
         );
     }

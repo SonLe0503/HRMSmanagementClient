@@ -36,6 +36,11 @@ export interface PendingEvaluationDto {
   status: string;
   deadline: string;
   selfEvaluationCompleted: boolean;
+  // Cycle timeline for time-gating
+  selfEvaluationStart: string;
+  selfEvaluationEnd: string;
+  managerEvaluationStart: string;
+  managerEvaluationEnd: string;
 }
 
 export interface EvaluationRatingResponseDto {
@@ -73,6 +78,11 @@ export interface EvaluationDetailDto {
     acknowledgedDate?: string;
     acknowledgementComments?: string;
     ratings: EvaluationRatingResponseDto[];
+    // Cycle timeline for time-gating
+    selfEvaluationStart: string;
+    selfEvaluationEnd: string;
+    managerEvaluationStart: string;
+    managerEvaluationEnd: string;
 }
 
 

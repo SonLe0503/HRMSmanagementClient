@@ -46,6 +46,9 @@ export interface AttendanceResponseDto {
     isLocked?: boolean;
     location?: string;
     remarks?: string;
+    explanationMessage?: string;
+    explanationStatus?: string;
+    explanationResponse?: string;
 }
 
 export interface AttendanceLogResponseDto {
@@ -238,6 +241,63 @@ export const addLocationReason = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Lỗi cập nhật lý do vị trí");
+        }
+    }
+);
+
+export const submitExplanation = createAsyncThunk(
+    "attendance/submitExplanation",
+    async ({ attendanceId, message }: { attendanceId: number; message: string }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Attendance/${attendanceId}/submit-explanation`,
+                method: "POST",
+                data: { message },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi gửi giải trình");
+        }
+    }
+);
+
+export const submitAbsentExplanation = createAsyncThunk(
+    "attendance/submitAbsentExplanation",
+    async ({ attendanceDate, message }: { attendanceDate: string; message: string }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Attendance/submit-absent-explanation`,
+                method: "POST",
+                data: { date: attendanceDate, message },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi gửi giải trình vắng mặt");
+        }
+    }
+);
+
+export const approveExplanation = createAsyncThunk(
+    "attendance/approveExplanation",
+    async ({ attendanceId, isApproved, responseMessage, manualCheckInTime, manualCheckOutTime }: { attendanceId: number; isApproved: boolean; responseMessage?: string; manualCheckInTime?: string; manualCheckOutTime?: string; }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Attendance/${attendanceId}/approve-explanation`,
+                method: "PUT",
+                data: { isApproved, response: responseMessage, manualCheckInTime, manualCheckOutTime },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi duyệt giải trình");
         }
     }
 );
@@ -471,6 +531,38 @@ export const attendanceSlice = createSlice({
                 if (record) record.isLocked = false;
                 if (state.selectedDetail && state.selectedDetail.attendance.attendanceId === action.payload.attendanceId) {
                     state.selectedDetail.attendance.isLocked = false;
+                }
+            })
+            
+            // Explanations
+            .addCase(submitExplanation.fulfilled, (state, action) => {
+                state.loading = false;
+                state.successMessage = action.payload.message;
+                const updatedRecord = action.payload.data;
+                const index = state.myHistory.findIndex(r => r.attendanceId === updatedRecord.attendanceId);
+                if (index !== -1) {
+                    state.myHistory[index] = updatedRecord;
+                }
+                if (state.myToday && state.myToday.attendance?.attendanceId === updatedRecord.attendanceId) {
+                    state.myToday.attendance = updatedRecord;
+                }
+            })
+            .addCase(submitAbsentExplanation.fulfilled, (state, action) => {
+                state.loading = false;
+                state.successMessage = action.payload.message;
+                const updatedRecord = action.payload.data;
+                const index = state.myHistory.findIndex(r => r.attendanceDate === updatedRecord.attendanceDate);
+                if (index !== -1) {
+                    state.myHistory[index] = updatedRecord;
+                }
+            })
+            .addCase(approveExplanation.fulfilled, (state, action) => {
+                state.loading = false;
+                state.successMessage = action.payload.message;
+                const updatedRecord = action.payload.data;
+                const index = state.records.findIndex(r => r.attendanceId === updatedRecord.attendanceId);
+                if (index !== -1) {
+                    state.records[index] = updatedRecord;
                 }
             })
             

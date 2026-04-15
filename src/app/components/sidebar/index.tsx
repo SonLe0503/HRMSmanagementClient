@@ -146,6 +146,7 @@ const Sidebar = () => {
                 key: "hr-time", icon: <ClockCircleOutlined />, label: "Chấm công & Ca làm",
                 children: [
                     { key: URL.ManageAttendance, label: "Quản lý chấm công" },
+                    { key: URL.MyAttendance, label: "Chấm công của tôi" },
                     { key: URL.ManageShift, label: "Quản lý ca" },
                     { key: URL.ManageShiftAssignment, label: "Phân ca làm việc" },
                 ]
