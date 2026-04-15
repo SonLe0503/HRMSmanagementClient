@@ -48,6 +48,7 @@ const URL = {
     ViewEvaluationResultDetail: "/performance/results/:id",
     ManageSystemSettings: "/admin/system-settings",
     HRPayrollSettings: "/hr/payroll-settings",
+    ManageFaceRegistration: "/hr/manage-face-registration",
     MyProfile: "/my-profile",
 }
 

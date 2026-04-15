@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spin, Tooltip, Modal } from "antd";
-import { CheckCircleOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spin } from "antd";
+import { CheckCircleOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading, checkFaceRegistration } from "../../../../store/attendanceSlide";
+import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading } from "../../../../store/attendanceSlide";
 import dayjs from "dayjs";
-import FaceRegisterModal from "../modal/FaceRegisterModal";
 import CameraCaptureModal from "../modal/CameraCaptureModal";
 
 const { Text } = Typography;
@@ -14,33 +13,12 @@ const AttendanceTodayCard = () => {
     const myToday = useAppSelector(selectMyToday);
     const loading = useAppSelector(selectAttendanceLoading);
     
-    // Modals visibility
-    const [faceRegisterOpen, setFaceRegisterOpen] = useState(false);
     const [checkInOpen, setCheckInOpen] = useState(false);
     const [checkOutOpen, setCheckOutOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchMyToday());
     }, [dispatch]);
-
-    const handleOpenFaceRegister = async () => {
-        try {
-            const res = await dispatch(checkFaceRegistration()).unwrap();
-            if (res.isRegistered) {
-                Modal.confirm({
-                    title: 'Đã có dữ liệu khuôn mặt',
-                    content: 'Bạn đã đăng ký khuôn mặt trên hệ thống. Bạn có muốn chụp lại để cập nhật mới không?',
-                    okText: 'Cập nhật',
-                    cancelText: 'Huỷ',
-                    onOk: () => setFaceRegisterOpen(true)
-                });
-            } else {
-                setFaceRegisterOpen(true);
-            }
-        } catch (error) {
-            setFaceRegisterOpen(true);
-        }
-    };
 
     const handleCheckInCapture = async (faceImage: string) => {
         try {
@@ -130,24 +108,9 @@ const AttendanceTodayCard = () => {
 
     return (
         <>
-            <Card 
-                title={
-                    <div className="flex justify-between items-center">
-                        <span>Attendance Today</span>
-                        <Tooltip title="Đăng ký khuôn mặt">
-                            <Button 
-                                type="text" 
-                                icon={<UserOutlined />} 
-                                onClick={handleOpenFaceRegister}
-                                size="small"
-                                className="flex items-center"
-                            >
-                                Register Face
-                            </Button>
-                        </Tooltip>
-                    </div>
-                } 
-                variant="borderless" 
+            <Card
+                title="Attendance Today"
+                variant="borderless"
                 className="shadow-sm mb-6"
             >
                 <Text type="secondary" className="block mb-4">Ngày hiện tại: {dayjs().format("DD/MM/YYYY")}</Text>
@@ -215,12 +178,6 @@ const AttendanceTodayCard = () => {
                     </Space>
                 </div>
             </Card>
-
-            <FaceRegisterModal 
-                open={faceRegisterOpen} 
-                onCancel={() => setFaceRegisterOpen(false)}
-                onSuccess={() => setFaceRegisterOpen(false)}
-            />
 
             <CameraCaptureModal 
                 open={checkInOpen}

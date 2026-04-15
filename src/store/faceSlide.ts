@@ -1,0 +1,126 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { request } from "../utils/request";
+import type { RootState } from "./index";
+
+// ── DTOs ────────────────────────────────────────────────────────────────────
+
+export interface EmployeeFaceStatusDto {
+    employeeId: number;
+    employeeCode: string;
+    fullName: string;
+    email: string;
+    departmentName?: string;
+    positionName?: string;
+    isRegistered: boolean;
+    registeredAt?: string;
+    lastUpdatedAt?: string;
+}
+
+interface IFaceState {
+    employeesFaceStatus: EmployeeFaceStatusDto[];
+    loading: boolean;
+    error: string | null;
+}
+
+const initialState: IFaceState = {
+    employeesFaceStatus: [],
+    loading: false,
+    error: null,
+};
+
+// ── Thunks ───────────────────────────────────────────────────────────────────
+
+export const fetchAllEmployeesFaceStatus = createAsyncThunk(
+    "face/fetchAllEmployeesFaceStatus",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: "/Face/admin/employees",
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data as EmployeeFaceStatusDto[];
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi tải danh sách");
+        }
+    }
+);
+
+export const adminRegisterFace = createAsyncThunk(
+    "face/adminRegisterFace",
+    async (dto: { employeeId: number; referenceImageBase64: string }, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Face/admin/register/${dto.employeeId}`,
+                method: "POST",
+                data: { referenceImageBase64: dto.referenceImageBase64 },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi đăng ký khuôn mặt");
+        }
+    }
+);
+
+export const adminDeleteFace = createAsyncThunk(
+    "face/adminDeleteFace",
+    async (employeeId: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: `/Face/admin/${employeeId}`,
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi xóa hồ sơ khuôn mặt");
+        }
+    }
+);
+
+// ── Slice ────────────────────────────────────────────────────────────────────
+
+const faceSlice = createSlice({
+    name: "face",
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchAllEmployeesFaceStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAllEmployeesFaceStatus.fulfilled, (state, action) => {
+                state.loading = false;
+                state.employeesFaceStatus = action.payload;
+            })
+            .addCase(fetchAllEmployeesFaceStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(adminRegisterFace.pending, (state) => { state.loading = true; })
+            .addCase(adminRegisterFace.fulfilled, (state) => { state.loading = false; })
+            .addCase(adminRegisterFace.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(adminDeleteFace.pending, (state) => { state.loading = true; })
+            .addCase(adminDeleteFace.fulfilled, (state) => { state.loading = false; })
+            .addCase(adminDeleteFace.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
+    }
+});
+
+export const selectEmployeesFaceStatus = (state: RootState) => state.face.employeesFaceStatus;
+export const selectFaceLoading = (state: RootState) => state.face.loading;
+
+export default faceSlice.reducer;

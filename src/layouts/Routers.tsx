@@ -49,6 +49,7 @@ const MyEvaluationResults = lazy(() => import("../app/pages/performanceEvaluatio
 const ViewEvaluationResultDetail = lazy(() => import("../app/pages/performanceEvaluation/ViewEvaluationResultDetail"));
 const ManageSystemSettings = lazy(() => import("../app/pages/manageSystemSettings/index"));
 const HRPayrollSettings = lazy(() => import("../app/pages/hrPayrollSettings/index"));
+const ManageFaceRegistration = lazy(() => import("../app/pages/manageFaceRegistration/index"));
 const MyProfile = lazy(() => import("../app/pages/myProfile/index"));
 
 const shareResourceItem = [
@@ -292,6 +293,12 @@ const privateResourceItem = [
     {
         key: URL.HRPayrollSettings,
         element: <HRPayrollSettings />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageFaceRegistration,
+        element: <ManageFaceRegistration />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
