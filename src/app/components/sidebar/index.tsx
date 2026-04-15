@@ -176,6 +176,12 @@ const Sidebar = () => {
                 ]
             },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
+            {
+                key: "hr-config", icon: <SettingOutlined />, label: "Cấu hình",
+                children: [
+                    { key: URL.HRPayrollSettings, label: "Cấu hình kỳ lương" },
+                ]
+            },
         ],
     };
 

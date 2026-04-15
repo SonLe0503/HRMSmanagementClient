@@ -1,18 +1,61 @@
-import { useState, useEffect } from "react";
-import { Table, DatePicker, Button, Space, Card, Tag, Tooltip, Modal, Input, message, Form, Alert, Typography } from "antd";
+import { useState, useEffect, useMemo } from "react";
+import { Table, Button, Space, Select, Card, Tag, Tooltip, Modal, Input, message, Form, Alert, Typography, Row, Col, Statistic, Divider } from "antd";
 import {
     SearchOutlined, ReloadOutlined, ExclamationCircleOutlined,
-    EditOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, WarningOutlined
+    EditOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, WarningOutlined,
+    CalendarOutlined, ThunderboltOutlined
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
     fetchMyHistory, selectMyHistory, selectAttendanceLoading,
     submitExplanation, submitAbsentExplanation, type AttendanceResponseDto
 } from "../../../../store/attendanceSlide";
+import { fetchPayrollSettings, selectPayrollSettings } from "../../../../store/systemSettingSlide";
 import dayjs from "dayjs";
 
-const { RangePicker } = DatePicker;
 const { Text } = Typography;
+
+// ─── Payroll Period Utilities ──────────────────────────────────────────────────
+
+interface PayrollPeriod {
+    label: string;
+    value: string;        // fromDate dùng làm key duy nhất
+    fromDate: string;     // YYYY-MM-DD
+    toDate: string;       // YYYY-MM-DD
+    displayLabel: string; // "Kỳ 03/2026 (05/03 → 04/04)"
+}
+
+function generatePayrollPeriods(cutOffDay: number): PayrollPeriod[] {
+    const periods: PayrollPeriod[] = [];
+    const today = dayjs();
+
+    for (let i = 12; i >= -1; i--) {
+        const base = today.subtract(i, "month");
+        const periodStart = base.date(cutOffDay);
+        const periodEnd = periodStart.add(1, "month").subtract(1, "day");
+
+        const fromDate = periodStart.format("YYYY-MM-DD");
+        const toDate = periodEnd.format("YYYY-MM-DD");
+        const monthLabel = periodStart.format("MM/YYYY");
+
+        periods.push({
+            label: `Kỳ ${monthLabel}`,
+            value: fromDate,
+            fromDate,
+            toDate,
+            displayLabel: `Kỳ ${monthLabel}  (${periodStart.format("DD/MM")} → ${periodEnd.format("DD/MM/YYYY")})`
+        });
+    }
+
+    return periods;
+}
+
+function getCurrentPeriod(periods: PayrollPeriod[]): PayrollPeriod | undefined {
+    const today = dayjs().format("YYYY-MM-DD");
+    return periods.find(p => today >= p.fromDate && today <= p.toDate);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 
 const EXPLANATION_STATUS_CONFIG: Record<string, { color: string; label: string; icon: React.ReactNode }> = {
     Required: { color: "error",      label: "Cần giải trình",  icon: <WarningOutlined /> },
@@ -31,29 +74,44 @@ const MyAttendanceHistoryTable = () => {
     const dispatch = useAppDispatch();
     const records = useAppSelector(selectMyHistory);
     const loading = useAppSelector(selectAttendanceLoading);
+    const payrollSettings = useAppSelector(selectPayrollSettings);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<AttendanceResponseDto | null>(null);
     const [form] = Form.useForm();
 
-    const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
-        dayjs().startOf('month'),
-        dayjs()
-    ]);
+    const cutOffDay = payrollSettings?.payrollCutOffDay ?? 1;
+    const payrollPeriods = useMemo(() => generatePayrollPeriods(cutOffDay), [cutOffDay]);
 
-    useEffect(() => { handleSearch(); }, [dispatch]);
+    const [selectedPeriodKey, setSelectedPeriodKey] = useState<string>("");
+
+    useEffect(() => {
+        dispatch(fetchPayrollSettings());
+    }, [dispatch]);
+
+    // Khi payrollPeriods sẵn sàng → chọn kỳ hiện tại và fetch lần đầu
+    useEffect(() => {
+        if (payrollPeriods.length === 0) return;
+        const current = getCurrentPeriod(payrollPeriods) ?? payrollPeriods[payrollPeriods.length - 2];
+        if (!current) return;
+        setSelectedPeriodKey(current.value);
+        dispatch(fetchMyHistory({ fromDate: current.fromDate, toDate: current.toDate }));
+    }, [payrollPeriods]);
+
+    const selectedPeriod = useMemo(
+        () => payrollPeriods.find(p => p.value === selectedPeriodKey),
+        [payrollPeriods, selectedPeriodKey]
+    );
 
     const handleSearch = () => {
-        const fromDate = dateRange[0]?.format("YYYY-MM-DD");
-        const toDate = dateRange[1]?.format("YYYY-MM-DD");
-        dispatch(fetchMyHistory({ fromDate, toDate }));
+        if (!selectedPeriod) return;
+        dispatch(fetchMyHistory({ fromDate: selectedPeriod.fromDate, toDate: selectedPeriod.toDate }));
     };
 
-    const handleReset = () => {
-        setDateRange([dayjs().startOf('month'), dayjs()]);
-        dispatch(fetchMyHistory({
-            fromDate: dayjs().startOf('month').format("YYYY-MM-DD"),
-            toDate: dayjs().format("YYYY-MM-DD")
-        }));
+    const handleCurrentPeriod = () => {
+        const current = getCurrentPeriod(payrollPeriods);
+        if (!current) return;
+        setSelectedPeriodKey(current.value);
+        dispatch(fetchMyHistory({ fromDate: current.fromDate, toDate: current.toDate }));
     };
 
     const handleOpenExplanation = (record: AttendanceResponseDto) => {
@@ -67,13 +125,13 @@ const MyAttendanceHistoryTable = () => {
         try {
             const values = await form.validateFields();
             if (!selectedRecord) return;
-            
+
             if (selectedRecord.attendanceId === 0) {
                 await dispatch(submitAbsentExplanation({ attendanceDate: selectedRecord.attendanceDate, message: values.message })).unwrap();
             } else {
                 await dispatch(submitExplanation({ attendanceId: selectedRecord.attendanceId, message: values.message })).unwrap();
             }
-            
+
             message.success("Phiếu giải trình đã được gửi. Đang chờ Quản lý duyệt.");
             setModalOpen(false);
             handleSearch();
@@ -83,7 +141,22 @@ const MyAttendanceHistoryTable = () => {
         }
     };
 
-    const requiredCount = records.filter(r => r.explanationStatus === "Required" || r.location?.includes("[INVALID]") && !r.explanationStatus || (r.status === "Absent" || r.status === "Incomplete") && !r.explanationStatus).length;
+    // ─── Thống kê tổng hợp ────────────────────────────────────────────────────
+    const summary = useMemo(() => {
+        const totalRecords = records.length;
+        const presentDays = records.filter(r =>
+            r.status === "Present" || r.status === "Late" || r.status === "PaidLeave"
+        ).length;
+        const totalWorkingHours = records.reduce((sum, r) => sum + (r.workingHours ?? 0), 0);
+        const totalOvertimeHours = records.reduce((sum, r) => sum + (r.payrollOvertimeHours ?? 0), 0);
+        return { totalRecords, presentDays, totalWorkingHours, totalOvertimeHours };
+    }, [records]);
+
+    const requiredCount = records.filter(r =>
+        r.explanationStatus === "Required" ||
+        (r.location?.includes("[INVALID]") && !r.explanationStatus) ||
+        ((r.status === "Absent" || r.status === "Incomplete") && !r.explanationStatus)
+    ).length;
 
     const columns = [
         {
@@ -101,7 +174,9 @@ const MyAttendanceHistoryTable = () => {
         {
             title: "Giờ công (h)", dataIndex: "workingHours", key: "workingHours", align: 'center' as const,
             render: (val: number, record: AttendanceResponseDto) => {
-                const blocked = ["Required", "Pending", "Rejected"].includes(record.explanationStatus || "") || (record.location?.includes("[INVALID]") && !record.explanationStatus) || ((record.status === "Absent" || record.status === "Incomplete") && !record.explanationStatus);
+                const blocked = ["Required", "Pending", "Rejected"].includes(record.explanationStatus || "") ||
+                    (record.location?.includes("[INVALID]") && !record.explanationStatus) ||
+                    ((record.status === "Absent" || record.status === "Incomplete") && !record.explanationStatus);
                 return blocked
                     ? <Tooltip title="Giờ công bị tạm khóa chờ giải trình được duyệt"><Tag color="red">0 🔒</Tag></Tooltip>
                     : (val ?? "0");
@@ -153,13 +228,7 @@ const MyAttendanceHistoryTable = () => {
 
                 if ((record.status === "Absent" || record.status === "Incomplete") && !s) {
                     return (
-                        <Button
-                            type="dashed"
-                            size="small"
-                            icon={<EditOutlined />}
-                            danger
-                            onClick={() => handleOpenExplanation(record)}
-                        >
+                        <Button type="dashed" size="small" icon={<EditOutlined />} danger onClick={() => handleOpenExplanation(record)}>
                             Giải trình ngay
                         </Button>
                     );
@@ -192,12 +261,91 @@ const MyAttendanceHistoryTable = () => {
                 />
             )}
 
-            <Space className="mb-4">
-                <RangePicker value={dateRange} onChange={(v) => setDateRange(v as any)} format="DD/MM/YYYY" allowClear={false} />
-                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch} loading={loading}>Tìm kiếm</Button>
-                <Button icon={<ReloadOutlined />} onClick={handleReset}>Làm mới</Button>
+            {/* ── Bộ lọc kỳ lương ── */}
+            <Space className="mb-4" wrap>
+                <Select
+                    style={{ width: 320 }}
+                    value={selectedPeriodKey || undefined}
+                    onChange={setSelectedPeriodKey}
+                    options={payrollPeriods.map(p => ({ label: p.displayLabel, value: p.value }))}
+                    suffixIcon={<CalendarOutlined />}
+                    placeholder="Chọn kỳ lương"
+                />
+                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch} loading={loading}>
+                    Xem
+                </Button>
+                <Button icon={<ReloadOutlined />} onClick={handleCurrentPeriod}>
+                    Kỳ hiện tại
+                </Button>
             </Space>
 
+            {/* ── Thông tin kỳ đang xem ── */}
+            {selectedPeriod && (
+                <div className="mb-4 text-sm text-slate-500 flex items-center gap-2">
+                    <CalendarOutlined />
+                    <span>
+                        Đang xem: <strong>{selectedPeriod.displayLabel}</strong>
+                        &nbsp;·&nbsp; Ngày chốt: <strong>ngày {cutOffDay} hàng tháng</strong>
+                    </span>
+                </div>
+            )}
+
+            {/* ── 4 thẻ thống kê ── */}
+            {records.length > 0 && (
+                <>
+                    <Row gutter={16} className="mb-4">
+                        <Col xs={12} sm={6}>
+                            <Card size="small" className="bg-blue-50 border-blue-200 text-center">
+                                <Statistic
+                                    title={<span className="text-blue-600 text-xs font-medium">Tổng bản ghi</span>}
+                                    value={summary.totalRecords}
+                                    suffix="ngày"
+                                    valueStyle={{ color: '#1d4ed8', fontSize: 20 }}
+                                    prefix={<CalendarOutlined />}
+                                />
+                            </Card>
+                        </Col>
+                        <Col xs={12} sm={6}>
+                            <Card size="small" className="bg-green-50 border-green-200 text-center">
+                                <Statistic
+                                    title={<span className="text-green-600 text-xs font-medium">Ngày có mặt</span>}
+                                    value={summary.presentDays}
+                                    suffix="ngày"
+                                    valueStyle={{ color: '#15803d', fontSize: 20 }}
+                                    prefix={<CheckCircleOutlined />}
+                                />
+                            </Card>
+                        </Col>
+                        <Col xs={12} sm={6}>
+                            <Card size="small" className="bg-indigo-50 border-indigo-200 text-center">
+                                <Statistic
+                                    title={<span className="text-indigo-600 text-xs font-medium">Tổng giờ công</span>}
+                                    value={summary.totalWorkingHours}
+                                    precision={1}
+                                    suffix="h"
+                                    valueStyle={{ color: '#4338ca', fontSize: 20 }}
+                                    prefix={<ClockCircleOutlined />}
+                                />
+                            </Card>
+                        </Col>
+                        <Col xs={12} sm={6}>
+                            <Card size="small" className="bg-orange-50 border-orange-200 text-center">
+                                <Statistic
+                                    title={<span className="text-orange-600 text-xs font-medium">Tổng giờ OT (tính lương)</span>}
+                                    value={summary.totalOvertimeHours}
+                                    precision={1}
+                                    suffix="h"
+                                    valueStyle={{ color: '#c2410c', fontSize: 20 }}
+                                    prefix={<ThunderboltOutlined />}
+                                />
+                            </Card>
+                        </Col>
+                    </Row>
+                    <Divider style={{ margin: '0 0 16px 0' }} />
+                </>
+            )}
+
+            {/* ── Bảng dữ liệu ── */}
             <Table
                 columns={columns}
                 dataSource={records}
@@ -206,14 +354,33 @@ const MyAttendanceHistoryTable = () => {
                 pagination={{ pageSize: 15 }}
                 bordered
                 rowClassName={(r) => {
-                    const isRequired = r.explanationStatus === "Required" || (r.location?.includes("[INVALID]") && !r.explanationStatus) || ((r.status === "Absent" || r.status === "Incomplete") && !r.explanationStatus);
+                    const isRequired = r.explanationStatus === "Required" ||
+                        (r.location?.includes("[INVALID]") && !r.explanationStatus) ||
+                        ((r.status === "Absent" || r.status === "Incomplete") && !r.explanationStatus);
                     if (isRequired) return "ant-table-row-danger";
                     if (r.explanationStatus === "Pending") return "ant-table-row-warning";
                     if (r.explanationStatus === "Rejected") return "ant-table-row-error";
                     return "";
                 }}
+                summary={() => records.length > 0 ? (
+                    <Table.Summary fixed>
+                        <Table.Summary.Row className="bg-slate-50 font-semibold">
+                            <Table.Summary.Cell index={0} colSpan={3} align="right">
+                                <span className="text-slate-600">Tổng cộng ({summary.totalRecords} bản ghi):</span>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={3} align="center">
+                                <Tag color="blue">{summary.totalWorkingHours.toFixed(1)}h</Tag>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={4} align="center">
+                                <Tag color="orange">{summary.totalOvertimeHours.toFixed(1)}h</Tag>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={5} colSpan={3} />
+                        </Table.Summary.Row>
+                    </Table.Summary>
+                ) : undefined}
             />
 
+            {/* ── Modal giải trình ── */}
             <Modal
                 title={<Space><ExclamationCircleOutlined style={{ color: "#fa8c16" }} /><span>Phiếu giải trình chấm công</span></Space>}
                 open={modalOpen}

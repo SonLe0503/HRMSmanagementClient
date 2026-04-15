@@ -12,9 +12,14 @@ interface ApprovalSettings {
     defaultFallbackUserId: number | null;
 }
 
+interface PayrollSettings {
+    payrollCutOffDay: number;
+}
+
 interface SystemSettingState {
     locationSettings: LocationSettings | null;
     approvalSettings: ApprovalSettings | null;
+    payrollSettings: PayrollSettings | null;
     loading: boolean;
     error: string | null;
 }
@@ -22,6 +27,7 @@ interface SystemSettingState {
 const initialState: SystemSettingState = {
     locationSettings: null,
     approvalSettings: null,
+    payrollSettings: null,
     loading: false,
     error: null,
 };
@@ -77,6 +83,43 @@ export const fetchApprovalSettings = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Lỗi lấy cấu hình phê duyệt");
+        }
+    }
+);
+
+export const fetchPayrollSettings = createAsyncThunk(
+    "systemSetting/fetchPayrollSettings",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: "/SystemSettings/payroll",
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi lấy cấu hình kỳ lương");
+        }
+    }
+);
+
+export const updatePayrollSettings = createAsyncThunk(
+    "systemSetting/updatePayrollSettings",
+    async (dto: PayrollSettings, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({
+                url: "/SystemSettings/payroll",
+                method: "PUT",
+                data: dto,
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi cập nhật cấu hình kỳ lương");
         }
     }
 );
@@ -149,12 +192,34 @@ const systemSettingSlice = createSlice({
             .addCase(updateApprovalSettings.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(fetchPayrollSettings.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchPayrollSettings.fulfilled, (state, action) => {
+                state.loading = false;
+                state.payrollSettings = action.payload;
+            })
+            .addCase(fetchPayrollSettings.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(updatePayrollSettings.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updatePayrollSettings.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(updatePayrollSettings.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 });
 
 export const selectLocationSettings = (state: any) => state.systemSetting.locationSettings;
 export const selectApprovalSettings = (state: any) => state.systemSetting.approvalSettings;
+export const selectPayrollSettings = (state: any) => state.systemSetting.payrollSettings;
 export const selectSystemSettingLoading = (state: any) => state.systemSetting.loading;
 
 export default systemSettingSlice.reducer;
