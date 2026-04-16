@@ -147,6 +147,7 @@ const Sidebar = () => {
                 children: [
                     { key: URL.ManageAttendance, label: "Quản lý chấm công" },
                     { key: URL.MyAttendance, label: "Chấm công của tôi" },
+                    { key: URL.ManageFaceRegistration, label: "Đăng ký khuôn mặt" },
                     { key: URL.ManageShift, label: "Quản lý ca" },
                     { key: URL.ManageShiftAssignment, label: "Phân ca làm việc" },
                 ]
