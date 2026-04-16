@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Space, Card, Tag, Modal, Input, message, Form, Alert, Badge, Typography, TimePicker, Row, Col } from "antd";
+import { Table, Button, Space, Card, Tag, Modal, Input, message, Form, Alert, Badge, Typography, TimePicker, Row, Col, Tooltip } from "antd";
 import {
     ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined,
     FileTextOutlined, ClockCircleOutlined
@@ -98,11 +98,23 @@ const ExplanationApprovalTable = () => {
         },
         {
             title: "Hành động", key: "action", align: "center" as const,
-            render: (_: any, record: AttendanceResponseDto) => (
-                <Button type="primary" size="small" icon={<FileTextOutlined />} onClick={() => handleOpenReview(record)}>
-                    Xem xét
-                </Button>
-            )
+            render: (_: any, record: AttendanceResponseDto) => {
+                const isToday = dayjs(record.attendanceDate).isSame(dayjs(), 'day') || dayjs(record.attendanceDate).isAfter(dayjs(), 'day');
+                
+                return (
+                    <Tooltip title={isToday ? "Giải trình cho ngày hiện tại chỉ có thể duyệt vào ngày mai để tránh lỗi chấm công." : ""}>
+                        <Button 
+                            type="primary" 
+                            size="small" 
+                            icon={<FileTextOutlined />} 
+                            onClick={() => handleOpenReview(record)}
+                            disabled={isToday}
+                        >
+                            Xem xét
+                        </Button>
+                    </Tooltip>
+                );
+            }
         }
     ];
 

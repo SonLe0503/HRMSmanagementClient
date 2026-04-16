@@ -173,10 +173,31 @@ const AddEmployee = () => {
                 <Card title="Thông tin công việc" className="mb-4" style={{ marginBottom: 20 }}>
                     <Row gutter={16}>
                         <Col span={12}>
-                            <Form.Item name="joinDate" label="Ngày vào làm" rules={[{ required: true, message: "Vui lòng chọn ngày vào làm" }]}>
+                            <Form.Item 
+                                name="joinDate" 
+                                label="Ngày vào làm" 
+                                dependencies={['dateOfBirth']}
+                                rules={[
+                                    { required: true, message: "Vui lòng chọn ngày vào làm" },
+                                    ({ getFieldValue }) => ({
+                                        validator(_, value) {
+                                            const dob = getFieldValue('dateOfBirth');
+                                            if (!value || !dob) {
+                                                return Promise.resolve();
+                                            }
+                                            // dob.add(18, 'year') là ngày đủ 18 tuổi
+                                            if (value.isBefore(dob.add(18, 'year'), 'day')) {
+                                                return Promise.reject(new Error('Nhân viên phải đủ ít nhất 18 tuổi tại thời điểm vào làm'));
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    }),
+                                ]}
+                            >
                                 <DatePicker
                                     style={{ width: "100%" }}
                                     format="DD/MM/YYYY"
+                                    disabledDate={d => d && d < dayjs().startOf('day')}
                                 />
                             </Form.Item>
                         </Col>

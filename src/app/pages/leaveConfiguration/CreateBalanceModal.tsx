@@ -83,7 +83,7 @@ const CreateBalanceModal = ({ visible, onClose }: CreateBalanceModalProps) => {
                     >
                         {(employees || []).map((e: any) => (
                             <Option key={e.employeeId} value={e.employeeId}>
-                                {e.firstName} {e.lastName} ({e.employeeCode})
+                                {e.fullName} ({e.employeeCode})
                             </Option>
                         ))}
                     </Select>
