@@ -31,6 +31,7 @@ import evaluationResultSlide from "./evaluationResultSlide";
 import systemSettingSlide from "./systemSettingSlide";
 import faceSlide from "./faceSlide";
 import dashboardSlide from "./dashboardSlide";
+import payrollSlide from "./payrollSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -69,6 +70,7 @@ const reducers = {
   systemSetting: systemSettingSlide,
   face: faceSlide,
   dashboard: dashboardSlide,
+  payroll: payrollSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

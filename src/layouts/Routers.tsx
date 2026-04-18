@@ -52,6 +52,13 @@ const HRPayrollSettings = lazy(() => import("../app/pages/hrPayrollSettings/inde
 const ManageFaceRegistration = lazy(() => import("../app/pages/manageFaceRegistration/index"));
 const MyProfile = lazy(() => import("../app/pages/myProfile/index"));
 
+const PayrollPeriods = lazy(() => import("../app/pages/payroll/index"));
+const PayrollPeriodDetail = lazy(() => import("../app/pages/payroll/periodDetail/index"));
+const PayrollRecordDetail = lazy(() => import("../app/pages/payroll/recordDetail/index"));
+const MyPayslips = lazy(() => import("../app/pages/payroll/myPayslips/index"));
+const PayrollReport = lazy(() => import("../app/pages/payroll/PayrollReport"));
+const PayrollMethodology = lazy(() => import("../app/pages/payroll/PayrollMethodology"));
+
 const shareResourceItem = [
     {
         key: URL.Login,
@@ -305,6 +312,42 @@ const privateResourceItem = [
     {
         key: URL.MyProfile,
         element: <MyProfile />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PayrollPeriods,
+        element: <PayrollPeriods />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PayrollPeriodDetail,
+        element: <PayrollPeriodDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PayrollRecordDetail,
+        element: <PayrollRecordDetail />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyPayslips,
+        element: <MyPayslips />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PayrollReport,
+        element: <PayrollReport />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.PayrollMethodology,
+        element: <PayrollMethodology />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
