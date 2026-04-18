@@ -16,10 +16,18 @@ interface PayrollSettings {
     payrollCutOffDay: number;
 }
 
+interface CompanySettings {
+    companyName: string;
+    address: string;
+    phone: string;
+    email: string;
+}
+
 interface SystemSettingState {
     locationSettings: LocationSettings | null;
     approvalSettings: ApprovalSettings | null;
     payrollSettings: PayrollSettings | null;
+    companySettings: CompanySettings | null;
     loading: boolean;
     error: string | null;
 }
@@ -28,6 +36,7 @@ const initialState: SystemSettingState = {
     locationSettings: null,
     approvalSettings: null,
     payrollSettings: null,
+    companySettings: null,
     loading: false,
     error: null,
 };
@@ -124,6 +133,34 @@ export const updatePayrollSettings = createAsyncThunk(
     }
 );
 
+export const fetchCompanySettings = createAsyncThunk(
+    "systemSetting/fetchCompanySettings",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: "/SystemSettings/company", method: "GET", headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi lấy thông tin công ty");
+        }
+    }
+);
+
+export const updateCompanySettings = createAsyncThunk(
+    "systemSetting/updateCompanySettings",
+    async (dto: CompanySettings, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: "/SystemSettings/company", method: "PUT", data: dto, headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi cập nhật thông tin công ty");
+        }
+    }
+);
+
 export const updateApprovalSettings = createAsyncThunk(
     "systemSetting/updateApprovalSettings",
     async (dto: ApprovalSettings, { rejectWithValue, getState }) => {
@@ -213,6 +250,21 @@ const systemSettingSlice = createSlice({
             .addCase(updatePayrollSettings.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(fetchCompanySettings.pending, (state) => { state.loading = true; })
+            .addCase(fetchCompanySettings.fulfilled, (state, action) => {
+                state.loading = false;
+                state.companySettings = action.payload;
+            })
+            .addCase(fetchCompanySettings.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(updateCompanySettings.pending, (state) => { state.loading = true; })
+            .addCase(updateCompanySettings.fulfilled, (state) => { state.loading = false; })
+            .addCase(updateCompanySettings.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 });
@@ -220,6 +272,7 @@ const systemSettingSlice = createSlice({
 export const selectLocationSettings = (state: any) => state.systemSetting.locationSettings;
 export const selectApprovalSettings = (state: any) => state.systemSetting.approvalSettings;
 export const selectPayrollSettings = (state: any) => state.systemSetting.payrollSettings;
+export const selectCompanySettings = (state: any) => state.systemSetting.companySettings;
 export const selectSystemSettingLoading = (state: any) => state.systemSetting.loading;
 
 export default systemSettingSlice.reducer;

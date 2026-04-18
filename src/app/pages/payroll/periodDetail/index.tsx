@@ -16,6 +16,7 @@ import {
   fetchRecordsByPeriod,
   calculateAllEmployees,
   approvePayrollPeriod,
+  generatePayslipsForPeriod,
   selectCurrentPeriod,
   selectPayrollRecords,
   selectPayrollLoading,
@@ -56,9 +57,20 @@ const PayrollPeriodDetail = () => {
   const handleCalculateAll = async () => {
     try {
       await dispatch(calculateAllEmployees(periodId)).unwrap()
+      // Re-fetch period để cập nhật status → "Calculated" (hiện nút Duyệt cho Admin)
+      await dispatch(fetchPayrollPeriodById(periodId))
       message.success("Đã hoàn tất tính lương cho toàn bộ nhân viên!")
     } catch (err: any) {
       message.error(err.message || "Lỗi khi tính lương")
+    }
+  }
+
+  const handleGeneratePayslips = async () => {
+    try {
+      const res = await dispatch(generatePayslipsForPeriod(periodId)).unwrap()
+      message.success(res.message || "Đã tạo phiếu lương!")
+    } catch (err: any) {
+      message.error(err.message || "Lỗi tạo phiếu lương")
     }
   }
 
@@ -71,8 +83,24 @@ const PayrollPeriodDetail = () => {
     }
   }
 
-  const handleExport = () => {
-    window.open(`http://localhost:5103/api/Payroll/export/${periodId}`, "_blank")
+  const handleExport = async () => {
+    try {
+      const token = infoLogin?.accessToken
+      const res = await fetch(`http://localhost:5103/api/Payroll/export/${periodId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error("Xuất Excel thất bại")
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Payroll_Thang${period?.month}_${period?.year}.xlsx`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch (err: any) {
+      message.error(err.message || "Lỗi xuất Excel")
+    }
   }
 
   const columns: ColumnsType<IPayrollRecord> = [
@@ -199,13 +227,22 @@ const PayrollPeriodDetail = () => {
             </Button>
           )}
           {isHR && isApproved && (
-            <Button
-              icon={<FileExcelOutlined />}
-              onClick={handleExport}
-              className="border-green-500 text-green-600"
-            >
-              Xuất Excel
-            </Button>
+            <>
+              <Button
+                icon={<FileExcelOutlined />}
+                onClick={handleGeneratePayslips}
+                className="border-blue-500 text-blue-600"
+              >
+                Tạo phiếu lương
+              </Button>
+              <Button
+                icon={<FileExcelOutlined />}
+                onClick={handleExport}
+                className="border-green-500 text-green-600"
+              >
+                Xuất Excel
+              </Button>
+            </>
           )}
           {isAdmin && isCalculated && (
             <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleApprove}>Duyệt & Khóa</Button>

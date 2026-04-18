@@ -282,6 +282,22 @@ export const removeDeduction = createAsyncThunk(
   }
 )
 
+export const generatePayslipsForPeriod = createAsyncThunk(
+  "payroll/generatePayslipsForPeriod",
+  async (periodId: number, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/payslips/period/${periodId}/generate-all`,
+        method: "POST",
+        headers: getAuthHeader(getState()),
+      })
+      return res.data
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi tạo phiếu lương")
+    }
+  }
+)
+
 export const generatePayslip = createAsyncThunk(
   "payroll/generatePayslip",
   async (recordId: number, { rejectWithValue, getState }) => {

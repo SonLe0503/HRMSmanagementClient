@@ -6,13 +6,15 @@ import {
     AimOutlined,
     SettingOutlined,
     QuestionCircleOutlined,
-    DollarOutlined
+    DollarOutlined,
+    BankOutlined
 } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
     fetchLocationSettings, selectLocationSettings, selectSystemSettingLoading,
     updateLocationSettings, fetchApprovalSettings, selectApprovalSettings,
-    updateApprovalSettings, fetchPayrollSettings, selectPayrollSettings, updatePayrollSettings
+    updateApprovalSettings, fetchPayrollSettings, selectPayrollSettings, updatePayrollSettings,
+    fetchCompanySettings, selectCompanySettings, updateCompanySettings
 } from "../../../store/systemSettingSlide";
 import { fetchAllUsers, selectUsers } from "../../../store/userSlide";
 import { fetchApprovalAnalysis, selectApprovalAnalysis } from "../../../store/employeeSlide";
@@ -24,6 +26,7 @@ import LocationConfigurationCard from "./components/LocationConfigurationCard";
 import ApprovalAnalysisTable from "./components/ApprovalAnalysisTable";
 import GuidanceCard from "./components/GuidanceCard";
 import PayrollSettingsCard from "./components/PayrollSettingsCard";
+import CompanySettingsCard from "./components/CompanySettingsCard";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -32,11 +35,13 @@ const SystemSettingPage: React.FC = () => {
     const [defaultFallbackForm] = Form.useForm();
     const [locationForm] = Form.useForm();
     const [payrollForm] = Form.useForm();
+    const [companyForm] = Form.useForm();
     const dispatch = useAppDispatch();
 
     const locationSettings = useAppSelector(selectLocationSettings);
     const approvalSettings = useAppSelector(selectApprovalSettings);
     const payrollSettings = useAppSelector(selectPayrollSettings);
+    const companySettings = useAppSelector(selectCompanySettings);
     const approvalAnalysis = useAppSelector(selectApprovalAnalysis);
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectSystemSettingLoading);
@@ -48,6 +53,7 @@ const SystemSettingPage: React.FC = () => {
         dispatch(fetchLocationSettings());
         dispatch(fetchApprovalSettings());
         dispatch(fetchPayrollSettings());
+        dispatch(fetchCompanySettings());
         dispatch(fetchAllUsers());
         dispatch(fetchApprovalAnalysis());
     }, [dispatch]);
@@ -60,6 +66,10 @@ const SystemSettingPage: React.FC = () => {
     useEffect(() => {
         if (payrollSettings) payrollForm.setFieldsValue(payrollSettings);
     }, [payrollSettings, payrollForm]);
+
+    useEffect(() => {
+        if (companySettings) companyForm.setFieldsValue(companySettings);
+    }, [companySettings, companyForm]);
 
     useEffect(() => {
         if (approvalSettings) {
@@ -80,6 +90,16 @@ const SystemSettingPage: React.FC = () => {
             dispatch(fetchLocationSettings());
         } catch (error: any) {
             message.error(error || "Lỗi lưu cấu hình vị trí");
+        }
+    };
+
+    const onCompanyFinish = async (values: any) => {
+        try {
+            await dispatch(updateCompanySettings(values)).unwrap();
+            message.success("Thông tin công ty đã được lưu");
+            dispatch(fetchCompanySettings());
+        } catch (error: any) {
+            message.error(error || "Lỗi lưu thông tin công ty");
         }
     };
 
@@ -222,6 +242,32 @@ const SystemSettingPage: React.FC = () => {
         },
         {
             key: "4",
+            label: <Space className="px-4"><BankOutlined />Thông tin Công ty</Space>,
+            children: (
+                <div className="animate-in fade-in duration-500">
+                    <Row gutter={[32, 32]}>
+                        <Col xs={24} lg={16}>
+                            <CompanySettingsCard
+                                form={companyForm}
+                                loading={loading}
+                                onFinish={onCompanyFinish}
+                                onRefresh={() => dispatch(fetchCompanySettings())}
+                            />
+                        </Col>
+                        <Col xs={24} lg={8}>
+                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 h-full">
+                                <Title level={4} className="mb-4">Lưu ý</Title>
+                                <Paragraph className="text-slate-500">
+                                    Thông tin công ty sẽ được hiển thị trên phần đầu của mỗi phiếu lương PDF khi xuất cho nhân viên.
+                                </Paragraph>
+                            </div>
+                        </Col>
+                    </Row>
+                </div>
+            )
+        },
+        {
+            key: "5",
             label: <Space className="px-4"><AimOutlined />Phân tích (Audit)</Space>,
             children: (
                 <div className="animate-in fade-in duration-500">

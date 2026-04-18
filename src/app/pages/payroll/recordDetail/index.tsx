@@ -87,7 +87,7 @@ const PayrollRecordDetail = () => {
               <Descriptions.Item label="Lương cơ bản">{record.baseSalary.toLocaleString()} đ</Descriptions.Item>
               <Descriptions.Item label="Ngày công chuẩn">{record.workingDays} ngày</Descriptions.Item>
               <Descriptions.Item label="Ngày công thực tế">
-                <Badge count={record.actualWorkingDays} color="blue" /> / {record.workingDays} ngày
+                <Badge count={record.actualWorkingDays} color="blue" showZero /> / {record.workingDays} ngày
               </Descriptions.Item>
               <Descriptions.Item label="Trạng thái">
                 <Tag color={record.status === "Approved" ? "green" : "orange"}>{record.status.toUpperCase()}</Tag>

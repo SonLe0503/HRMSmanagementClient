@@ -19,8 +19,23 @@ const MyPayslips = () => {
     }
   }, [dispatch, currentUser])
 
-  const handleDownload = (payslipId: number) => {
-    window.open(`http://localhost:5103/api/Payroll/payslips/${payslipId}/pdf`, "_blank")
+  const handleDownload = async (payslipId: number, month: number, year: number) => {
+    try {
+      const token = currentUser?.accessToken
+      const res = await fetch(`http://localhost:5103/api/Payroll/payslips/${payslipId}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error("Tải PDF thất bại")
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `PhieuLuong_Thang${month}_${year}.pdf`
+      a.click()
+      window.URL.revokeObjectURL(url)
+    } catch (err: any) {
+      console.error(err)
+    }
   }
 
   const columns = [
@@ -67,10 +82,10 @@ const MyPayslips = () => {
       title: "",
       key: "action",
       render: (_: any, r: IPayslip) => (
-        <Button 
-          type="primary" 
-          icon={<FilePdfOutlined />} 
-          onClick={() => handleDownload(r.payslipId)}
+        <Button
+          type="primary"
+          icon={<FilePdfOutlined />}
+          onClick={() => handleDownload(r.payslipId, r.month, r.year)}
         >
           Tải PDF
         </Button>

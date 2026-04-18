@@ -1,6 +1,9 @@
-import { Modal, Form, DatePicker, Select, Row, Col, message } from "antd"
-import { useAppDispatch } from "../../../store"
+import { useEffect, useState } from "react"
+import { Modal, Form, Select, Alert, message } from "antd"
+import dayjs from "dayjs"
+import { useAppDispatch, useAppSelector } from "../../../store"
 import { createPayrollPeriod } from "../../../store/payrollSlide"
+import { fetchPayrollSettings, selectPayrollSettings } from "../../../store/systemSettingSlide"
 
 interface Props {
   visible: boolean
@@ -11,20 +14,53 @@ interface Props {
 const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
+  const payrollSettings = useAppSelector(selectPayrollSettings)
+
+  const [month, setMonth] = useState<number | null>(null)
+  const [year, setYear] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (visible) {
+      dispatch(fetchPayrollSettings())
+    }
+  }, [visible, dispatch])
+
+  // Reset khi đóng modal
+  useEffect(() => {
+    if (!visible) {
+      form.resetFields()
+      setMonth(null)
+      setYear(null)
+    }
+  }, [visible, form])
+
+  const cutOffDay = payrollSettings?.payrollCutOffDay ?? 1
+
+  // Tính startDate / endDate từ tháng, năm, ngày chốt
+  const computeDates = (m: number, y: number) => {
+    const start = dayjs(`${y}-${String(m).padStart(2, "0")}-${String(cutOffDay).padStart(2, "0")}`)
+    const end = start.add(1, "month").subtract(1, "day")
+    return { startDate: start.format("YYYY-MM-DD"), endDate: end.format("YYYY-MM-DD") }
+  }
+
+  const dates = month && year ? computeDates(month, year) : null
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields()
-      const payload = {
-        month: values.month,
-        year: values.year,
-        startDate: values.range[0].format("YYYY-MM-DD"),
-        endDate: values.range[1].format("YYYY-MM-DD"),
+      if (!dates) {
+        message.error("Vui lòng chọn đầy đủ tháng và năm")
+        return
       }
 
-      await dispatch(createPayrollPeriod(payload)).unwrap()
+      await dispatch(createPayrollPeriod({
+        month: values.month,
+        year: values.year,
+        startDate: dates.startDate,
+        endDate: dates.endDate,
+      })).unwrap()
+
       message.success("Tạo kỳ lương thành công!")
-      form.resetFields()
       onSuccess()
     } catch (err: any) {
       message.error(err.message || "Không thể tạo kỳ lương")
@@ -39,41 +75,54 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
       onCancel={onCancel}
       okText="Xác nhận"
       cancelText="Hủy bỏ"
-      width={500}
+      width={460}
     >
       <Form form={form} layout="vertical" className="mt-4">
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item name="month" label="Tháng" rules={[{ required: true }]}>
-              <Select placeholder="Chọn tháng">
-                {Array.from({ length: 12 }, (_, i) => (
-                  <Select.Option key={i + 1} value={i + 1}>Tháng {i + 1}</Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="year" label="Năm" rules={[{ required: true }]}>
-              <Select placeholder="Chọn năm">
-                {[2024, 2025, 2026].map(y => (
-                  <Select.Option key={y} value={y}>{y}</Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+        <div className="flex gap-3">
+          <Form.Item name="month" label="Tháng" rules={[{ required: true, message: "Chọn tháng" }]} className="flex-1">
+            <Select
+              placeholder="Chọn tháng"
+              onChange={(v) => setMonth(v)}
+            >
+              {Array.from({ length: 12 }, (_, i) => (
+                <Select.Option key={i + 1} value={i + 1}>Tháng {i + 1}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-        <Form.Item 
-          name="range" 
-          label="Thời gian chốt công" 
-          rules={[{ required: true, message: "Vui lòng chọn khoảng thời gian" }]}
-        >
-          <DatePicker.RangePicker className="w-full" />
-        </Form.Item>
-        
-        <p className="text-gray-400 text-xs italic">
-          * Lưu ý: Thời gian này dùng để lọc dữ liệu Chấm công, Nghỉ phép và OT của nhân viên.
-        </p>
+          <Form.Item name="year" label="Năm" rules={[{ required: true, message: "Chọn năm" }]} className="flex-1">
+            <Select
+              placeholder="Chọn năm"
+              onChange={(v) => setYear(v)}
+            >
+              {[2024, 2025, 2026, 2027].map(y => (
+                <Select.Option key={y} value={y}>{y}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </div>
+
+        {dates ? (
+          <Alert
+            type="info"
+            showIcon
+            message={
+              <span>
+                Thời gian chốt công:{" "}
+                <strong>{dates.startDate}</strong> → <strong>{dates.endDate}</strong>
+              </span>
+            }
+            description={`Dựa theo ngày chốt lương = ${cutOffDay} (cấu hình trong Cài đặt hệ thống)`}
+            className="mt-1"
+          />
+        ) : (
+          <Alert
+            type="warning"
+            showIcon
+            message="Chọn tháng và năm để xem thời gian chốt công tự động"
+            className="mt-1"
+          />
+        )}
       </Form>
     </Modal>
   )

@@ -10,6 +10,8 @@ export interface IPayrollPeriod {
   totalEmployees: number
   totalGrossPay: number
   totalNetPay: number
+  totalInsurance: number
+  totalTax: number
   aggregatedDate?: string
   calculatedDate?: string
   approvedDate?: string
