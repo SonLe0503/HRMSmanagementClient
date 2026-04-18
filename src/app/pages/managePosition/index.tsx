@@ -24,7 +24,7 @@ const ManagePosition = () => {
 
     const handleToggleStatus = (record: any) => {
         const action = record.isActive ? deactivatePosition(record.positionId) : activatePosition(record.positionId);
-        const successMsg = record.isActive ? "Position deactivated successfully (MSG-100)" : "Position activated successfully";
+        const successMsg = record.isActive ? "Vô hiệu hóa chức vụ thành công" : "Kích hoạt chức vụ thành công";
 
         setTogglingId(record.positionId);
         dispatch(action)
@@ -34,7 +34,7 @@ const ManagePosition = () => {
                 dispatch(fetchAllPositions());
             })
             .catch((error: any) => {
-                const msg = typeof error === 'string' ? error : error?.message || (record.isActive ? "Cannot deactivate position (MSG-101)" : "Cannot activate position");
+                const msg = typeof error === 'string' ? error : error?.message || (record.isActive ? "Không thể vô hiệu hóa chức vụ" : "Không thể kích hoạt chức vụ");
                 message.error(msg);
             })
             .finally(() => {
@@ -50,13 +50,13 @@ const ManagePosition = () => {
 
     const columns = [
         {
-            title: "Code",
+            title: "Mã",
             dataIndex: "positionCode",
             key: "positionCode",
             width: 100,
         },
         {
-            title: "Name",
+            title: "Tên chức vụ",
             dataIndex: "positionName",
             key: "positionName",
             width: 250,
@@ -67,28 +67,28 @@ const ManagePosition = () => {
             ),
         },
         {
-            title: "Level",
+            title: "Cấp bậc",
             dataIndex: "level",
             key: "level",
             width: 100,
         },
         {
-            title: "Top Level",
+            title: "Cấp cao nhất",
             dataIndex: "isTopLevel",
             key: "isTopLevel",
             width: 120,
             render: (isTopLevel: boolean) => (
-                isTopLevel ? <Tag color="blue" icon={<CheckCircleOutlined />}>Top-Level</Tag> : <Text type="secondary">-</Text>
+                isTopLevel ? <Tag color="blue" icon={<CheckCircleOutlined />}>Cấp cao nhất</Tag> : <Text type="secondary">-</Text>
             ),
         },
         {
-            title: "Employees",
+            title: "Số nhân viên",
             dataIndex: "employeeCount",
             key: "employeeCount",
             width: 100,
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "isActive",
             key: "isActive",
             width: 100,
@@ -102,12 +102,12 @@ const ManagePosition = () => {
             ),
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             width: 80,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="View Detail">
+                    <Tooltip title="Xem chi tiết">
                         <Button 
                             icon={<EyeOutlined />} 
                             onClick={() => navigate(`/hr/manage-position/${record.positionId}`)} 
@@ -123,16 +123,16 @@ const ManagePosition = () => {
             <Card
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <Title level={4} style={{ margin: 0 }}>Position Management</Title>
+                        <Title level={4} style={{ margin: 0 }}>Quản lý chức vụ</Title>
                         <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
-                            Add New Position
+                            Thêm chức vụ mới
                         </Button>
                     </div>
                 }
             >
                 <div style={{ marginBottom: 16 }}>
                     <Input.Search
-                        placeholder="Search by Position Code or Name..."
+                        placeholder="Tìm kiếm theo mã hoặc tên chức vụ..."
                         allowClear
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}

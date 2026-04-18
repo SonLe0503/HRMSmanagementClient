@@ -27,17 +27,17 @@ const PerformanceCycles = () => {
 
     const handleActivateCycle = (id: number) => {
         Modal.confirm({
-            title: "Activate Cycle",
-            content: "Are you sure you want to activate this evaluation cycle?",
+            title: "Kích hoạt đợt đánh giá",
+            content: "Bạn có chắc chắn muốn kích hoạt đợt đánh giá này?",
             onOk: () => {
                 dispatch(activateCycle(id))
                     .unwrap()
                     .then(() => {
-                        message.success("Cycle activated successfully");
+                        message.success("Kích hoạt đợt đánh giá thành công");
                         dispatch(fetchAllCycles());
                     })
                     .catch((err) => {
-                        message.error(err?.message || "Failed to activate cycle");
+                        message.error(err?.message || "Kích hoạt đợt đánh giá thất bại");
                     });
             }
         });
@@ -45,17 +45,17 @@ const PerformanceCycles = () => {
 
     const handleCloseCycle = (id: number) => {
         Modal.confirm({
-            title: "Close Cycle",
-            content: "Are you sure you want to close this evaluation cycle?",
+            title: "Đóng đợt đánh giá",
+            content: "Bạn có chắc chắn muốn đóng đợt đánh giá này?",
             onOk: () => {
                 dispatch(closeCycle({ id, dto: {} }))
                     .unwrap()
                     .then(() => {
-                        message.success("Cycle closed successfully");
+                        message.success("Đóng đợt đánh giá thành công");
                         dispatch(fetchAllCycles());
                     })
                     .catch((err) => {
-                        message.error(err?.message || "Failed to close cycle");
+                        message.error(err?.message || "Đóng đợt đánh giá thất bại");
                     });
             }
         });
@@ -77,36 +77,36 @@ const PerformanceCycles = () => {
 
     const columns = [
         {
-            title: "Cycle Name",
+            title: "Tên đợt đánh giá",
             dataIndex: "cycleName",
             key: "cycleName",
             render: (name: string) => <div style={{ fontWeight: 500 }}>{name}</div>,
         },
         {
-            title: "Type",
+            title: "Loại",
             dataIndex: "cycleType",
             key: "cycleType",
             width: 120,
             render: (type: string) => <Tag>{type}</Tag>
         },
         {
-            title: "Period",
+            title: "Thời gian",
             key: "period",
             width: 250,
             render: (_: any, record: any) => (
                 <Text type="secondary">
-                    {record.evaluationPeriodStart} to {record.evaluationPeriodEnd}
+                    {record.evaluationPeriodStart} đến {record.evaluationPeriodEnd}
                 </Text>
             )
         },
         {
-            title: "Employees",
+            title: "Số nhân viên",
             dataIndex: "employeeCount",
             key: "employeeCount",
             width: 100,
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "status",
             key: "status",
             width: 120,
@@ -115,13 +115,13 @@ const PerformanceCycles = () => {
             )
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             width: 150,
             render: (_: any, record: any) => (
                 <Space size="middle">
                     {record.status === "Draft" && (
-                        <Tooltip title="Activate Cycle">
+                        <Tooltip title="Kích hoạt đợt đánh giá">
                             <Button 
                                 type="primary"
                                 size="small"
@@ -131,7 +131,7 @@ const PerformanceCycles = () => {
                         </Tooltip>
                     )}
                     {record.status === "Active" && (
-                        <Tooltip title="Close Cycle">
+                        <Tooltip title="Đóng đợt đánh giá">
                             <Button 
                                 danger
                                 size="small"
@@ -140,11 +140,11 @@ const PerformanceCycles = () => {
                             />
                         </Tooltip>
                     )}
-                    <Tooltip title="View Summary">
+                    <Tooltip title="Xem tổng quan">
                         <Button 
                             size="small"
                             icon={<InfoCircleOutlined />} 
-                            onClick={() => message.info("Summary view coming soon")}
+                            onClick={() => message.info("Tính năng xem tổng quan sắp có")}
                         />
                     </Tooltip>
                 </Space>
@@ -157,16 +157,16 @@ const PerformanceCycles = () => {
             <Card
                 title={
                     <div className="flex justify-between items-center">
-                        <Title level={4} style={{ margin: 0 }}>Evaluation Cycles</Title>
+                        <Title level={4} style={{ margin: 0 }}>Đợt đánh giá</Title>
                         <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
-                            Create New Cycle
+                            Tạo đợt đánh giá mới
                         </Button>
                     </div>
                 }
             >
                 <div className="mb-4">
                     <Input.Search
-                        placeholder="Search cycles..."
+                        placeholder="Tìm kiếm đợt đánh giá..."
                         allowClear
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}

@@ -41,21 +41,27 @@ const AddEmployee = () => {
         value: d.departmentId,
     }));
 
-    const positionOptions = activePositions.map(p => ({
-        label: p.positionName,
-        value: p.positionId,
-    }));
+    const positionOptions = [
+        { label: "Không chọn", value: null },
+        ...activePositions.map(p => ({
+            label: p.positionName,
+            value: p.positionId,
+        }))
+    ];
 
     const managerUserIds = users
         .filter(u => u.roles.includes(EUserRole.MANAGE) || u.roles.includes(EUserRole.ADMIN))
         .map(u => u.employeeId);
 
-    const managerOptions = employees
-        .filter(e => managerUserIds.includes(e.employeeId))
-        .map(e => ({
-            label: `${e.fullName} (${e.employeeCode})`,
-            value: e.employeeId,
-        }));
+    const managerOptions = [
+        { label: "Không chọn", value: null },
+        ...employees
+            .filter(e => managerUserIds.includes(e.employeeId))
+            .map(e => ({
+                label: `${e.fullName} (${e.employeeCode})`,
+                value: e.employeeId,
+            }))
+    ];
 
     const onFinish = (values: any) => {
         const payload = {
@@ -202,11 +208,20 @@ const AddEmployee = () => {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item name="baseSalary" label="Lương cơ bản">
+                            <Form.Item 
+                                name="baseSalary" 
+                                label="Lương cơ bản" 
+                                rules={[
+                                    { required: true, message: "Vui lòng nhập lương cơ bản" },
+                                    { type: "number", min: 1000000, message: "Lương cơ bản phải ít nhất 1.000.000 VND" },
+                                    { type: "number", max: 100000000, message: "Lương cơ bản không được vượt quá 100.000.000 VND" }
+                                ]}
+                            >
                                 <InputNumber
                                     style={{ width: "100%" }}
                                     formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                    min={0}
+                                    min={1000000}
+                                    max={100000000}
                                     placeholder="VND"
                                 />
                             </Form.Item>

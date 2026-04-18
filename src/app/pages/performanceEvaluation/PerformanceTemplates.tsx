@@ -30,7 +30,7 @@ const PerformanceTemplates = () => {
 
     const handleToggleStatus = (record: any) => {
         const action = record.isActive ? deactivateTemplate(record.templateId) : activateTemplate(record.templateId);
-        const successMsg = record.isActive ? "Template deactivated successfully" : "Template activated successfully";
+        const successMsg = record.isActive ? "Vô hiệu hóa mẫu thành công" : "Kích hoạt mẫu thành công";
 
         setTogglingId(record.templateId);
         dispatch(action)
@@ -40,7 +40,7 @@ const PerformanceTemplates = () => {
                 dispatch(fetchAllTemplates());
             })
             .catch((error: any) => {
-                message.error(error?.message || "Operation failed");
+                message.error(error?.message || "Thao tác thất bại");
             })
             .finally(() => {
                 setTogglingId(null);
@@ -54,7 +54,7 @@ const PerformanceTemplates = () => {
 
     const columns = [
         {
-            title: "Template Name",
+            title: "Tên mẫu",
             dataIndex: "templateName",
             key: "templateName",
             render: (name: string) => (
@@ -64,18 +64,18 @@ const PerformanceTemplates = () => {
             ),
         },
         {
-            title: "Criteria Count",
+            title: "Số tiêu chí",
             dataIndex: "criteriaCount",
             key: "criteriaCount",
             width: 150,
             render: (count: number) => (
                 <Tag color={count > 0 ? "blue" : "orange"}>
-                    {count} Criteria
+                    {count} Tiêu chí
                 </Tag>
             )
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "isActive",
             key: "isActive",
             width: 120,
@@ -89,19 +89,19 @@ const PerformanceTemplates = () => {
             ),
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             width: 150,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="Manage Criteria">
+                    <Tooltip title="Quản lý tiêu chí">
                         <Button 
                             type="primary"
                             ghost
                             icon={<SettingOutlined />} 
                             onClick={() => navigate(`/performance/templates/${record.templateId}/criteria`)} 
                         >
-                            Criteria
+                            Tiêu chí
                         </Button>
                     </Tooltip>
                 </Space>
@@ -114,16 +114,16 @@ const PerformanceTemplates = () => {
             <Card
                 title={
                     <div className="flex justify-between items-center">
-                        <Title level={4} style={{ margin: 0 }}>Evaluation Templates</Title>
+                        <Title level={4} style={{ margin: 0 }}>Mẫu đánh giá</Title>
                         <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
-                            Add New Template
+                            Thêm mẫu mới
                         </Button>
                     </div>
                 }
             >
                 <div className="mb-4">
                     <Input.Search
-                        placeholder="Search by template name..."
+                        placeholder="Tìm kiếm theo tên mẫu..."
                         allowClear
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}

@@ -90,6 +90,20 @@ export const fetchAllEmployees = createAsyncThunk(
     }
 );
 
+export const fetchActiveEmployees = createAsyncThunk(
+    "employee/fetchActive",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: "/Employee/active", method: "GET", headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || "Something went wrong");
+        }
+    }
+);
+
 export const fetchEmployeeById = createAsyncThunk(
     "employee/fetchById",
     async (id: number, { rejectWithValue, getState }) => {
@@ -181,6 +195,15 @@ export const employeeSlice = createSlice({
                 }));
             })
             .addCase(fetchAllEmployees.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+            .addCase(fetchActiveEmployees.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(fetchActiveEmployees.fulfilled, (state, action) => {
+                state.loading = false;
+                state.employees = action.payload.map((e: any) => ({
+                    ...e,
+                    employeeId: e.employeeId || e.id
+                }));
+            })
+            .addCase(fetchActiveEmployees.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
             .addCase(fetchEmployeeById.pending, (state) => { state.loading = true; state.error = null; })
             .addCase(fetchEmployeeById.fulfilled, (state, action) => {
                 state.loading = false;

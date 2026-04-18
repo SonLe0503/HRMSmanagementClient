@@ -4,6 +4,8 @@ import { createDepartment, selectDepartmentLoading } from "../../../../store/dep
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
+import { fetchAllUsers, selectUsers } from "../../../../store/userSlide";
+import { EUserRole } from "../../../../interface/app";
 
 interface AddDepartmentModalProps {
     open: boolean;
@@ -16,23 +18,36 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
     const navigate = useNavigate();
     const loading = useAppSelector(selectDepartmentLoading);
     const employees = useAppSelector(selectEmployees);
+    const users = useAppSelector(selectUsers);
 
     useEffect(() => {
         if (open) {
             dispatch(fetchAllEmployees());
+            dispatch(fetchAllUsers());
         }
     }, [open, dispatch]);
+
+    const managerUserIds = users
+        .filter(u => u.roles.includes(EUserRole.MANAGE))
+        .map(u => u.employeeId);
+
+    const managerOptions = employees
+        .filter(e => managerUserIds.includes(e.employeeId))
+        .map(e => ({
+            label: `${e.fullName} (${e.employeeCode})`,
+            value: e.employeeId,
+        }));
 
     const onFinish = (values: any) => {
         dispatch(createDepartment(values)).then((res: any) => {
             if (!res.error) {
-                message.success("Department created successfully (MSG-93)");
+                message.success("Tạo phòng ban thành công");
                 form.resetFields();
                 onCancel();
                 navigate(`/hr/manage-department/${res.payload.departmentId}`);
             } else {
                 const error = res.payload;
-                const msg = typeof error === 'string' ? error : error?.message || "Failed to create department";
+                const msg = typeof error === 'string' ? error : error?.message || "Tạo phòng ban thất bại";
                 message.error(msg);
             }
         });
@@ -40,7 +55,7 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
 
     return (
         <Modal
-            title="Add New Department"
+            title="Thêm phòng ban mới"
             open={open}
             onCancel={() => {
                 form.resetFields();
@@ -57,23 +72,23 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
             >
                 <Form.Item
                     name="departmentCode"
-                    label="Department Code"
-                    rules={[{ required: true, message: "Please input the department code!" }]}
+                    label="Mã phòng ban"
+                    rules={[{ required: true, message: "Vui lòng nhập mã phòng ban!" }]}
                 >
                     <Input maxLength={20} />
                 </Form.Item>
 
                 <Form.Item
                     name="departmentName"
-                    label="Department Name"
-                    rules={[{ required: true, message: "Please input the department name!" }]}
+                    label="Tên phòng ban"
+                    rules={[{ required: true, message: "Vui lòng nhập tên phòng ban!" }]}
                 >
                     <Input maxLength={100} />
                 </Form.Item>
 
                 <Form.Item
                     name="description"
-                    label="Description"
+                    label="Mô tả"
                 >
                     <Input.TextArea maxLength={500} />
                 </Form.Item>
@@ -82,11 +97,11 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
 
                 <Form.Item
                     name="managerId"
-                    label="Manager"
+                    label="Quản lý"
                 >
-                    <Select disabled allowClear placeholder="Select manager" showSearch optionFilterProp="children">
-                        {employees.map(e => (
-                            <Select.Option key={e.employeeId} value={e.employeeId}>{e.fullName} ({e.employeeCode})</Select.Option>
+                    <Select allowClear placeholder="Chọn quản lý" showSearch optionFilterProp="children">
+                        {managerOptions.map(e => (
+                            <Select.Option key={e.value} value={e.value}>{e.label}</Select.Option>
                         ))}
                     </Select>
                 </Form.Item>

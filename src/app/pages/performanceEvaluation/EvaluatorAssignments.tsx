@@ -38,7 +38,7 @@ const EvaluatorAssignments = () => {
 
     const handleFetchPreview = () => {
         if (!selectedCycleId) {
-            message.warning("Please select a cycle first");
+            message.warning("Vui lòng chọn đợt đánh giá trước");
             return;
         }
         dispatch(fetchAssignmentPreview(selectedCycleId));
@@ -46,12 +46,12 @@ const EvaluatorAssignments = () => {
 
     const handleAutoAssign = () => {
         if (!selectedCycleId || !selectedTemplateId) {
-            message.warning("Please select a cycle and a template");
+            message.warning("Vui lòng chọn đợt đánh giá và mẫu đánh giá");
             return;
         }
         Modal.confirm({
-            title: "Auto-Assign Evaluators",
-            content: "System will assign direct managers as primary evaluators for all active employees. Proceed?",
+            title: "Tự động phân công người đánh giá",
+            content: "Hệ thống sẽ phân công quản lý trực tiếp làm người đánh giá chính cho tất cả nhân viên đang hoạt động. Tiếp tục?",
             onOk: () => {
                 dispatch(autoAssignEvaluators({
                     cycleId: selectedCycleId,
@@ -61,22 +61,22 @@ const EvaluatorAssignments = () => {
                     .unwrap()
                     .then((res: any) => {
                         if (res.errors && res.errors.length > 0) {
-                            message.warning(`Assigned ${res.successCount} employees, but failed for ${res.failedCount}. Error: ${res.errors[0].errorMessage}`);
+                            message.warning(`Đã phân công ${res.successCount} nhân viên, nhưng thất bại ${res.failedCount}. Lỗi: ${res.errors[0].errorMessage}`);
                         } else if (res.successCount > 0) {
-                            message.success(`Assigned ${res.successCount} employees successfully`);
+                            message.success(`Đã phân công ${res.successCount} nhân viên thành công`);
                         } else {
-                            message.info("No new employees were assigned.");
+                            message.info("Không có nhân viên mới được phân công.");
                         }
                         dispatch(fetchAssignmentPreview(selectedCycleId));
                     })
-                    .catch(err => message.error(err?.message || "Failed to auto-assign"));
+                    .catch(err => message.error(err?.message || "Tự động phân công thất bại"));
             }
         });
     };
 
     const columns = [
         {
-            title: "Employee",
+            title: "Nhân viên",
             dataIndex: "employeeName",
             key: "employeeName",
             render: (name: string, record: any) => (
@@ -87,24 +87,24 @@ const EvaluatorAssignments = () => {
             )
         },
         {
-            title: "Suggested Primary",
+            title: "Người đánh giá chính đề xuất",
             dataIndex: "suggestedPrimaryEvaluatorName",
             key: "primary",
-            render: (name: string) => name || <Tag color="gray">None</Tag>
+            render: (name: string) => name || <Tag color="gray">Không có</Tag>
         },
         {
-            title: "Issues",
+            title: "Vấn đề",
             dataIndex: "issue",
             key: "issue",
-            render: (issue: string) => issue ? <Tag color="red">{issue}</Tag> : <Tag color="green">Ready</Tag>
+            render: (issue: string) => issue ? <Tag color="red">{issue}</Tag> : <Tag color="green">Sẵn sàng</Tag>
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             width: 100,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="Assign Manually">
+                    <Tooltip title="Phân công thủ công">
                         <Button
                             disabled={!selectedTemplateId}
                             size="small"
@@ -127,15 +127,15 @@ const EvaluatorAssignments = () => {
         <div className="p-4">
             <Card
                 title={
-                    <Title level={4} style={{ margin: 0 }}>Evaluator Assignments</Title>
+                    <Title level={4} style={{ margin: 0 }}>Phân công người đánh giá</Title>
                 }
             >
                 <div style={{ display: "flex", gap: 16, marginBottom: 24, padding: 16, backgroundColor: "#f9f9f9", borderRadius: 8 }}>
                     <div style={{ flex: 1 }}>
-                        <Text strong>Select Active Cycle</Text>
+                        <Text strong>Chọn đợt đánh giá đang hoạt động</Text>
                         <Select
                             style={{ width: "100%", marginTop: 8 }}
-                            placeholder="Select cycle"
+                            placeholder="Chọn đợt đánh giá"
                             onChange={(val) => setSelectedCycleId(val)}
                         >
                             {(cycles || []).map(c => (
@@ -144,10 +144,10 @@ const EvaluatorAssignments = () => {
                         </Select>
                     </div>
                     <div style={{ flex: 1 }}>
-                        <Text strong>Apply Template</Text>
+                        <Text strong>Áp dụng mẫu đánh giá</Text>
                         <Select
                             style={{ width: "100%", marginTop: 8 }}
-                            placeholder="Select template"
+                            placeholder="Chọn mẫu đánh giá"
                             onChange={(val) => setSelectedTemplateId(val)}
                         >
                             {(templates || []).map(t => (
@@ -157,7 +157,7 @@ const EvaluatorAssignments = () => {
                     </div>
                     <div style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
                         <Button type="primary" ghost onClick={handleFetchPreview}>
-                            Load Employees
+                            Tải danh sách nhân viên
                         </Button>
                         <Button
                             type="primary"
@@ -165,9 +165,9 @@ const EvaluatorAssignments = () => {
                             onClick={handleAutoAssign}
                             disabled={!selectedCycleId || !selectedTemplateId}
                         >
-                            Auto Assign All
+                            Tự động phân công tất cả
                         </Button>
-                        <Tooltip title="Bulk assign by Department coming soon">
+                        <Tooltip title="Tính năng phân công hàng loạt theo phòng ban sắp có">
                             <Button icon={<DeploymentUnitOutlined />} disabled />
                         </Tooltip>
                     </div>
@@ -180,12 +180,12 @@ const EvaluatorAssignments = () => {
                     loading={loading}
                     pagination={{ pageSize: 10 }}
                     size="middle"
-                    locale={{ emptyText: "Select a cycle and click Load Employees to see suggestions" }}
+                    locale={{ emptyText: "Chọn đợt đánh giá và nhấn Tải danh sách nhân viên để xem đề xuất" }}
                 />
             </Card>
 
             <Modal
-                title={`Manual Assignment - ${selectedEmployeeForManual?.employeeName}`}
+                title={`Phân công thủ công - ${selectedEmployeeForManual?.employeeName}`}
                 open={isManualModalVisible}
                 onOk={() => {
                     form.validateFields().then(values => {
@@ -201,12 +201,12 @@ const EvaluatorAssignments = () => {
                             if (res.errors && res.errors.length > 0) {
                                 message.error(res.errors[0].errorMessage);
                             } else {
-                                message.success("Assigned successfully");
+                                message.success("Phân công thành công");
                                 setIsManualModalVisible(false);
                             }
                             dispatch(fetchAssignmentPreview(selectedCycleId));
                         }).catch(err => {
-                            message.error(err?.message || "Failed to assign");
+                            message.error(err?.message || "Phân công thất bại");
                         });
                     });
                 }}

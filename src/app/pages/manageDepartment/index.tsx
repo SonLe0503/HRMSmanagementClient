@@ -24,7 +24,7 @@ const ManageDepartment = () => {
 
     const handleToggleStatus = (record: any) => {
         const action = record.isActive ? deactivateDepartment(record.departmentId) : activateDepartment(record.departmentId);
-        const successMsg = record.isActive ? "Department deactivated successfully (MSG-95)" : "Department activated successfully";
+        const successMsg = record.isActive ? "Vô hiệu hóa phòng ban thành công" : "Kích hoạt phòng ban thành công";
 
         setTogglingId(record.departmentId);
         dispatch(action)
@@ -34,7 +34,7 @@ const ManageDepartment = () => {
                 dispatch(fetchAllDepartments());
             })
             .catch((error: any) => {
-                const msg = typeof error === 'string' ? error : error?.message || (record.isActive ? "Cannot deactivate department (MSG-96)" : "Cannot activate department");
+                const msg = typeof error === 'string' ? error : error?.message || (record.isActive ? "Không thể vô hiệu hóa phòng ban" : "Không thể kích hoạt phòng ban");
                 message.error(msg);
             })
             .finally(() => {
@@ -50,13 +50,13 @@ const ManageDepartment = () => {
 
     const columns = [
         {
-            title: "Code",
+            title: "Mã",
             dataIndex: "departmentCode",
             key: "departmentCode",
             width: 100,
         },
         {
-            title: "Name",
+            title: "Tên phòng ban",
             dataIndex: "departmentName",
             key: "departmentName",
             width: 200,
@@ -67,27 +67,20 @@ const ManageDepartment = () => {
             ),
         },
         {
-            title: "Parent Department",
-            dataIndex: "parentDepartmentName",
-            key: "parentDepartmentName",
-            width: 200,
-            render: (val: string) => val || "—"
-        },
-        {
-            title: "Manager",
+            title: "Quản lý",
             dataIndex: "managerName",
             key: "managerName",
             width: 200,
             render: (val: string) => val || "—"
         },
         {
-            title: "Employees",
+            title: "Số nhân viên",
             dataIndex: "employeeCount",
             key: "employeeCount",
             width: 100,
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "isActive",
             key: "isActive",
             width: 100,
@@ -101,12 +94,12 @@ const ManageDepartment = () => {
             ),
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             width: 80,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="View Detail">
+                    <Tooltip title="Xem chi tiết">
                         <Button 
                             icon={<EyeOutlined />} 
                             onClick={() => navigate(`/hr/manage-department/${record.departmentId}`)} 
@@ -122,16 +115,16 @@ const ManageDepartment = () => {
             <Card
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <Title level={4} style={{ margin: 0 }}>Department Management</Title>
+                        <Title level={4} style={{ margin: 0 }}>Quản lý phòng ban</Title>
                         <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
-                            Add New Department
+                            Thêm phòng ban mới
                         </Button>
                     </div>
                 }
             >
                 <div style={{ marginBottom: 16 }}>
                     <Input.Search
-                        placeholder="Search by Department Code or Name..."
+                        placeholder="Tìm kiếm theo mã hoặc tên phòng ban..."
                         allowClear
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -151,10 +144,10 @@ const ManageDepartment = () => {
                         emptyText: searchText ? (
                             <div style={{ padding: "20px 0" }}>
                                 <Text type="secondary">
-                                    No department found matching criteria (MSG-92)
+                                    Không tìm thấy phòng ban nào phù hợp
                                 </Text>
                             </div>
-                        ) : "No data available"
+                        ) : "Không có dữ liệu"
                     }}
                 />
             </Card>
