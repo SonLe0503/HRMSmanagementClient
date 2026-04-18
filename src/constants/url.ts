@@ -50,6 +50,18 @@ const URL = {
     HRPayrollSettings: "/hr/payroll-settings",
     ManageFaceRegistration: "/hr/manage-face-registration",
     MyProfile: "/my-profile",
+    
+    // Payroll — Admin/HR
+    PayrollPeriods:       "/payroll/periods",
+    PayrollPeriodDetail:  "/payroll/periods/:id",
+    PayrollRecordDetail:  "/payroll/records/:id",
+    PayrollReport:        "/payroll/report",
+
+    // Payroll — Employee
+    MyPayslips:           "/payroll/my-payslips",
+
+    // Payroll — Reference
+    PayrollMethodology:   "/payroll/methodology",
 }
 
 export default URL

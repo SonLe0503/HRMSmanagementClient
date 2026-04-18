@@ -11,6 +11,7 @@ import {
     CalendarOutlined,
     PieChartOutlined,
     SettingOutlined,
+    WalletOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -75,6 +76,14 @@ const Sidebar = () => {
                 ]
             },
             {
+                key: "admin-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
+                children: [
+                    { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
+                    { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
+                    { key: URL.PayrollMethodology, label: "Quy tắc tính lương" },
+                ]
+            },
+            {
                 key: "admin-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
                 children: [
                     { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
@@ -116,6 +125,13 @@ const Sidebar = () => {
                 ]
             },
             {
+                key: "manage-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
+                children: [
+                    { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
+                    { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
+                ]
+            },
+            {
                 key: "manage-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
                 children: [
                     { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
@@ -131,6 +147,7 @@ const Sidebar = () => {
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.EvaluationList, icon: <SolutionOutlined />, label: "Phiếu đánh giá của tôi" },
             { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
+            { key: URL.MyPayslips, icon: <WalletOutlined />, label: "Phiếu lương của tôi" },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -174,6 +191,15 @@ const Sidebar = () => {
                     { key: URL.PerformanceCycles, label: "Đợt đánh giá" },
                     { key: URL.EvaluatorAssignments, label: "Phân công đánh giá" },
                     { key: URL.EvaluationList, label: "Phiếu đánh giá" },
+                ]
+            },
+            {
+                key: "hr-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
+                children: [
+                    { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
+                    { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
+                    { key: URL.PayrollReport, label: "Báo cáo quỹ lương" },
+                    { key: URL.PayrollMethodology, label: "Quy tắc tính lương" },
                 ]
             },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
