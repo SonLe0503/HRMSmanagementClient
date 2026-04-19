@@ -19,11 +19,11 @@ const AddTemplateModal = ({ open, onCancel, onSuccess }: AddTemplateModalProps) 
             const values = await form.validateFields();
             setLoading(true);
             await dispatch(createTemplate(values)).unwrap();
-            message.success("Template created successfully");
+            message.success("Tạo mẫu đánh giá thành công");
             form.resetFields();
             onSuccess();
         } catch (error: any) {
-            message.error(error?.message || "Operation failed");
+            message.error(error?.message || "Thao tác thất bại");
         } finally {
             setLoading(false);
         }
@@ -31,7 +31,7 @@ const AddTemplateModal = ({ open, onCancel, onSuccess }: AddTemplateModalProps) 
 
     return (
         <Modal
-            title="Add New Evaluation Template"
+            title="Thêm mẫu đánh giá mới"
             open={open}
             onOk={handleOk}
             onCancel={onCancel}
@@ -41,16 +41,16 @@ const AddTemplateModal = ({ open, onCancel, onSuccess }: AddTemplateModalProps) 
             <Form form={form} layout="vertical">
                 <Form.Item
                     name="templateName"
-                    label="Template Name"
-                    rules={[{ required: true, message: "Please input template name!" }]}
+                    label="Tên mẫu"
+                    rules={[{ required: true, message: "Vui lòng nhập tên mẫu!" }]}
                 >
-                    <Input placeholder="Enter template name" />
+                    <Input placeholder="Nhập tên mẫu" />
                 </Form.Item>
                 <Form.Item
                     name="description"
-                    label="Description"
+                    label="Mô tả"
                 >
-                    <Input.TextArea rows={4} placeholder="Enter template description" />
+                    <Input.TextArea rows={4} placeholder="Nhập mô tả mẫu đánh giá" />
                 </Form.Item>
             </Form>
         </Modal>

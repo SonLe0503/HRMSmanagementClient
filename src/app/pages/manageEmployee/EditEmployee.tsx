@@ -88,21 +88,27 @@ const EditEmployee = () => {
         value: d.departmentId,
     }));
 
-    const positionOptions = activePositions.map(p => ({
-        label: p.positionName,
-        value: p.positionId,
-    }));
+    const positionOptions = [
+        { label: "Không chọn", value: null },
+        ...activePositions.map(p => ({
+            label: p.positionName,
+            value: p.positionId,
+        }))
+    ];
 
     const managerUserIds = users
         .filter(u => u.roles.includes(EUserRole.MANAGE) || u.roles.includes(EUserRole.ADMIN))
         .map(u => u.employeeId);
 
-    const managerOptions = employees
-        .filter(e => managerUserIds.includes(e.employeeId))
-        .map(e => ({
-            label: `${e.fullName} (${e.employeeCode})`,
-            value: e.employeeId,
-        }));
+    const managerOptions = [
+        { label: "Không chọn", value: null },
+        ...employees
+            .filter(e => managerUserIds.includes(e.employeeId))
+            .map(e => ({
+                label: `${e.fullName} (${e.employeeCode})`,
+                value: e.employeeId,
+            }))
+    ];
 
     const onFinish = (values: any) => {
         if (!editingEmployee || !id) return;
@@ -190,9 +196,12 @@ const EditEmployee = () => {
                             <Form.Item 
                                 name="phone" 
                                 label="Số điện thoại" 
-                                rules={[{ required: true, message: "Vui lòng nhập số điện thoại" }]}
+                                rules={[
+                                    { required: true, message: "Vui lòng nhập số điện thoại" },
+                                    { pattern: /^0\d{9}$/, message: "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0" }
+                                ]}
                             >
-                                <Input placeholder="09xxxxxxxx" maxLength={20} />
+                                <Input placeholder="09xxxxxxxx" maxLength={10} />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -269,11 +278,32 @@ const EditEmployee = () => {
                     </Row>
                     <Row gutter={16}>
                         <Col span={12}>
-                            <Form.Item name="baseSalary" label="Lương cơ bản">
+                            <Form.Item 
+                                name="baseSalary" 
+                                label="Lương cơ bản" 
+                                rules={[
+                                    { required: true, message: "Vui lòng nhập lương cơ bản" },
+                                    ({ }) => ({
+                                        validator(_, value) {
+                                            if (value === undefined || value === null || value === '') {
+                                                return Promise.resolve();
+                                            }
+                                            if (value < 1000000) {
+                                                return Promise.reject(new Error('Lương cơ bản phải ít nhất 1.000.000 VND'));
+                                            }
+                                            if (value > 100000000) {
+                                                return Promise.reject(new Error('Lương cơ bản không được vượt quá 100.000.000 VND'));
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    }),
+                                ]}
+                            >
                                 <InputNumber
                                     style={{ width: "100%" }}
                                     formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                    min={0}
+                                    min={1000000}
+                                    max={100000000}
                                 />
                             </Form.Item>
                         </Col>

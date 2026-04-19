@@ -3,7 +3,7 @@ import { Modal, Form, Select, DatePicker, InputNumber, Input, message, Row, Col 
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { submitProcedure, updateProcedure, selectHRProcedureLoading } from "../../../../store/hrProcedureSlide";
-import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
+import { fetchActiveEmployees, selectEmployees } from "../../../../store/employeeSlide";
 import { fetchActiveDepartments, selectActiveDepartments } from "../../../../store/departmentSlide";
 import { fetchActivePositions, selectActivePositions } from "../../../../store/positionSlide";
 
@@ -43,7 +43,7 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
 
     useEffect(() => {
         if (open) {
-            if (employees.length === 0) dispatch(fetchAllEmployees());
+            if (employees.length === 0) dispatch(fetchActiveEmployees());
             if (departments.length === 0) dispatch(fetchActiveDepartments());
             if (positions.length === 0) dispatch(fetchActivePositions());
         }
