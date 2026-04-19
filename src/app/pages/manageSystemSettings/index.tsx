@@ -14,7 +14,8 @@ import {
     fetchLocationSettings, selectLocationSettings, selectSystemSettingLoading,
     updateLocationSettings, fetchApprovalSettings, selectApprovalSettings,
     updateApprovalSettings, fetchPayrollSettings, selectPayrollSettings, updatePayrollSettings,
-    fetchCompanySettings, selectCompanySettings, updateCompanySettings
+    fetchCompanySettings, selectCompanySettings, updateCompanySettings,
+    fetchPayrollCalcSettings, selectPayrollCalcSettings, updatePayrollCalcSettings
 } from "../../../store/systemSettingSlide";
 import { fetchAllUsers, selectUsers } from "../../../store/userSlide";
 import { fetchApprovalAnalysis, selectApprovalAnalysis } from "../../../store/employeeSlide";
@@ -27,6 +28,7 @@ import ApprovalAnalysisTable from "./components/ApprovalAnalysisTable";
 import GuidanceCard from "./components/GuidanceCard";
 import PayrollSettingsCard from "./components/PayrollSettingsCard";
 import CompanySettingsCard from "./components/CompanySettingsCard";
+import PayrollCalculationSettingsCard from "./components/PayrollCalculationSettingsCard";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -36,12 +38,14 @@ const SystemSettingPage: React.FC = () => {
     const [locationForm] = Form.useForm();
     const [payrollForm] = Form.useForm();
     const [companyForm] = Form.useForm();
+    const [payrollCalcForm] = Form.useForm();
     const dispatch = useAppDispatch();
 
     const locationSettings = useAppSelector(selectLocationSettings);
     const approvalSettings = useAppSelector(selectApprovalSettings);
     const payrollSettings = useAppSelector(selectPayrollSettings);
     const companySettings = useAppSelector(selectCompanySettings);
+    const payrollCalcSettings = useAppSelector(selectPayrollCalcSettings);
     const approvalAnalysis = useAppSelector(selectApprovalAnalysis);
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectSystemSettingLoading);
@@ -54,6 +58,7 @@ const SystemSettingPage: React.FC = () => {
         dispatch(fetchApprovalSettings());
         dispatch(fetchPayrollSettings());
         dispatch(fetchCompanySettings());
+        dispatch(fetchPayrollCalcSettings());
         dispatch(fetchAllUsers());
         dispatch(fetchApprovalAnalysis());
     }, [dispatch]);
@@ -70,6 +75,10 @@ const SystemSettingPage: React.FC = () => {
     useEffect(() => {
         if (companySettings) companyForm.setFieldsValue(companySettings);
     }, [companySettings, companyForm]);
+
+    useEffect(() => {
+        if (payrollCalcSettings) payrollCalcForm.setFieldsValue(payrollCalcSettings);
+    }, [payrollCalcSettings, payrollCalcForm]);
 
     useEffect(() => {
         if (approvalSettings) {
@@ -110,6 +119,16 @@ const SystemSettingPage: React.FC = () => {
             dispatch(fetchPayrollSettings());
         } catch (error: any) {
             message.error(error || "Lỗi lưu cấu hình kỳ lương");
+        }
+    };
+
+    const onPayrollCalcFinish = async (values: any) => {
+        try {
+            await dispatch(updatePayrollCalcSettings(values)).unwrap();
+            message.success("Cấu hình tính lương đã được lưu");
+            dispatch(fetchPayrollCalcSettings());
+        } catch (error: any) {
+            message.error(error || "Lỗi lưu cấu hình tính lương");
         }
     };
 
@@ -214,26 +233,38 @@ const SystemSettingPage: React.FC = () => {
         },
         {
             key: "3",
-            label: <Space className="px-4"><DollarOutlined />Kỳ lương</Space>,
+            label: <Space className="px-4"><DollarOutlined />Kỳ lương & Tính lương</Space>,
             children: (
                 <div className="animate-in fade-in duration-500">
                     <Row gutter={[32, 32]}>
                         <Col xs={24} lg={16}>
-                            <PayrollSettingsCard
-                                form={payrollForm}
-                                loading={loading}
-                                onFinish={onPayrollFinish}
-                                onRefresh={() => dispatch(fetchPayrollSettings())}
-                            />
+                            <Space direction="vertical" style={{ width: "100%" }} size={24}>
+                                <PayrollSettingsCard
+                                    form={payrollForm}
+                                    loading={loading}
+                                    onFinish={onPayrollFinish}
+                                    onRefresh={() => dispatch(fetchPayrollSettings())}
+                                />
+                                <PayrollCalculationSettingsCard
+                                    form={payrollCalcForm}
+                                    loading={loading}
+                                    onFinish={onPayrollCalcFinish}
+                                    onRefresh={() => dispatch(fetchPayrollCalcSettings())}
+                                />
+                            </Space>
                         </Col>
                         <Col xs={24} lg={8}>
-                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 h-full">
+                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                                 <Title level={4} className="mb-4">Lưu ý</Title>
                                 <Paragraph className="text-slate-500">
-                                    Thay đổi ngày chốt lương sẽ ảnh hưởng đến cách hiển thị kỳ lương trong bảng chấm công.
-                                    Nên cấu hình trước khi bắt đầu chu kỳ mới.
+                                    Thay đổi ngày chốt lương sẽ ảnh hưởng đến kỳ lương mới. Nên cấu hình trước khi bắt đầu chu kỳ.
                                 </Paragraph>
                                 <Badge status="warning" text="Giới hạn tối đa ngày 28 để tránh lỗi tháng 2" />
+                                <Paragraph className="text-slate-500 mt-4">
+                                    Thay đổi tỷ lệ bảo hiểm hoặc giảm trừ thuế chỉ có hiệu lực với lần <strong>Tính lương</strong> tiếp theo.
+                                    Các kỳ đã Approved không bị ảnh hưởng.
+                                </Paragraph>
+                                <Badge status="processing" text="Chế độ Fixed BH: phù hợp khi công ty khai báo mức BH riêng với cơ quan BHXH" />
                             </div>
                         </Col>
                     </Row>

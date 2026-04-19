@@ -23,11 +23,23 @@ interface CompanySettings {
     email: string;
 }
 
+export interface PayrollCalculationSettings {
+    bhxhRate: number;           // % BHXH NLĐ đóng, mặc định 8
+    bhytRate: number;           // % BHYT NLĐ đóng, mặc định 1.5
+    bhtnRate: number;           // % BHTN NLĐ đóng, mặc định 1
+    insuranceCap: number;       // Mức trần BH, mặc định 46,800,000
+    insuranceBaseMode: string;  // "Gross" | "Fixed"
+    insuranceFixedBase: number; // Mức cố định (khi mode = "Fixed")
+    personalDeduction: number;  // Giảm trừ bản thân, mặc định 11,000,000
+    dependentDeduction: number; // Giảm trừ mỗi NPT, mặc định 4,400,000
+}
+
 interface SystemSettingState {
     locationSettings: LocationSettings | null;
     approvalSettings: ApprovalSettings | null;
     payrollSettings: PayrollSettings | null;
     companySettings: CompanySettings | null;
+    payrollCalcSettings: PayrollCalculationSettings | null;
     loading: boolean;
     error: string | null;
 }
@@ -37,6 +49,7 @@ const initialState: SystemSettingState = {
     approvalSettings: null,
     payrollSettings: null,
     companySettings: null,
+    payrollCalcSettings: null,
     loading: false,
     error: null,
 };
@@ -161,6 +174,34 @@ export const updateCompanySettings = createAsyncThunk(
     }
 );
 
+export const fetchPayrollCalcSettings = createAsyncThunk(
+    "systemSetting/fetchPayrollCalcSettings",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: "/SystemSettings/payroll-calculation", method: "GET", headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi lấy cấu hình tính lương");
+        }
+    }
+);
+
+export const updatePayrollCalcSettings = createAsyncThunk(
+    "systemSetting/updatePayrollCalcSettings",
+    async (dto: PayrollCalculationSettings, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const response = await request({ url: "/SystemSettings/payroll-calculation", method: "PUT", data: dto, headers: { Authorization: `Bearer ${token}` } });
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi cập nhật cấu hình tính lương");
+        }
+    }
+);
+
 export const updateApprovalSettings = createAsyncThunk(
     "systemSetting/updateApprovalSettings",
     async (dto: ApprovalSettings, { rejectWithValue, getState }) => {
@@ -186,86 +227,45 @@ const systemSettingSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(fetchLocationSettings.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchLocationSettings.fulfilled, (state, action) => {
-                state.loading = false;
-                state.locationSettings = action.payload;
-            })
-            .addCase(fetchLocationSettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            .addCase(updateLocationSettings.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(updateLocationSettings.fulfilled, (state) => {
-                state.loading = false;
-            })
-            .addCase(updateLocationSettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            .addCase(fetchApprovalSettings.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchApprovalSettings.fulfilled, (state, action) => {
-                state.loading = false;
-                state.approvalSettings = action.payload;
-            })
-            .addCase(fetchApprovalSettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            .addCase(updateApprovalSettings.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(updateApprovalSettings.fulfilled, (state) => {
-                state.loading = false;
-            })
-            .addCase(updateApprovalSettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            .addCase(fetchPayrollSettings.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchPayrollSettings.fulfilled, (state, action) => {
-                state.loading = false;
-                state.payrollSettings = action.payload;
-            })
-            .addCase(fetchPayrollSettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            .addCase(updatePayrollSettings.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(updatePayrollSettings.fulfilled, (state) => {
-                state.loading = false;
-            })
-            .addCase(updatePayrollSettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
+            .addCase(fetchLocationSettings.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(fetchLocationSettings.fulfilled, (state, action) => { state.loading = false; state.locationSettings = action.payload; })
+            .addCase(fetchLocationSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(updateLocationSettings.pending, (state) => { state.loading = true; state.error = null; })
+            .addCase(updateLocationSettings.fulfilled, (state) => { state.loading = false; })
+            .addCase(updateLocationSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(fetchApprovalSettings.pending, (state) => { state.loading = true; })
+            .addCase(fetchApprovalSettings.fulfilled, (state, action) => { state.loading = false; state.approvalSettings = action.payload; })
+            .addCase(fetchApprovalSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(updateApprovalSettings.pending, (state) => { state.loading = true; })
+            .addCase(updateApprovalSettings.fulfilled, (state) => { state.loading = false; })
+            .addCase(updateApprovalSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(fetchPayrollSettings.pending, (state) => { state.loading = true; })
+            .addCase(fetchPayrollSettings.fulfilled, (state, action) => { state.loading = false; state.payrollSettings = action.payload; })
+            .addCase(fetchPayrollSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(updatePayrollSettings.pending, (state) => { state.loading = true; })
+            .addCase(updatePayrollSettings.fulfilled, (state) => { state.loading = false; })
+            .addCase(updatePayrollSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
             .addCase(fetchCompanySettings.pending, (state) => { state.loading = true; })
-            .addCase(fetchCompanySettings.fulfilled, (state, action) => {
-                state.loading = false;
-                state.companySettings = action.payload;
-            })
-            .addCase(fetchCompanySettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
+            .addCase(fetchCompanySettings.fulfilled, (state, action) => { state.loading = false; state.companySettings = action.payload; })
+            .addCase(fetchCompanySettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
             .addCase(updateCompanySettings.pending, (state) => { state.loading = true; })
             .addCase(updateCompanySettings.fulfilled, (state) => { state.loading = false; })
-            .addCase(updateCompanySettings.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            });
+            .addCase(updateCompanySettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(fetchPayrollCalcSettings.pending, (state) => { state.loading = true; })
+            .addCase(fetchPayrollCalcSettings.fulfilled, (state, action) => { state.loading = false; state.payrollCalcSettings = action.payload; })
+            .addCase(fetchPayrollCalcSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; })
+
+            .addCase(updatePayrollCalcSettings.pending, (state) => { state.loading = true; })
+            .addCase(updatePayrollCalcSettings.fulfilled, (state) => { state.loading = false; })
+            .addCase(updatePayrollCalcSettings.rejected, (state, action) => { state.loading = false; state.error = action.payload as string; });
     },
 });
 
@@ -273,6 +273,7 @@ export const selectLocationSettings = (state: any) => state.systemSetting.locati
 export const selectApprovalSettings = (state: any) => state.systemSetting.approvalSettings;
 export const selectPayrollSettings = (state: any) => state.systemSetting.payrollSettings;
 export const selectCompanySettings = (state: any) => state.systemSetting.companySettings;
+export const selectPayrollCalcSettings = (state: any) => state.systemSetting.payrollCalcSettings;
 export const selectSystemSettingLoading = (state: any) => state.systemSetting.loading;
 
 export default systemSettingSlice.reducer;
