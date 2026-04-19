@@ -58,7 +58,7 @@ const TabQuyTrinh = () => (
   <Card className="border-0 shadow-none">
     <Alert
       type="info" showIcon icon={<InfoCircleOutlined />} className="mb-6"
-      message="Tỷ lệ đóng BH tính trên mức lương tối đa = 20 × Lương tối thiểu vùng (hiện tại ≈ 46,800,000 đ/tháng tại Vùng I)"
+      message="Tỷ lệ BH, mức trần, và giảm trừ thuế có thể thay đổi tại Thiết lập Hệ thống → tab Kỳ lương & Tính lương. Tài liệu dưới đây mô tả luồng tính lương và các giá trị mặc định theo quy định hiện hành."
     />
     <Timeline items={[
       {
