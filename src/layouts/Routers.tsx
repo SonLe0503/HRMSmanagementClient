@@ -58,6 +58,8 @@ const PayrollRecordDetail = lazy(() => import("../app/pages/payroll/recordDetail
 const MyPayslips = lazy(() => import("../app/pages/payroll/myPayslips/index"));
 const PayrollReport = lazy(() => import("../app/pages/payroll/PayrollReport"));
 const PayrollMethodology = lazy(() => import("../app/pages/payroll/PayrollMethodology"));
+const MyResignationRequest = lazy(() => import("../app/pages/myResignationRequest/index"));
+const ManageResignationRequest = lazy(() => import("../app/pages/manageResignationRequest/index"));
 
 const shareResourceItem = [
     {
@@ -348,6 +350,18 @@ const privateResourceItem = [
     {
         key: URL.PayrollMethodology,
         element: <PayrollMethodology />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyResignationRequest,
+        element: <MyResignationRequest />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageResignationRequest,
+        element: <ManageResignationRequest />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
