@@ -134,6 +134,24 @@ export const fetchActiveCycles = createAsyncThunk(
   }
 );
 
+export const fetchCompletedCycles = createAsyncThunk(
+  "evaluationCycle/fetchCompleted",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      const response = await request({
+        url: "/evaluationcycle/completed",
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
 export const fetchCycleById = createAsyncThunk(
   "evaluationCycle/fetchById",
   async (id: number, { rejectWithValue, getState }) => {
@@ -271,6 +289,18 @@ export const evaluationCycleSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchCompletedCycles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCompletedCycles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cycles = action.payload;
+      })
+      .addCase(fetchCompletedCycles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(fetchCycleById.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedCycle = action.payload;
@@ -307,10 +337,10 @@ export const evaluationCycleSlice = createSlice({
         state.loading = false;
         const index = state.cycles.findIndex(c => c.cycleId === action.payload.id);
         if (index !== -1) {
-          state.cycles[index].status = "Cancelled";
+          state.cycles[index].status = "Completed";
         }
         if (state.selectedCycle && state.selectedCycle.cycleId === action.payload.id) {
-          state.selectedCycle.status = "Cancelled";
+          state.selectedCycle.status = "Completed";
         }
       });
   },

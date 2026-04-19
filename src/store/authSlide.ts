@@ -119,7 +119,11 @@ export const slice = createSlice({
           accessToken: token,
           role: decodedToken["role"] as EUserRole,
           userId: decodedToken["nameid"],
-          employeeId: decodedToken["employeeId"] ? Number(decodedToken["employeeId"]) : undefined,
+          employeeId: decodedToken["employeeId"]
+            ? Number(decodedToken["employeeId"])
+            : decodedToken["EmployeeID"]
+              ? Number(decodedToken["EmployeeID"])
+              : undefined,
           userName: decodedToken["unique_name"],
           expiresTime: decodedToken["exp"],
           isTopLevel: decodedToken["IsTopLevel"] === "true",

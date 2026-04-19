@@ -30,7 +30,7 @@ import {
     exportCompetencyReport
 } from "../../../store/competencySlide";
 import type { CompetencyReportFilterDTO, CompetencyReportItemDTO } from "../../../store/competencySlide";
-import { fetchActiveCycles, selectCycles } from "../../../store/evaluationCycleSlide";
+import { fetchCompletedCycles, selectCycles } from "../../../store/evaluationCycleSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../store/employeeSlide";
 import { selectInfoLogin } from "../../../store/authSlide";
 import { EUserRole } from "../../../interface/app";
@@ -52,16 +52,26 @@ const CompetencyReport = () => {
     // Local state for filters
     const [filter, setFilter] = useState<CompetencyReportFilterDTO>({
         scope: role === EUserRole.EMPLOYEE ? "Individual" : "Team",
-        employeeId: role === EUserRole.EMPLOYEE ? (infoLogin?.userId ? Number(infoLogin.userId) : undefined) : undefined
+        employeeId: role === EUserRole.EMPLOYEE ? infoLogin?.employeeId : undefined
     });
     
     const [drilldownModalOpen, setDrilldownModalOpen] = useState(false);
     const [selectedCriteria, setSelectedCriteria] = useState<CompetencyReportItemDTO | null>(null);
 
     useEffect(() => {
-        dispatch(fetchActiveCycles());
+        dispatch(fetchCompletedCycles());
         dispatch(fetchAllEmployees());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (role === EUserRole.EMPLOYEE && infoLogin?.employeeId) {
+            setFilter((prev) => ({
+                ...prev,
+                scope: "Individual",
+                employeeId: infoLogin.employeeId
+            }));
+        }
+    }, [role, infoLogin?.employeeId]);
 
     const handleGenerate = () => {
         if (filter.scope === "Individual" && !filter.employeeId) {
