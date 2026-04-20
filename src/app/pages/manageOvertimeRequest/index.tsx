@@ -35,7 +35,7 @@ const ManageOvertimeRequest = () => {
                         <Text className="font-bold text-slate-800">{record.employeeName}</Text>
                         {record.isTopLevel && (
                             <Tag color="blue" className="rounded-full px-3 m-0 border-blue-100 text-[10px] font-bold uppercase tracking-wider">
-                                Management
+                                Quản lý
                             </Tag>
                         )}
                     </div>
@@ -106,7 +106,7 @@ const ManageOvertimeRequest = () => {
                     onClick={() => handleReview(record)}
                     className="rounded-lg font-semibold hover:bg-blue-50"
                 >
-                    Review
+                    Xem xét
                 </Button>
             ),
         },
@@ -161,7 +161,7 @@ const ManageOvertimeRequest = () => {
                             Danh sách yêu cầu đang chờ
                         </Title>
                         <Tag icon={<ClockCircleOutlined />} color="warning" className="px-4 py-1.5 rounded-full font-bold border-none shadow-sm">
-                            Real-time update
+                            Cập nhật trực tiếp
                         </Tag>
                     </div>
                     <Table

@@ -108,7 +108,7 @@ const WorkforceAnalytics = () => {
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-                <Title level={3} style={{ margin: 0 }}>Workforce Analytics & Insights</Title>
+                <Title level={3} style={{ margin: 0 }}>Phân tích & Thống kê Nhân lực</Title>
                 <Space>
                     <Button icon={<SaveOutlined />}>Lưu bộ lọc</Button>
                     <Button icon={<ScheduleOutlined />}>Lên lịch báo cáo</Button>
@@ -119,7 +119,7 @@ const WorkforceAnalytics = () => {
                         onClick={handleGetAIInsights}
                         disabled={!analytics}
                     >
-                        AI Insights
+                        Phân tích AI
                     </Button>
                 </Space>
             </div>
@@ -212,7 +212,7 @@ const WorkforceAnalytics = () => {
                             {renderStatistic("Tỉ lệ hiện diện", analytics.engagementProductivity.averageAttendanceRate, <RiseOutlined />, "%", 1)}
                         </Col>
                         <Col span={6}>
-                            {renderStatistic("High Performers", analytics.talentAnalytics.highPerformerCount, <BulbOutlined />)}
+                            {renderStatistic("Nhân viên xuất sắc", analytics.talentAnalytics.highPerformerCount, <BulbOutlined />)}
                         </Col>
                     </Row>
 
@@ -299,7 +299,7 @@ const WorkforceAnalytics = () => {
 
             {/* AI Insights Drawer */}
             <Drawer
-                title={<Space><BulbOutlined /> AI Workforce Insights & Forecast</Space>}
+                title={<Space><BulbOutlined /> Phân tích AI & Dự báo Nhân lực</Space>}
                 size="large"
                 onClose={() => setShowAIInsights(false)}
                 open={showAIInsights}

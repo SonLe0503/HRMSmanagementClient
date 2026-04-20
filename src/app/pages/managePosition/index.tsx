@@ -152,10 +152,10 @@ const ManagePosition = () => {
                         emptyText: searchText ? (
                             <div style={{ padding: "20px 0" }}>
                                 <Text type="secondary">
-                                    No position found matching criteria (MSG-97)
+                                    Không tìm thấy chức vụ phù hợp
                                 </Text>
                             </div>
-                        ) : "No data available"
+                        ) : "Không có dữ liệu"
                     }}
                 />
             </Card>

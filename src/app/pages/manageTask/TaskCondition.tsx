@@ -23,7 +23,7 @@ const TaskCondition: React.FC<TaskConditionProps> = ({
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12} md={8}>
                     <Input
-                        placeholder="Search Task ID, Type, Description..."
+                        placeholder="Tìm theo mã, loại, mô tả..."
                         prefix={<SearchOutlined />}
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -33,29 +33,29 @@ const TaskCondition: React.FC<TaskConditionProps> = ({
                 <Col xs={24} sm={12} md={4}>
                     <Select
                         style={{ width: '100%' }}
-                        placeholder="Filter Priority"
+                        placeholder="Lọc độ ưu tiên"
                         allowClear
                         value={priorityFilter}
                         onChange={setPriorityFilter}
                     >
-                        <Select.Option value="High">High</Select.Option>
-                        <Select.Option value="Medium">Medium</Select.Option>
-                        <Select.Option value="Low">Low</Select.Option>
+                        <Select.Option value="High">Cao</Select.Option>
+                        <Select.Option value="Medium">Trung bình</Select.Option>
+                        <Select.Option value="Low">Thấp</Select.Option>
                     </Select>
                 </Col>
                 <Col xs={24} sm={12} md={4}>
                     <Select
                         style={{ width: '100%' }}
-                        placeholder="Filter Status"
+                        placeholder="Lọc trạng thái"
                         allowClear
                         value={statusFilter}
                         onChange={setStatusFilter}
                     >
-                        <Select.Option value="Pending">Pending</Select.Option>
-                        <Select.Option value="InProgress">InProgress</Select.Option>
-                        <Select.Option value="Approved">Approved</Select.Option>
-                        <Select.Option value="Rejected">Rejected</Select.Option>
-                        <Select.Option value="Cancelled">Cancelled</Select.Option>
+                        <Select.Option value="Pending">Chờ xử lý</Select.Option>
+                        <Select.Option value="InProgress">Đang thực hiện</Select.Option>
+                        <Select.Option value="Approved">Đã duyệt</Select.Option>
+                        <Select.Option value="Rejected">Từ chối</Select.Option>
+                        <Select.Option value="Cancelled">Đã hủy</Select.Option>
                     </Select>
                 </Col>
                 <Col xs={24} sm={12} md={6}>

@@ -30,19 +30,19 @@ const DashboardAdmin = () => {
     const stats = data?.statistics;
 
     const cards = [
-        { title: "Total Users", value: stats?.totalUsers, icon: <UserOutlined />, color: "#1890ff", desc: "Total registered accounts" },
-        { title: "Active Users", value: stats?.activeUsers, icon: <SafetyCertificateOutlined />, color: "#52c41a", desc: "Users active in last 30 days" },
-        { title: "New Users", value: stats?.newUsers, icon: <RiseOutlined />, color: "#722ed1", desc: "Registered in selected period" },
-        { title: "Total Employees", value: stats?.totalEmployees, icon: <TeamOutlined />, color: "#faad14", desc: "Active workforce size" },
-        { title: "Total Departments", value: stats?.totalDepartments, icon: <ApartmentOutlined />, color: "#13c2c2", desc: "Organizational units" },
-        { title: "Total Leave Requests", value: stats?.totalLeaveRequests, icon: <FileTextOutlined />, color: "#eb2f96", desc: "Submitted in period" },
-        { title: "Pending Approvals", value: stats?.pendingApprovals, icon: <ClockCircleOutlined />, color: "#fa8c16", desc: "Requests awaiting action" },
-        { title: "Attendance Rate", value: `${stats?.attendanceRate ?? 0}%`, icon: <CheckCircleOutlined />, color: "#2f54eb", desc: "Avg presence in period" },
-        { title: "Overtime Hours", value: stats?.overtimeHours, icon: <RocketOutlined />, color: "#fa541c", desc: "Total OT hours approved" },
-        { title: "System Uptime", value: stats?.systemUptime, icon: <MonitorOutlined />, color: "#a0d911", desc: "Time since last restart" },
-        { title: "Error Rate", value: `${((stats?.errorRate ?? 0) * 100).toFixed(2)}%`, icon: <WarningOutlined />, color: "#f5222d", desc: "API request failure rate" },
-        { title: "Database Size", value: stats?.databaseSize, icon: <DatabaseOutlined />, color: "#595959", desc: "Total storage utilized" },
-        { title: "API Response Time", value: `${stats?.apiResponseTime}ms`, icon: <GlobalOutlined />, color: "#1890ff", desc: "Average server latency" },
+        { title: "Tổng tài khoản", value: stats?.totalUsers, icon: <UserOutlined />, color: "#1890ff", desc: "Tổng số tài khoản đã đăng ký" },
+        { title: "Tài khoản hoạt động", value: stats?.activeUsers, icon: <SafetyCertificateOutlined />, color: "#52c41a", desc: "Hoạt động trong 30 ngày qua" },
+        { title: "Tài khoản mới", value: stats?.newUsers, icon: <RiseOutlined />, color: "#722ed1", desc: "Đăng ký trong kỳ đã chọn" },
+        { title: "Tổng nhân viên", value: stats?.totalEmployees, icon: <TeamOutlined />, color: "#faad14", desc: "Quy mô nhân lực hiện tại" },
+        { title: "Tổng phòng ban", value: stats?.totalDepartments, icon: <ApartmentOutlined />, color: "#13c2c2", desc: "Số đơn vị tổ chức" },
+        { title: "Tổng đơn nghỉ phép", value: stats?.totalLeaveRequests, icon: <FileTextOutlined />, color: "#eb2f96", desc: "Đã nộp trong kỳ" },
+        { title: "Chờ phê duyệt", value: stats?.pendingApprovals, icon: <ClockCircleOutlined />, color: "#fa8c16", desc: "Yêu cầu đang chờ xử lý" },
+        { title: "Tỉ lệ chuyên cần", value: `${stats?.attendanceRate ?? 0}%`, icon: <CheckCircleOutlined />, color: "#2f54eb", desc: "Trung bình có mặt trong kỳ" },
+        { title: "Giờ tăng ca", value: stats?.overtimeHours, icon: <RocketOutlined />, color: "#fa541c", desc: "Tổng giờ OT đã duyệt" },
+        { title: "Thời gian hoạt động", value: stats?.systemUptime, icon: <MonitorOutlined />, color: "#a0d911", desc: "Kể từ lần khởi động lại" },
+        { title: "Tỉ lệ lỗi", value: `${((stats?.errorRate ?? 0) * 100).toFixed(2)}%`, icon: <WarningOutlined />, color: "#f5222d", desc: "Tỉ lệ lỗi API request" },
+        { title: "Dung lượng Database", value: stats?.databaseSize, icon: <DatabaseOutlined />, color: "#595959", desc: "Tổng dung lượng sử dụng" },
+        { title: "Thời gian phản hồi API", value: `${stats?.apiResponseTime}ms`, icon: <GlobalOutlined />, color: "#1890ff", desc: "Độ trễ trung bình máy chủ" },
     ];
 
     const container = {
@@ -65,12 +65,12 @@ const DashboardAdmin = () => {
             <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                 <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
                     <Col>
-                        <Title level={2} style={{ margin: 0 }}>Admin Overview Dashboard</Title>
-                        <Text type="secondary">Real-time system analytics and operational health</Text>
+                        <Title level={2} style={{ margin: 0 }}>Tổng quan Quản trị hệ thống</Title>
+                        <Text type="secondary">Phân tích hệ thống và tình trạng vận hành theo thời gian thực</Text>
                     </Col>
                     <Col>
                         <Space size="middle">
-                            <Text strong>Period:</Text>
+                            <Text strong>Kỳ:</Text>
                             <RangePicker 
                                 value={dateRange}
                                 onChange={(dates) => {
@@ -121,7 +121,7 @@ const DashboardAdmin = () => {
                         <Col span={12}>
                             <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
                                 <Card 
-                                    title={<Space><ClockCircleOutlined />Recent Activities</Space>} 
+                                    title={<Space><ClockCircleOutlined />Hoạt động gần đây</Space>}
                                     bordered={false} 
                                     style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', minHeight: '400px' }}
                                 >
@@ -137,7 +137,7 @@ const DashboardAdmin = () => {
                                                 />
                                             </List.Item>
                                         )}
-                                        locale={{ emptyText: "No recent system logs" }}
+                                        locale={{ emptyText: "Không có log hệ thống gần đây" }}
                                     />
                                 </Card>
                             </motion.div>
@@ -146,7 +146,7 @@ const DashboardAdmin = () => {
                             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                                 <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
                                     <Card 
-                                        title={<Space><WarningOutlined />Alerts & Notifications</Space>} 
+                                        title={<Space><WarningOutlined />Cảnh báo & Thông báo</Space>}
                                         bordered={false} 
                                         style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                                     >
@@ -168,7 +168,7 @@ const DashboardAdmin = () => {
 
                                 <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
                                     <Card 
-                                        title={<Space><CodeOutlined />Scheduled Tasks Status</Space>} 
+                                        title={<Space><CodeOutlined />Trạng thái tác vụ định kỳ</Space>}
                                         bordered={false} 
                                         style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                                     >

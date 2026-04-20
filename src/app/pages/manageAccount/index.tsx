@@ -47,7 +47,7 @@ const ManageAccount = () => {
 
     const handleToggleStatus = (record: any) => {
         const action = record.isActive ? deactivateUser(record.userId) : activateUser(record.userId);
-        const successMsg = record.isActive ? "User deactivated" : "User activated";
+        const successMsg = record.isActive ? "Đã vô hiệu hóa tài khoản" : "Đã kích hoạt tài khoản";
 
         setTogglingUserId(record.userId);
         dispatch(action)
@@ -56,7 +56,7 @@ const ManageAccount = () => {
                 message.success(successMsg);
             })
             .catch((error: any) => {
-                const msg = typeof error === 'string' ? error : error?.message || "An error occurred";
+                const msg = typeof error === 'string' ? error : error?.message || "Đã xảy ra lỗi";
                 message.error(msg);
             })
             .finally(() => {
@@ -81,13 +81,13 @@ const ManageAccount = () => {
 
     const columns = [
         {
-            title: "ID",
+            title: "Mã",
             dataIndex: "userId",
             key: "userId",
             width: 70,
         },
         {
-            title: "Username",
+            title: "Tên đăng nhập",
             dataIndex: "username",
             key: "username",
             render: (text: string) => (
@@ -103,7 +103,7 @@ const ManageAccount = () => {
             key: "email",
         },
         {
-            title: "Roles",
+            title: "Vai trò",
             dataIndex: "roles",
             key: "roles",
             render: (roles: string[]) => (
@@ -117,17 +117,17 @@ const ManageAccount = () => {
             ),
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "isActive",
             key: "isActive",
             render: (isActive: boolean) => (
                 <Tag color={isActive ? "green" : "red"}>
-                    {isActive ? "ACTIVE" : "INACTIVE"}
+                    {isActive ? "HOẠT ĐỘNG" : "NGỪNG"}
                 </Tag>
             ),
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             render: (_: any, record: any) => (
                 <Space size="middle">
@@ -152,9 +152,9 @@ const ManageAccount = () => {
             <Card
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <Title level={4} style={{ margin: 0 }}>Manage Accounts</Title>
+                        <Title level={4} style={{ margin: 0 }}>Quản lý Tài khoản</Title>
                         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-                            Add User
+                            Thêm tài khoản
                         </Button>
                     </div>
                 }

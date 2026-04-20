@@ -51,10 +51,10 @@ const ManageTask: React.FC = () => {
     };
 
     const handleApprove = (id: number) => {
-        dispatch(approveTask({ id, comments: "Approved via Task Management" }))
+        dispatch(approveTask({ id, comments: "Đã duyệt qua Quản lý Công việc" }))
             .unwrap()
             .then(() => {
-                message.success("Task approved successfully");
+                message.success("Đã duyệt công việc thành công");
                 dispatch(fetchAllTasks());
             })
             .catch((err) => message.error(err));
@@ -62,17 +62,17 @@ const ManageTask: React.FC = () => {
 
     const handleReject = (id: number) => {
         Modal.confirm({
-            title: 'Reject Task',
+            title: 'Từ chối công việc',
             content: (
                 <div className="mt-2">
-                    <Text>Are you sure you want to reject this task?</Text>
+                    <Text>Bạn có chắc chắn muốn từ chối công việc này?</Text>
                 </div>
             ),
             onOk: () => {
-                dispatch(rejectTask({ id, reason: "Rejected via Task Management (Reason required min 10 chars)" }))
+                dispatch(rejectTask({ id, reason: "Từ chối qua Quản lý Công việc (Lý do tối thiểu 10 ký tự)" }))
                     .unwrap()
                     .then(() => {
-                        message.success("Task rejected successfully");
+                        message.success("Đã từ chối công việc thành công");
                         dispatch(fetchAllTasks());
                     })
                     .catch((err) => message.error(err));
@@ -107,43 +107,43 @@ const ManageTask: React.FC = () => {
 
     const getStatusTag = (status: string) => {
         switch (status) {
-            case 'Pending': return <Tag icon={<ClockCircleOutlined />} color="default">PENDING</Tag>;
-            case 'InProgress': return <Tag icon={<ClockCircleOutlined />} color="processing">IN PROGRESS</Tag>;
-            case 'Approved': return <Tag icon={<CheckCircleOutlined />} color="success">APPROVED</Tag>;
-            case 'Rejected': return <Tag icon={<CloseCircleOutlined />} color="error">REJECTED</Tag>;
-            case 'Cancelled': return <Tag icon={<CloseCircleOutlined />} color="default">CANCELLED</Tag>;
+            case 'Pending': return <Tag icon={<ClockCircleOutlined />} color="default">CHỜ XỬ LÝ</Tag>;
+            case 'InProgress': return <Tag icon={<ClockCircleOutlined />} color="processing">ĐANG THỰC HIỆN</Tag>;
+            case 'Approved': return <Tag icon={<CheckCircleOutlined />} color="success">ĐÃ DUYỆT</Tag>;
+            case 'Rejected': return <Tag icon={<CloseCircleOutlined />} color="error">TỪ CHỐI</Tag>;
+            case 'Cancelled': return <Tag icon={<CloseCircleOutlined />} color="default">ĐÃ HỦY</Tag>;
             default: return <Tag>{status}</Tag>;
         }
     };
 
     const columns = [
         {
-            title: "Task ID",
+            title: "Mã CV",
             dataIndex: "taskId",
             key: "taskId",
             width: 90,
             sorter: (a: any, b: any) => a.taskId - b.taskId,
         },
         {
-            title: "Type",
+            title: "Loại",
             dataIndex: "taskType",
             key: "taskType",
             width: 150,
         },
         {
-            title: "Description",
+            title: "Mô tả",
             dataIndex: "taskTitle",
             key: "taskTitle",
             ellipsis: true,
         },
         {
-            title: "Assigned To",
+            title: "Người thực hiện",
             dataIndex: "assignedUsername",
             key: "assignedUsername",
-            render: (text: string) => text || "Unassigned",
+            render: (text: string) => text || "Chưa phân công",
         },
         {
-            title: "Priority",
+            title: "Độ ưu tiên",
             dataIndex: "priority",
             key: "priority",
             width: 100,
@@ -153,24 +153,24 @@ const ManageTask: React.FC = () => {
             sorter: (a: any, b: any) => a.priority.localeCompare(b.priority),
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "status",
             key: "status",
             width: 120,
             render: (status: string) => getStatusTag(status),
         },
         !isEmployee && {
-            title: "Task Role",
+            title: "Vai trò",
             key: "taskRole",
             width: 120,
             render: (_: any, record: any) => (
                 record.assignedTo === currentUserId
-                    ? <Tag color="orange">ASSIGNED TO ME</Tag>
-                    : <Tag color="default">FOLLOW UP</Tag>
+                    ? <Tag color="orange">ĐƯỢC GIAO</Tag>
+                    : <Tag color="default">THEO DÕI</Tag>
             )
         },
         {
-            title: "Due Date",
+            title: "Hạn hoàn thành",
             dataIndex: "dueDate",
             key: "dueDate",
             width: 120,
@@ -187,13 +187,13 @@ const ManageTask: React.FC = () => {
             sorter: (a: any, b: any) => dayjs(a.dueDate).unix() - dayjs(b.dueDate).unix(),
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             fixed: "right" as const,
             width: 100,
             render: (_: any, record: any) => (
                 <Space>
-                    <Tooltip title="View Details">
+                    <Tooltip title="Xem chi tiết">
                         <Button
                             type="text"
                             icon={<EyeOutlined />}
@@ -216,7 +216,7 @@ const ManageTask: React.FC = () => {
                 </div>
                 {canCreateTask && (
                     <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
-                        Create Task
+                        Tạo công việc
                     </Button>
                 )}
             </div>
@@ -249,12 +249,12 @@ const ManageTask: React.FC = () => {
             </Card>
 
             <Modal
-                title={`Task Details: #${selectedTask?.taskId}`}
+                title={`Chi tiết công việc #${selectedTask?.taskId}`}
                 open={isDetailModalOpen}
                 onCancel={() => setIsDetailModalOpen(false)}
                 footer={[
                     <Button key="back" onClick={() => setIsDetailModalOpen(false)}>
-                        Close
+                        Đóng
                     </Button>,
                     (selectedTask?.status === 'Pending' || selectedTask?.status === 'InProgress') &&
                     selectedTask?.assignedTo === currentUserId && (
@@ -267,7 +267,7 @@ const ManageTask: React.FC = () => {
                                     handleReject(selectedTask.taskId);
                                 }}
                             >
-                                Reject
+                                Từ chối
                             </Button>
                             <Button
                                 key="approve"
@@ -277,7 +277,7 @@ const ManageTask: React.FC = () => {
                                     handleApprove(selectedTask.taskId);
                                 }}
                             >
-                                Approve
+                                Duyệt
                             </Button>
                         </>
                     )
@@ -286,29 +286,29 @@ const ManageTask: React.FC = () => {
             >
                 {selectedTask && (
                     <Descriptions bordered column={2}>
-                        <Descriptions.Item label="Title" span={2}>{selectedTask.taskTitle}</Descriptions.Item>
-                        <Descriptions.Item label="Type">{selectedTask.taskType}</Descriptions.Item>
-                        <Descriptions.Item label="Priority">
+                        <Descriptions.Item label="Tiêu đề" span={2}>{selectedTask.taskTitle}</Descriptions.Item>
+                        <Descriptions.Item label="Loại">{selectedTask.taskType}</Descriptions.Item>
+                        <Descriptions.Item label="Độ ưu tiên">
                             <Tag color={getPriorityColor(selectedTask.priority)}>{selectedTask.priority}</Tag>
                         </Descriptions.Item>
-                        <Descriptions.Item label="Status">{getStatusTag(selectedTask.status)}</Descriptions.Item>
-                        <Descriptions.Item label="Assigned To">{selectedTask.assignedUsername || "N/A"}</Descriptions.Item>
-                        <Descriptions.Item label="Due Date">
-                            {selectedTask.dueDate ? dayjs(selectedTask.dueDate).format("YYYY-MM-DD") : "N/A"}
+                        <Descriptions.Item label="Trạng thái">{getStatusTag(selectedTask.status)}</Descriptions.Item>
+                        <Descriptions.Item label="Người thực hiện">{selectedTask.assignedUsername || "Chưa phân công"}</Descriptions.Item>
+                        <Descriptions.Item label="Hạn hoàn thành">
+                            {selectedTask.dueDate ? dayjs(selectedTask.dueDate).format("DD/MM/YYYY") : "Không có"}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Created Date">
-                            {dayjs(selectedTask.createdDate).format("YYYY-MM-DD HH:mm")}
+                        <Descriptions.Item label="Ngày tạo">
+                            {dayjs(selectedTask.createdDate).format("DD/MM/YYYY HH:mm")}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Description" span={2}>
-                            {selectedTask.taskDescription || "No description provided."}
+                        <Descriptions.Item label="Mô tả" span={2}>
+                            {selectedTask.taskDescription || "Không có mô tả."}
                         </Descriptions.Item>
                         {selectedTask.completedDate && (
-                            <Descriptions.Item label="Completed Date" span={2}>
-                                {dayjs(selectedTask.completedDate).format("YYYY-MM-DD HH:mm")}
+                            <Descriptions.Item label="Ngày hoàn thành" span={2}>
+                                {dayjs(selectedTask.completedDate).format("DD/MM/YYYY HH:mm")}
                             </Descriptions.Item>
                         )}
                         {selectedTask.completionNotes && (
-                            <Descriptions.Item label="Notes/Reason" span={2}>
+                            <Descriptions.Item label="Ghi chú / Lý do" span={2}>
                                 {selectedTask.completionNotes}
                             </Descriptions.Item>
                         )}

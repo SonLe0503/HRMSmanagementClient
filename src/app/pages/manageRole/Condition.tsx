@@ -18,7 +18,7 @@ const Condition = ({
         <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
             <Col xs={24} sm={16} md={12}>
                 <Input
-                    placeholder="Search by role name or description"
+                    placeholder="Tìm theo tên vai trò hoặc mô tả"
                     prefix={<SearchOutlined />}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
@@ -28,13 +28,13 @@ const Condition = ({
             <Col xs={24} sm={8} md={6}>
                 <Select
                     style={{ width: "100%" }}
-                    placeholder="Filter by Status"
+                    placeholder="Lọc trạng thái"
                     value={statusFilter}
                     onChange={setStatusFilter}
                     allowClear
                 >
-                    <Select.Option value={true}>Active</Select.Option>
-                    <Select.Option value={false}>Inactive</Select.Option>
+                    <Select.Option value={true}>Hoạt động</Select.Option>
+                    <Select.Option value={false}>Ngừng</Select.Option>
                 </Select>
             </Col>
         </Row>

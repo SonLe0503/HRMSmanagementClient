@@ -79,7 +79,7 @@ const HeaderBar = () => {
                 color={parseInt(timeLeft.split(':')[0]) < 5 ? "error" : "processing"}
                 className="m-0 text-sm py-1 px-3"
             >
-                Session: {timeLeft}
+                Phiên: {timeLeft}
             </Tag>
             
             <Dropdown
@@ -87,7 +87,7 @@ const HeaderBar = () => {
                     items: [
                         ...(infoLogin?.employeeId ? [{
                             key: 'profile',
-                            label: 'My Profile',
+                            label: 'Hồ sơ của tôi',
                             icon: <UserOutlined />,
                             onClick: () => navigate(URL.MyProfile),
                         }] : []),
@@ -102,7 +102,7 @@ const HeaderBar = () => {
                         },
                         {
                             key: 'logout',
-                            label: 'Logout',
+                            label: 'Đăng xuất',
                             icon: <LogoutOutlined />,
                             onClick: handleLogout,
                             danger: true,
