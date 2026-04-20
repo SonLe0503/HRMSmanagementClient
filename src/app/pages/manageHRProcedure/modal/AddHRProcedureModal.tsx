@@ -43,11 +43,11 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
 
     useEffect(() => {
         if (open) {
-            if (employees.length === 0) dispatch(fetchActiveEmployees());
+            dispatch(fetchActiveEmployees());
             if (departments.length === 0) dispatch(fetchActiveDepartments());
             if (positions.length === 0) dispatch(fetchActivePositions());
         }
-    }, [open, dispatch, employees.length, departments.length, positions.length]);
+    }, [open, dispatch, departments.length, positions.length]);
 
     useEffect(() => {
         if (open && initialValues) {

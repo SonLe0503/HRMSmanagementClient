@@ -132,7 +132,7 @@ const EvaluationList = () => {
                                 placeholder="Chọn đợt đánh giá"
                                 onChange={handleCycleChange}
                                 allowClear
-                                defaultValue={selectedCycleId}
+                                value={selectedCycleId || undefined}
                             >
                                 {(cycles || []).map(c => (
                                     <Select.Option key={c.cycleId} value={c.cycleId}>{c.cycleName}</Select.Option>

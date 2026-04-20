@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { Table, Button, Card, Typography, Tag, Row, Col, Statistic, Spin } from "antd";
 import { EyeOutlined, ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../store";
+import { selectInfoLogin } from "../../../store/authSlide";
 import { fetchAvailableResults, fetchPerformanceSummary, selectAvailableResults, selectPerformanceSummary, selectEvaluationResultLoading } from "../../../store/evaluationResultSlide";
+import type { EvaluationResultListDto } from "../../../store/evaluationResultSlide";
 import { useNavigate } from "react-router-dom";
 import URL from "../../../constants/url";
 
@@ -14,7 +16,8 @@ const MyEvaluationResults = () => {
     const resultsList = useAppSelector(selectAvailableResults);
     const summary = useAppSelector(selectPerformanceSummary);
     const loading = useAppSelector(selectEvaluationResultLoading);
-    const currentUser = Number(useAppSelector((state: any) => state.auth.infoLogin?.employeeId || state.auth.infoLogin?.userId));
+    const authInfo = useAppSelector(selectInfoLogin);
+    const currentUser = authInfo?.employeeId ?? (authInfo?.userId && !isNaN(Number(authInfo.userId)) ? Number(authInfo.userId) : undefined);
 
     useEffect(() => {
         if (currentUser) {
@@ -26,7 +29,7 @@ const MyEvaluationResults = () => {
     const columns = [
         { title: "Cycle Name", dataIndex: "cycleName", key: "cycleName" },
         { title: "Period", key: "period",
-            render: (_: any, record: any) => `${record.evaluationPeriodStart} - ${record.evaluationPeriodEnd}`
+            render: (_: string, record: EvaluationResultListDto) => `${record.evaluationPeriodStart} - ${record.evaluationPeriodEnd}`
         },
         { title: "Completed On", dataIndex: "completionDate", key: "completionDate" },
         { title: "Overall Rating", dataIndex: "overallRating", key: "overallRating", render: (val: number) => val ? <b>{val.toFixed(1)}</b> : "-" },
@@ -34,7 +37,7 @@ const MyEvaluationResults = () => {
             render: (status: string) => <Tag color={status === 'Completed' || status === 'Acknowledged' ? 'green' : 'orange'}>{status}</Tag>
         },
         { title: "Action", key: "action",
-            render: (_: any, record: any) => (
+            render: (_: string, record: EvaluationResultListDto) => (
                 <Button 
                     type="primary" 
                     icon={<EyeOutlined />} 

@@ -30,7 +30,7 @@ import {
     exportCompetencyReport
 } from "../../../store/competencySlide";
 import type { CompetencyReportFilterDTO, CompetencyReportItemDTO } from "../../../store/competencySlide";
-import { fetchActiveCycles, selectCycles } from "../../../store/evaluationCycleSlide";
+import { fetchActiveAndCompletedCycles, selectCycles } from "../../../store/evaluationCycleSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../store/employeeSlide";
 import { selectInfoLogin } from "../../../store/authSlide";
 import { EUserRole } from "../../../interface/app";
@@ -46,22 +46,29 @@ const CompetencyReport = () => {
     // Selectors
     const report = useAppSelector(selectCompetencyReport);
     const loading = useAppSelector(selectCompetencyLoading);
+    const error = useAppSelector((state: any) => state.competency?.error);
     const cycles = useAppSelector(selectCycles);
     const employees = useAppSelector(selectEmployees);
     
     // Local state for filters
     const [filter, setFilter] = useState<CompetencyReportFilterDTO>({
         scope: role === EUserRole.EMPLOYEE ? "Individual" : "Team",
-        employeeId: role === EUserRole.EMPLOYEE ? (infoLogin?.userId ? Number(infoLogin.userId) : undefined) : undefined
+        employeeId: role === EUserRole.EMPLOYEE ? (infoLogin?.employeeId ?? (infoLogin?.userId ? Number(infoLogin.userId) : undefined)) : undefined
     });
     
     const [drilldownModalOpen, setDrilldownModalOpen] = useState(false);
     const [selectedCriteria, setSelectedCriteria] = useState<CompetencyReportItemDTO | null>(null);
 
     useEffect(() => {
-        dispatch(fetchActiveCycles());
+        dispatch(fetchActiveAndCompletedCycles());
         dispatch(fetchAllEmployees());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (error) {
+            message.error(`Lỗi: ${error}`);
+        }
+    }, [error]);
 
     const handleGenerate = () => {
         if (filter.scope === "Individual" && !filter.employeeId) {
