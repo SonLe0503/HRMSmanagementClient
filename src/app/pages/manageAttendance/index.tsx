@@ -29,6 +29,9 @@ const ManageAttendance = () => {
                                 <span>
                                     <TableOutlined />
                                     Bảng chấm công
+                                    <span style={{
+                                        marginLeft: 8
+                                    }}></span>
                                 </span>
                             ),
                             children: <AttendanceTable />

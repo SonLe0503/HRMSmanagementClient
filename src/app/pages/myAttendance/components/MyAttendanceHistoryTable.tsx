@@ -160,19 +160,19 @@ const MyAttendanceHistoryTable = () => {
 
     const columns = [
         {
-            title: "Ngày", dataIndex: "attendanceDate", key: "attendanceDate",
+            title: "Ngày", dataIndex: "attendanceDate", key: "attendanceDate", width: 110,
             render: (v: string) => dayjs(v).format("DD/MM/YYYY")
         },
         {
-            title: "Check In", dataIndex: "checkInTime", key: "checkInTime",
+            title: "Giờ vào", dataIndex: "checkInTime", key: "checkInTime", width: 90, align: 'center' as const,
             render: (v: string) => v ? dayjs(v).format("HH:mm:ss") : "—"
         },
         {
-            title: "Check Out", dataIndex: "checkOutTime", key: "checkOutTime",
+            title: "Giờ ra", dataIndex: "checkOutTime", key: "checkOutTime", width: 90, align: 'center' as const,
             render: (v: string) => v ? dayjs(v).format("HH:mm:ss") : "—"
         },
         {
-            title: "Giờ công (h)", dataIndex: "workingHours", key: "workingHours", align: 'center' as const,
+            title: "Giờ công (h)", dataIndex: "workingHours", key: "workingHours", width: 120, align: 'center' as const,
             render: (val: number, record: AttendanceResponseDto) => {
                 const blocked = ["Required", "Pending", "Rejected"].includes(record.explanationStatus || "") ||
                     (record.location?.includes("[INVALID]") && !record.explanationStatus) ||
@@ -183,7 +183,7 @@ const MyAttendanceHistoryTable = () => {
             }
         },
         {
-            title: "OT tính lương (h)", key: "overtime", align: 'center' as const,
+            title: "OT lương (h)", key: "overtime", width: 120, align: 'center' as const,
             render: (_: any, r: any) => {
                 const payroll = r.payrollOvertimeHours || 0;
                 return (
@@ -194,9 +194,9 @@ const MyAttendanceHistoryTable = () => {
             }
         },
         {
-            title: "Trạng thái", dataIndex: "status", key: "status",
+            title: "Trạng thái", dataIndex: "status", key: "status", width: 150,
             render: (s: string, record: AttendanceResponseDto) => (
-                <Space>
+                <Space size={4}>
                     <Tag color={STATUS_COLOR[s] || "default"}>{s}</Tag>
                     {record.location?.includes("[INVALID]") && (
                         <Tooltip title="Vị trí check-in/out không hợp lệ">
@@ -207,7 +207,7 @@ const MyAttendanceHistoryTable = () => {
             )
         },
         {
-            title: "Giải trình", key: "explanation", align: 'center' as const,
+            title: "Giải trình", key: "explanation", width: 150, align: 'center' as const,
             render: (_: any, record: AttendanceResponseDto) => {
                 let { explanationStatus, explanationResponse, location, status } = record;
                 if ((location?.includes("[INVALID]") || status === "Absent" || status === "Incomplete") && !explanationStatus) explanationStatus = "Required";
@@ -221,7 +221,7 @@ const MyAttendanceHistoryTable = () => {
             }
         },
         {
-            title: "Hành động", key: "action", align: 'center' as const,
+            title: "Hành động", key: "action", width: 150, align: 'center' as const,
             render: (_: any, record: AttendanceResponseDto) => {
                 let s = record.explanationStatus;
                 if (record.location?.includes("[INVALID]") && !s) s = "Required";
@@ -253,18 +253,18 @@ const MyAttendanceHistoryTable = () => {
     ];
 
     return (
-        <Card title="Lịch sử chấm công của tôi">
+        <Card title="Lịch sử chấm công của tôi" style={{ overflow: 'hidden' }}>
             {requiredCount > 0 && (
                 <Alert
-                    type="warning" showIcon icon={<ExclamationCircleOutlined />} className="mb-4"
+                    type="warning" showIcon icon={<ExclamationCircleOutlined />} className="!mb-4"
                     message={`Bạn có ${requiredCount} ngày chấm công cần giải trình. Giờ công những ngày này đang bị tạm khóa.`}
                 />
             )}
 
             {/* ── Bộ lọc kỳ lương ── */}
-            <Space className="mb-4" wrap>
+            <Space className="mb-4" wrap style={{ rowGap: 8 }}>
                 <Select
-                    style={{ width: 320 }}
+                    style={{ width: 'min(320px, 100%)' }}
                     value={selectedPeriodKey || undefined}
                     onChange={setSelectedPeriodKey}
                     options={payrollPeriods.map(p => ({ label: p.displayLabel, value: p.value }))}
@@ -293,8 +293,8 @@ const MyAttendanceHistoryTable = () => {
             {/* ── 4 thẻ thống kê ── */}
             {records.length > 0 && (
                 <>
-                    <Row gutter={16} className="mb-4">
-                        <Col xs={12} sm={6}>
+                    <Row gutter={[12, 12]} className="mb-4">
+                        <Col xs={24} sm={12} md={6}>
                             <Card size="small" className="bg-blue-50 border-blue-200 text-center">
                                 <Statistic
                                     title={<span className="text-blue-600 text-xs font-medium">Tổng bản ghi</span>}
@@ -305,7 +305,7 @@ const MyAttendanceHistoryTable = () => {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={12} sm={6}>
+                        <Col xs={24} sm={12} md={6}>
                             <Card size="small" className="bg-green-50 border-green-200 text-center">
                                 <Statistic
                                     title={<span className="text-green-600 text-xs font-medium">Ngày có mặt</span>}
@@ -316,7 +316,7 @@ const MyAttendanceHistoryTable = () => {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={12} sm={6}>
+                        <Col xs={24} sm={12} md={6}>
                             <Card size="small" className="bg-indigo-50 border-indigo-200 text-center">
                                 <Statistic
                                     title={<span className="text-indigo-600 text-xs font-medium">Tổng giờ công</span>}
@@ -328,7 +328,7 @@ const MyAttendanceHistoryTable = () => {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={12} sm={6}>
+                        <Col xs={24} sm={12} md={6}>
                             <Card size="small" className="bg-orange-50 border-orange-200 text-center">
                                 <Statistic
                                     title={<span className="text-orange-600 text-xs font-medium">Tổng giờ OT (tính lương)</span>}
@@ -352,6 +352,7 @@ const MyAttendanceHistoryTable = () => {
                 rowKey={(r) => r.attendanceId > 0 ? r.attendanceId : `virtual-${r.attendanceDate}`}
                 loading={loading}
                 pagination={{ pageSize: 15 }}
+                scroll={{ x: 980 }}
                 bordered
                 rowClassName={(r) => {
                     const isRequired = r.explanationStatus === "Required" ||

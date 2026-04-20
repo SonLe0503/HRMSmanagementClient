@@ -31,10 +31,10 @@ const ManageRole = () => {
         dispatch(changeRoleStatus({ id: record.roleId, isActive: !record.isActive }))
             .unwrap()
             .then(() => {
-                message.success("Role status updated");
+                message.success("Cập nhật trạng thái vai trò thành công");
             })
             .catch((error: any) => {
-                const msg = typeof error === 'string' ? error : error?.message || "Failed to update status";
+                const msg = typeof error === 'string' ? error : error?.message || "Cập nhật trạng thái thất bại";
                 message.error(msg);
             })
             .finally(() => {
@@ -57,13 +57,13 @@ const ManageRole = () => {
 
     const columns = [
         {
-            title: "ID",
+            title: "Mã",
             dataIndex: "roleId",
             key: "roleId",
             width: 70,
         },
         {
-            title: "Role Name",
+            title: "Tên vai trò",
             dataIndex: "roleName",
             key: "roleName",
             render: (text: string) => (
@@ -74,12 +74,12 @@ const ManageRole = () => {
             ),
         },
         {
-            title: "Description",
+            title: "Mô tả",
             dataIndex: "description",
             key: "description",
         },
         {
-            title: "User Count",
+            title: "Số tài khoản",
             dataIndex: "userCount",
             key: "userCount",
             render: (count: number) => (
@@ -90,7 +90,7 @@ const ManageRole = () => {
             ),
         },
         {
-            title: "Last Modified",
+            title: "Cập nhật lần cuối",
             dataIndex: "lastModifiedDate",
             key: "lastModifiedDate",
             render: (date: string) => (
@@ -101,22 +101,22 @@ const ManageRole = () => {
             ),
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "isActive",
             key: "isActive",
             render: (isActive: boolean) => (
                 <Tag color={isActive ? "green" : "red"}>
-                    {isActive ? "ACTIVE" : "INACTIVE"}
+                    {isActive ? "HOẠT ĐỘNG" : "NGỪNG"}
                 </Tag>
             ),
         },
         {
-            title: "Action",
+            title: "Thao tác",
             key: "action",
             width: 150,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="View Users">
+                    <Tooltip title="Xem tài khoản">
                         <Button
                             type="primary"
                             icon={<EyeOutlined />}
@@ -146,7 +146,7 @@ const ManageRole = () => {
             <Card
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <Title level={4} style={{ margin: 0 }}>Manage Roles</Title>
+                        <Title level={4} style={{ margin: 0 }}>Quản lý Vai trò</Title>
                     </div>
                 }
             >

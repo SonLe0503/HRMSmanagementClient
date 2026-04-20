@@ -30,15 +30,15 @@ const DashboardHR = () => {
     const stats = hrData?.statistics;
 
     const cards = [
-        { title: "Total Headcount", value: stats?.totalHeadcount, icon: <TeamOutlined />, color: "#1890ff", desc: "Current number of employees" },
-        { title: "New Hires", value: stats?.newHires, icon: <UserAddOutlined />, color: "#52c41a", desc: "Employees joined in period" },
-        { title: "Terminations", value: stats?.terminations, icon: <UserDeleteOutlined />, color: "#f5222d", desc: "Employees who left" },
-        { title: "Overall Attendance Rate", value: `${stats?.overallAttendanceRate ?? 0}%`, icon: <CheckCircleOutlined />, color: "#722ed1", desc: "Employees with good attendance" },
-        { title: "Average Leave Days Taken", value: stats?.averageLeaveDays, icon: <CalendarOutlined />, color: "#13c2c2", desc: "Average leave days per employee" },
-        { title: "Pending Leave Requests", value: stats?.pendingLeaveRequests, icon: <FileTextOutlined />, color: "#faad14", desc: "Requests awaiting approval" },
-        { title: "Pending Evaluations", value: stats?.pendingEvaluations, icon: <ClockCircleOutlined />, color: "#fa8c16", desc: "Evaluations due or overdue" },
-        { title: "Completed Evaluations", value: stats?.completedEvaluations, icon: <CarryOutOutlined />, color: "#2f54eb", desc: "Evaluations completed in period" },
-        { title: "Average Performance Score", value: stats?.averagePerformanceScore, icon: <StarOutlined />, color: "#eb2f96", desc: "Overall average performance" },
+        { title: "Tổng nhân sự", value: stats?.totalHeadcount, icon: <TeamOutlined />, color: "#1890ff", desc: "Số nhân viên hiện tại" },
+        { title: "Tuyển mới", value: stats?.newHires, icon: <UserAddOutlined />, color: "#52c41a", desc: "Nhân viên gia nhập trong kỳ" },
+        { title: "Nghỉ việc", value: stats?.terminations, icon: <UserDeleteOutlined />, color: "#f5222d", desc: "Nhân viên đã nghỉ việc" },
+        { title: "Tỉ lệ chuyên cần", value: `${stats?.overallAttendanceRate ?? 0}%`, icon: <CheckCircleOutlined />, color: "#722ed1", desc: "Nhân viên có mặt đầy đủ" },
+        { title: "Ngày nghỉ trung bình", value: stats?.averageLeaveDays, icon: <CalendarOutlined />, color: "#13c2c2", desc: "Trung bình ngày nghỉ/nhân viên" },
+        { title: "Đơn nghỉ chờ duyệt", value: stats?.pendingLeaveRequests, icon: <FileTextOutlined />, color: "#faad14", desc: "Yêu cầu chờ phê duyệt" },
+        { title: "Đánh giá chờ xử lý", value: stats?.pendingEvaluations, icon: <ClockCircleOutlined />, color: "#fa8c16", desc: "Đánh giá đến hạn hoặc quá hạn" },
+        { title: "Đánh giá hoàn thành", value: stats?.completedEvaluations, icon: <CarryOutOutlined />, color: "#2f54eb", desc: "Đánh giá hoàn thành trong kỳ" },
+        { title: "Điểm hiệu suất TB", value: stats?.averagePerformanceScore, icon: <StarOutlined />, color: "#eb2f96", desc: "Trung bình hiệu suất toàn công ty" },
     ];
 
     const container = {
@@ -59,12 +59,12 @@ const DashboardHR = () => {
             <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                 <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
                     <Col>
-                        <Title level={2} style={{ margin: 0 }}>HR Overview Dashboard</Title>
-                        <Text type="secondary">Workforce management and employee engagement insights</Text>
+                        <Title level={2} style={{ margin: 0 }}>Tổng quan Nhân sự</Title>
+                        <Text type="secondary">Quản lý nhân lực và thống kê gắn kết nhân viên</Text>
                     </Col>
                     <Col>
                         <Space size="middle">
-                            <Text strong>Period:</Text>
+                            <Text strong>Kỳ:</Text>
                             <RangePicker 
                                 value={dateRange}
                                 onChange={(dates) => {
@@ -112,10 +112,10 @@ const DashboardHR = () => {
                         <Col span={16}>
                             <Space direction="vertical" style={{ width: '100%' }} size={24}>
                                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-                                    <Card title={<Space><CalendarOutlined />Upcoming Probation & Contracts</Space>} bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                                    <Card title={<Space><CalendarOutlined />Thử việc & Hợp đồng sắp đến hạn</Space>} bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                                         <Row gutter={24}>
                                             <Col span={12}>
-                                                <Title level={5}>Probation Ends</Title>
+                                                <Title level={5}>Hết thời gian thử việc</Title>
                                                 <List
                                                     dataSource={hrData?.upcomingProbationEnds || []}
                                                     renderItem={(item) => (
@@ -129,7 +129,7 @@ const DashboardHR = () => {
                                                 />
                                             </Col>
                                             <Col span={12}>
-                                                <Title level={5}>Contract Renewals</Title>
+                                                <Title level={5}>Gia hạn hợp đồng</Title>
                                                 <List
                                                     dataSource={hrData?.contractRenewals || []}
                                                     renderItem={(item) => (
@@ -147,7 +147,7 @@ const DashboardHR = () => {
                                 </motion.div>
 
                                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
-                                    <Card title={<Space><HistoryOutlined />Recent HR Activities</Space>} bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                                    <Card title={<Space><HistoryOutlined />Hoạt động HR gần đây</Space>} bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                                         <List
                                             itemLayout="horizontal"
                                             dataSource={hrData?.recentHrActivities || []}
@@ -168,7 +168,7 @@ const DashboardHR = () => {
 
                         <Col span={8}>
                             <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
-                                <Card title={<Space><GiftOutlined />Birthday / Anniversary List</Space>} bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', minHeight: '520px' }}>
+                                <Card title={<Space><GiftOutlined />Sinh nhật & Kỷ niệm</Space>} bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', minHeight: '520px' }}>
                                     <List
                                         dataSource={hrData?.birthdays || []}
                                         renderItem={(item) => (
@@ -178,10 +178,10 @@ const DashboardHR = () => {
                                                     title={item.employeeName}
                                                     description={<Text type="secondary">{dayjs(item.date).format("MMMM DD")}</Text>}
                                                 />
-                                                <Tag color="magenta">Birthday</Tag>
+                                                <Tag color="magenta">Sinh nhật</Tag>
                                             </List.Item>
                                         )}
-                                        locale={{ emptyText: "No birthdays this month" }}
+                                        locale={{ emptyText: "Không có sinh nhật tháng này" }}
                                     />
                                 </Card>
                             </motion.div>

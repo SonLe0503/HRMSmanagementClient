@@ -29,10 +29,10 @@ const DashboardManage = () => {
     const stats = managerData?.statistics;
 
     const cards = [
-        { title: "Team Size", value: stats?.teamSize, icon: <TeamOutlined />, color: "#1890ff", desc: "Total direct reports" },
-        { title: "Present Today", value: stats?.presentToday, icon: <CheckCircleOutlined />, color: "#52c41a", desc: "Currently at work" },
-        { title: "On Leave Today", value: stats?.onLeaveToday, icon: <CalendarOutlined />, color: "#faad14", desc: "Team members on leave" },
-        { title: "Team Attendance Rate", value: `${stats?.teamAttendanceRate ?? 0}%`, icon: <LineChartOutlined />, color: "#722ed1", desc: "Average for selected period" },
+        { title: "Quy mô nhóm", value: stats?.teamSize, icon: <TeamOutlined />, color: "#1890ff", desc: "Tổng số nhân viên trực tiếp" },
+        { title: "Có mặt hôm nay", value: stats?.presentToday, icon: <CheckCircleOutlined />, color: "#52c41a", desc: "Đang làm việc" },
+        { title: "Nghỉ hôm nay", value: stats?.onLeaveToday, icon: <CalendarOutlined />, color: "#faad14", desc: "Thành viên đang nghỉ phép" },
+        { title: "Tỉ lệ chuyên cần nhóm", value: `${stats?.teamAttendanceRate ?? 0}%`, icon: <LineChartOutlined />, color: "#722ed1", desc: "Trung bình trong kỳ đã chọn" },
     ];
 
     const container = {
@@ -53,8 +53,8 @@ const DashboardManage = () => {
             <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                 <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
                     <Col>
-                        <Title level={2} style={{ margin: 0 }}>Manager Overview Dashboard</Title>
-                        <Text type="secondary">Team performance and operational efficiency tracker</Text>
+                        <Title level={2} style={{ margin: 0 }}>Tổng quan Quản lý nhóm</Title>
+                        <Text type="secondary">Hiệu suất nhóm và theo dõi hiệu quả vận hành</Text>
                     </Col>
                     <Col>
                         <Space size="middle">
@@ -97,11 +97,11 @@ const DashboardManage = () => {
                         <Col span={16}>
                              <Space direction="vertical" style={{ width: '100%' }} size={24}>
                                 <motion.div variants={item}>
-                                    <Card title={<Space><ClockCircleOutlined />Pending Leave Requests</Space>} bordered={false} style={{ borderRadius: '12px' }}>
+                                    <Card title={<Space><ClockCircleOutlined />Đơn nghỉ phép chờ duyệt</Space>} bordered={false} style={{ borderRadius: '12px' }}>
                                         <List
                                             dataSource={managerData?.pendingLeaveRequests || []}
                                             renderItem={(request) => (
-                                                <List.Item extra={<Button type="link">Review</Button>}>
+                                                <List.Item extra={<Button type="link">Xem xét</Button>}>
                                                     <List.Item.Meta
                                                         title={request.employeeName}
                                                         description={`${request.leaveType} — ${request.days} day(s)`}
@@ -112,7 +112,7 @@ const DashboardManage = () => {
                                     </Card>
                                 </motion.div>
                                 <motion.div variants={item}>
-                                    <Card title={<Space><CalendarOutlined />Upcoming Team Leaves</Space>} bordered={false} style={{ borderRadius: '12px' }}>
+                                    <Card title={<Space><CalendarOutlined />Lịch nghỉ sắp tới của nhóm</Space>} bordered={false} style={{ borderRadius: '12px' }}>
                                         <List
                                             dataSource={managerData?.upcomingTeamLeaves || []}
                                             renderItem={(leave) => (
@@ -135,19 +135,19 @@ const DashboardManage = () => {
                                 </Card>
                             </motion.div>
                             <motion.div variants={item}>
-                                <Card title="Tasks & Performance" bordered={false} style={{ borderRadius: '12px' }}>
+                                <Card title="Công việc & Hiệu suất" bordered={false} style={{ borderRadius: '12px' }}>
                                     <Space direction="vertical" style={{ width: '100%' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <Text>Active Tasks:</Text><Text strong>{managerData?.taskPerformance.activeTasks}</Text>
+                                            <Text>Công việc đang mở:</Text><Text strong>{managerData?.taskPerformance.activeTasks}</Text>
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <Text>Overdue Tasks:</Text><Text type="danger" strong>{managerData?.taskPerformance.overdueTasks}</Text>
+                                            <Text>Công việc quá hạn:</Text><Text type="danger" strong>{managerData?.taskPerformance.overdueTasks}</Text>
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <Text>Completion Rate:</Text><Text strong>{managerData?.taskPerformance.completionRate}%</Text>
+                                            <Text>Tỉ lệ hoàn thành:</Text><Text strong>{managerData?.taskPerformance.completionRate}%</Text>
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <Text>Pending Evaluations:</Text><Text strong>{managerData?.taskPerformance.pendingEvaluations}</Text>
+                                            <Text>Đánh giá chờ xử lý:</Text><Text strong>{managerData?.taskPerformance.pendingEvaluations}</Text>
                                         </div>
                                     </Space>
                                 </Card>
@@ -158,7 +158,7 @@ const DashboardManage = () => {
                     <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
                         <Col span={12}>
                              <motion.div variants={item}>
-                                <Card title="Recent Team Activities" bordered={false} style={{ borderRadius: '12px' }}>
+                                <Card title="Hoạt động nhóm gần đây" bordered={false} style={{ borderRadius: '12px' }}>
                                     <List
                                         dataSource={managerData?.recentTeamActivities || []}
                                         renderItem={(activity) => (
@@ -176,7 +176,7 @@ const DashboardManage = () => {
                         </Col>
                         <Col span={12}>
                             <motion.div variants={item}>
-                                <Card title="Upcoming Team Milestones" bordered={false} style={{ borderRadius: '12px' }}>
+                                <Card title="Cột mốc sắp tới của nhóm" bordered={false} style={{ borderRadius: '12px' }}>
                                     <List
                                         dataSource={managerData?.teamMilestones || []}
                                         renderItem={(m) => (

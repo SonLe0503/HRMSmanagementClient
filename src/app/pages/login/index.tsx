@@ -115,7 +115,7 @@ const LoginPage = () => {
                             requiredMark={false}
                         >
                             <Form.Item
-                                label={<span className="text-slate-500 font-bold text-[11px] tracking-[0.15em] uppercase px-1">Username</span>}
+                                label={<span className="text-slate-500 font-bold text-[11px] tracking-[0.15em] uppercase px-1">Tên đăng nhập</span>}
                                 name="username"
                                 rules={[{ required: true, message: "Vui lòng nhập tài khoản" }]}
                                 className="mb-6"
@@ -123,7 +123,7 @@ const LoginPage = () => {
                                 <Input
                                     size="large"
                                     prefix={<UserOutlined className="text-slate-300 mr-2" />}
-                                    placeholder="your_account"
+                                    placeholder="tên_đăng_nhập"
                                     className="!rounded-2xl border-slate-100 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
                                 />
                             </Form.Item>
@@ -170,7 +170,7 @@ const LoginPage = () => {
                     {/* Bottom Link */}
                     <div className="mt-8 text-center">
                         <Text className="text-white/40 text-xs font-bold tracking-widest uppercase">
-                            © 2026 HRMS Platform • Security Certified
+                            © 2026 HRMS Platform • Bảo mật được chứng nhận
                         </Text>
                     </div>
                 </motion.div>

@@ -170,7 +170,7 @@ const ManageHRProcedure = () => {
                         <Title level={4} style={{ margin: 0 }}>Quản lý Thủ tục HR</Title>
                         {canCreate && (
                             <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddOpen(true)}>
-                                Tạo Request Mới
+                                Tạo thủ tục mới
                             </Button>
                         )}
                     </div>

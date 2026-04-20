@@ -61,17 +61,17 @@ const AttendanceTable = () => {
     };
 
     const columns = [
-        { title: "Mã NV", dataIndex: "employeeId", key: "employeeId", width: 80, align: 'center' as const },
-        { title: "Họ và tên", dataIndex: "employeeName", key: "employeeName" },
-        { title: "Ngày", dataIndex: "attendanceDate", key: "attendanceDate", render: (val: string) => dayjs(val).format("DD/MM/YYYY") },
-        { title: "Giờ vào", dataIndex: "checkInTime", key: "checkInTime", render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
-        { title: "Giờ ra", dataIndex: "checkOutTime", key: "checkOutTime", render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
-        { title: "Tổng h", dataIndex: "workingHours", key: "workingHours", width: 80, align: 'center' as const, render: (val: number) => val ?? "0" },
+        { title: "Mã NV", dataIndex: "employeeId", key: "employeeId", width: 75, align: 'center' as const },
+        { title: "Họ và tên", dataIndex: "employeeName", key: "employeeName", width: 160, ellipsis: true },
+        { title: "Ngày", dataIndex: "attendanceDate", key: "attendanceDate", width: 105, render: (val: string) => dayjs(val).format("DD/MM/YYYY") },
+        { title: "Giờ vào", dataIndex: "checkInTime", key: "checkInTime", width: 90, align: 'center' as const, render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
+        { title: "Giờ ra", dataIndex: "checkOutTime", key: "checkOutTime", width: 90, align: 'center' as const, render: (val: string) => val ? dayjs(val).format("HH:mm:ss") : "—" },
+        { title: "Tổng h", dataIndex: "workingHours", key: "workingHours", width: 75, align: 'center' as const, render: (val: number) => val ?? "0" },
         {
             title: "OT (h)",
             dataIndex: "payrollOvertimeHours",
             key: "overtime",
-            width: 80,
+            width: 75,
             align: 'center' as const,
             render: (_: any, record: any) => {
                 const payroll = record.payrollOvertimeHours || 0;
@@ -97,6 +97,7 @@ const AttendanceTable = () => {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
+            width: 155,
             render: (status: string, record: any) => {
                 let color = "default";
                 if (status === "Present") color = "success";
@@ -108,16 +109,16 @@ const AttendanceTable = () => {
                 
                 const isInvalidLocation = record.location?.includes("[INVALID]");
                 return (
-                    <Space orientation="vertical" size="small">
-                        <Space>
-                            <Tag color={color}>{status}</Tag>
+                    <Space direction="vertical" size={2}>
+                        <Space size={4}>
+                            <Tag color={color} style={{ margin: 0 }}>{status}</Tag>
                             {isInvalidLocation && (
                                 <Tooltip title="Vị trí check-in/out không hợp lệ">
                                     <ExclamationCircleOutlined className="text-red-500" />
                                 </Tooltip>
                             )}
                         </Space>
-                        {record.isManualAdjusted && <Tag color="gold" style={{ fontSize: '10px' }}>Adjusted</Tag>}
+                        {record.isManualAdjusted && <Tag color="gold" style={{ fontSize: '10px', margin: 0 }}>Adjusted</Tag>}
                     </Space>
                 );
             }
@@ -126,11 +127,13 @@ const AttendanceTable = () => {
             title: "Ghi chú",
             dataIndex: "remarks",
             key: "remarks",
+            width: 140,
+            ellipsis: true,
             render: (val: string) => {
                 if (!val) return "—";
                 return (
                     <Tooltip title={val}>
-                        <div className="max-w-[150px] truncate">{val}</div>
+                        <span style={{ display: 'block', maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{val}</span>
                     </Tooltip>
                 );
             }
@@ -139,6 +142,7 @@ const AttendanceTable = () => {
             title: "Khóa",
             dataIndex: "isLocked",
             key: "isLocked",
+            width: 65,
             align: 'center' as const,
             render: (locked: boolean, record: any) => (
                 <Tooltip title={locked ? "Bản ghi đã khóa (Click để mở)" : "Bản ghi đang mở (Click để khóa)"}>
@@ -154,6 +158,7 @@ const AttendanceTable = () => {
         {
             title: "Thao tác",
             key: "action",
+            width: 110,
             align: 'center' as const,
             render: (_: any, record: any) => (
                 <Space size="small">
@@ -182,9 +187,9 @@ const AttendanceTable = () => {
     ];
 
     return (
-        <Card className="shadow-sm">
-            <div className="flex flex-wrap items-center justify-between mb-6 gap-4 border-b pb-4">
-                <Space wrap>
+        <Card className="shadow-sm" style={{ overflow: 'hidden' }}>
+            <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
+                <Space wrap style={{ rowGap: 8 }}>
                     <RangePicker
                         value={dateRange}
                         onChange={(val) => setDateRange(val as any)}
@@ -202,7 +207,7 @@ const AttendanceTable = () => {
                     />
                     <Select
                         placeholder="Trạng thái"
-                        style={{ width: 150 }}
+                        style={{ width: 180 }}
                         allowClear
                         value={statusFilter}
                         onChange={setStatusFilter}
@@ -221,11 +226,10 @@ const AttendanceTable = () => {
                     <Button onClick={handleToday}>
                         Hôm nay
                     </Button>
+                    <Button type="primary" danger icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
+                        Tạo chấm công Manual
+                    </Button>
                 </Space>
-
-                <Button type="primary" danger icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
-                    Tạo chấm công Manual
-                </Button>
             </div>
 
             <Table
@@ -234,6 +238,7 @@ const AttendanceTable = () => {
                 loading={loading}
                 rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}-${record.employeeId}`}
                 pagination={{ pageSize: 15 }}
+                scroll={{ x: 1150 }}
                 bordered
             />
 
