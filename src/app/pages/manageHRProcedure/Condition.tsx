@@ -48,8 +48,7 @@ const Condition = ({
             >
                 <Option value="Appointment">Bổ nhiệm</Option>
                 <Option value="Transfer">Điều chuyển</Option>
-                <Option value="Promotion">Thăng tiến</Option>
-                <Option value="Resignation">Thôi việc</Option>
+                <Option value="Demotion">Giáng chức</Option>
                 <Option value="Termination">Sa thải</Option>
             </Select>
         </Space>

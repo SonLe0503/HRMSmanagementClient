@@ -19,8 +19,7 @@ interface AddHRProcedureModalProps {
 const PROCEDURE_TYPES = [
     { label: "Bổ nhiệm", value: "Appointment" },
     { label: "Điều chuyển", value: "Transfer" },
-    { label: "Thăng tiến", value: "Promotion" },
-    { label: "Thôi việc", value: "Resignation" },
+    { label: "Giáng chức", value: "Demotion" },
     { label: "Sa thải", value: "Termination" }
 ];
 
@@ -94,11 +93,11 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
 
         const isAppointment = procedureType === "Appointment";
         const isTransfer = procedureType === "Transfer";
-        const isPromotion = procedureType === "Promotion";
+        const isDemotion = procedureType === "Demotion";
         const needsDepartment = isAppointment || isTransfer;
-        const needsPosition = isAppointment || isPromotion || isTransfer;
-        const needsSalary = isAppointment || isPromotion || isTransfer;
-        const needsManager = isAppointment || isPromotion || isTransfer;
+        const needsPosition = isAppointment || isDemotion || isTransfer;
+        const needsSalary = isAppointment || isDemotion || isTransfer;
+        const needsManager = isAppointment || isDemotion || isTransfer;
 
         return (
             <>
@@ -160,7 +159,7 @@ const AddHRProcedureModal = ({ open, initialValues, onCancel, onSuccess }: AddHR
                                 name="newPositionId" 
                                 label="Vị trí mới"
                                 rules={[
-                                    { required: isPromotion, message: 'Bắt buộc chọn Vị trí mới cho thủ tục thăng chức' }
+                                    { required: isDemotion, message: 'Bắt buộc chọn Vị trí mới cho thủ tục giáng chức' }
                                 ]}
                             >
                                 <Select 

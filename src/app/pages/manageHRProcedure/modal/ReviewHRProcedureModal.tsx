@@ -24,8 +24,7 @@ const STATUS_COLOR: Record<string, string> = {
 const PROCEDURE_TYPE_MAP: Record<string, string> = {
     Appointment: "Bổ nhiệm",
     Transfer: "Điều chuyển",
-    Promotion: "Thăng tiến",
-    Resignation: "Thôi việc",
+    Demotion: "Giáng chức",
     Termination: "Sa thải",
 };
 

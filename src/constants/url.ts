@@ -62,6 +62,10 @@ const URL = {
 
     // Payroll — Reference
     PayrollMethodology:   "/payroll/methodology",
+
+    // Resignation
+    MyResignationRequest:     "/resignation/my",
+    ManageResignationRequest: "/resignation/manage",
 }
 
 export default URL

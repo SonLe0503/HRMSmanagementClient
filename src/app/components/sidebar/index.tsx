@@ -62,6 +62,7 @@ const Sidebar = () => {
                     { key: URL.ManageLeaveRequest, label: "Duyệt nghỉ phép" },
                     { key: URL.LeaveConfiguration, label: "Cấu hình nghỉ phép" },
                     { key: URL.ManageOvertimeRequest, label: "Duyệt tăng ca" },
+                    { key: URL.ManageResignationRequest, label: "Duyệt đơn thôi việc" },
                 ]
             },
             {
@@ -108,6 +109,8 @@ const Sidebar = () => {
                     { key: URL.ManageLeaveRequest, label: "Duyệt nghỉ phép" },
                     { key: URL.MyOvertimeRequest, label: "Tăng ca của tôi" },
                     { key: URL.ManageOvertimeRequest, label: "Duyệt tăng ca" },
+                    { key: URL.MyResignationRequest, label: "Đơn thôi việc của tôi" },
+                    { key: URL.ManageResignationRequest, label: "Duyệt đơn thôi việc" },
                 ]
             },
             {
@@ -144,6 +147,7 @@ const Sidebar = () => {
             { key: URL.MyAttendance, icon: <ClockCircleOutlined />, label: "Chấm công của tôi" },
             { key: URL.MyLeaveRequest, icon: <CalendarOutlined />, label: "Nghỉ phép của tôi" },
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
+            { key: URL.MyResignationRequest, icon: <IdcardOutlined />, label: "Đơn thôi việc" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.EvaluationList, icon: <SolutionOutlined />, label: "Phiếu đánh giá của tôi" },
             { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
@@ -182,6 +186,7 @@ const Sidebar = () => {
                 key: "hr-services", icon: <IdcardOutlined />, label: "Dịch vụ Nhân sự",
                 children: [
                     { key: URL.ManageHRProcedure, label: "Quản lý thủ tục" },
+                    { key: URL.MyResignationRequest, label: "Đơn thôi việc của tôi" },
                 ]
             },
             {
