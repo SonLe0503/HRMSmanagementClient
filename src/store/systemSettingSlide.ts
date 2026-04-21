@@ -24,14 +24,17 @@ interface CompanySettings {
 }
 
 export interface PayrollCalculationSettings {
-    bhxhRate: number;           // % BHXH NLĐ đóng, mặc định 8
-    bhytRate: number;           // % BHYT NLĐ đóng, mặc định 1.5
-    bhtnRate: number;           // % BHTN NLĐ đóng, mặc định 1
-    insuranceCap: number;       // Mức trần BH, mặc định 46,800,000
-    insuranceBaseMode: string;  // "Gross" | "Fixed"
-    insuranceFixedBase: number; // Mức cố định (khi mode = "Fixed")
-    personalDeduction: number;  // Giảm trừ bản thân, mặc định 11,000,000
-    dependentDeduction: number; // Giảm trừ mỗi NPT, mặc định 4,400,000
+    bhxhRate: number;            // % BHXH NLĐ đóng, mặc định 8
+    bhytRate: number;            // % BHYT NLĐ đóng, mặc định 1.5
+    bhtnRate: number;            // % BHTN NLĐ đóng, mặc định 1
+    insuranceCap: number;        // Mức trần BH, mặc định 46,800,000
+    insuranceBaseMode: string;   // "Gross" | "Fixed"
+    insuranceFixedBase: number;  // Mức cố định (khi mode = "Fixed")
+    personalDeduction: number;   // Giảm trừ bản thân, mặc định 11,000,000
+    dependentDeduction: number;  // Giảm trừ mỗi NPT, mặc định 4,400,000
+    otWeekdayMultiplier: number; // Hệ số OT ngày thường, mặc định 1.5
+    otWeekendMultiplier: number; // Hệ số OT cuối tuần (T7+CN), mặc định 2.0
+    otHolidayMultiplier: number; // Hệ số OT ngày lễ/Tết, mặc định 3.0
 }
 
 interface SystemSettingState {
