@@ -1,4 +1,5 @@
-import { Typography, Card, Table, Tag, Collapse, Alert, Divider, Row, Col, Timeline, Tabs } from "antd"
+import { useEffect } from "react"
+import { Typography, Card, Table, Tag, Collapse, Alert, Divider, Row, Col, Timeline, Tabs, Skeleton } from "antd"
 import {
   BookOutlined,
   CalculatorOutlined,
@@ -6,10 +7,37 @@ import {
   FileTextOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons"
+import { useAppDispatch, useAppSelector } from "../../../store"
+import { fetchPayrollCalcSettings, selectPayrollCalcSettings } from "../../../store/systemSettingSlide"
+import type { PayrollCalculationSettings } from "../../../store/systemSettingSlide"
 
 const { Title, Text, Paragraph } = Typography
 const { Panel } = Collapse
 
+// ── Legal defaults ────────────────────────────────────────────────
+const DEFAULTS = {
+  bhxhRate: 8,
+  bhytRate: 1.5,
+  bhtnRate: 1,
+  insuranceCap: 46_800_000,
+  personalDeduction: 11_000_000,
+  dependentDeduction: 4_400_000,
+  otWeekdayMultiplier: 1.5,
+  otWeekendMultiplier: 2.0,
+  otHolidayMultiplier: 3.0,
+}
+
+const POLICY_LABEL = "Áp dụng theo chính sách tổ chức"
+
+function cancu(actual: number, defaultVal: number, legalText: string): string {
+  return actual === defaultVal ? legalText : POLICY_LABEL
+}
+
+function fmtMoney(v: number) {
+  return v.toLocaleString("vi-VN") + " đ"
+}
+
+// ── Biểu thuế TNCN (cố định theo luật) ───────────────────────────
 const tncnBrackets = [
   { bac: 1, range: "Đến 5 triệu đ/tháng",     rate: "5%",  base: "Thu nhập tính thuế × 5%" },
   { bac: 2, range: "5 – 10 triệu đ/tháng",     rate: "10%", base: "0.25tr + (TN − 5tr) × 10%" },
@@ -26,158 +54,145 @@ const tncnColumns = [
   { title: "Số thuế phải nộp", dataIndex: "base", className: "text-xs text-gray-500" },
 ]
 
-const insuranceRates = [
-  { loai: "BHXH (Hưu trí, tử tuất, ốm đau, thai sản)", nv: "8%",    dn: "17.5%", tong: "25.5%", cancu: "Luật BHXH 2014 – Điều 85, 86" },
-  { loai: "BHYT (Khám chữa bệnh)",                       nv: "1.5%",  dn: "3%",    tong: "4.5%",  cancu: "Luật BHYT 2008 (sửa đổi 2014) – Điều 13" },
-  { loai: "BHTN (Thất nghiệp)",                           nv: "1%",    dn: "1%",    tong: "2%",    cancu: "Luật Việc làm 2013 – Điều 57" },
-  { loai: "Tổng NLĐ đóng",                                nv: "10.5%", dn: "—",     tong: "—",     cancu: "" },
-]
-const insuranceColumns = [
-  { title: "Loại bảo hiểm",  dataIndex: "loai", render: (v: string) => <Text strong>{v}</Text> },
-  { title: "NLĐ đóng",       dataIndex: "nv",   render: (v: string) => <Tag color="red">{v}</Tag> },
-  { title: "NSDLĐ đóng",     dataIndex: "dn",   render: (v: string) => v !== "—" ? <Tag color="volcano">{v}</Tag> : <Text type="secondary">—</Text> },
-  { title: "Tổng",            dataIndex: "tong", render: (v: string) => v !== "—" ? <Tag color="magenta">{v}</Tag> : <Text type="secondary">—</Text> },
-  { title: "Căn cứ pháp lý", dataIndex: "cancu", className: "text-xs text-gray-500" },
-]
+// ── Tabs ──────────────────────────────────────────────────────────
 
-const otRates = [
-  { loai: "Ngày làm việc thường",         heso: "×1.5", cancu: "Điều 98.1a – Bộ Luật Lao động 2019" },
-  { loai: "Ngày nghỉ hàng tuần (Thứ 7)",  heso: "×2.0", cancu: "Điều 98.1b – Bộ Luật Lao động 2019" },
-  { loai: "Ngày Chủ Nhật",                heso: "×2.0", cancu: "Điều 98.1b – Bộ Luật Lao động 2019" },
-  { loai: "Ngày lễ, Tết",                  heso: "×3.0", cancu: "Điều 98.1c – Bộ Luật Lao động 2019" },
-]
-const otColumns = [
-  { title: "Loại ngày tăng ca", dataIndex: "loai", render: (v: string) => <Text strong>{v}</Text> },
-  { title: "Hệ số lương OT",   dataIndex: "heso", render: (v: string) => <Tag color="green" className="text-base font-bold">{v}</Tag> },
-  { title: "Căn cứ pháp lý",   dataIndex: "cancu", className: "text-xs text-gray-500" },
-]
+const TabQuyTrinh = ({ cfg }: { cfg: PayrollCalculationSettings }) => {
+  const totalBH = cfg.bhxhRate + cfg.bhytRate + cfg.bhtnRate
+  const capFmt = fmtMoney(cfg.insuranceCap)
+  const personalFmt = (cfg.personalDeduction / 1_000_000).toFixed(0) + "tr"
 
-// ── Tabs ─────────────────────────────────────────────────────────
-
-const TabQuyTrinh = () => (
-  <Card className="border-0 shadow-none">
-    <Alert
-      type="info" showIcon icon={<InfoCircleOutlined />} className="mb-6"
-      message="Tỷ lệ BH, mức trần, và giảm trừ thuế có thể thay đổi tại Thiết lập Hệ thống → tab Kỳ lương & Tính lương. Tài liệu dưới đây mô tả luồng tính lương và các giá trị mặc định theo quy định hiện hành."
-    />
-    <Timeline items={[
-      {
-        color: "blue",
-        children: (
-          <div>
-            <Text strong>Bước 1 — Xác định ngày công chuẩn (mẫu số)</Text>
-            <Paragraph className="text-gray-500 text-sm mb-0 mt-1">
-              Đếm số ngày được <strong>phân ca làm việc</strong> (<code>ShiftAssignment</code>) của nhân viên trong kỳ.
-              Fallback về đếm ngày T2–T6 nếu chưa có phân ca.
-            </Paragraph>
-          </div>
-        ),
-      },
-      {
-        color: "blue",
-        children: (
-          <div>
-            <Text strong>Bước 2 — Xác định ngày công thực tế quy đổi (tử số)</Text>
-            <Paragraph className="text-gray-500 text-sm mb-1 mt-1">Tính <code>Σ (WorkingHours / ShiftStandardHours)</code> cho các bản ghi hợp lệ:</Paragraph>
-            <ul className="text-gray-500 text-sm list-disc pl-5 space-y-1 mb-1">
-              <li><Tag color="green" className="text-xs">Present</Tag> <Tag color="orange" className="text-xs">Late</Tag> → luôn tính công</li>
-              <li>Bất kỳ trạng thái nào có <Tag color="blue" className="text-xs">ExplanationStatus = Approved</Tag> → tính công</li>
-              <li>Giải trình <strong>chưa duyệt / bị từ chối</strong> → không tính công</li>
-              <li><code>LeaveRequest</code> duyệt có lương (<Tag color="blue" className="text-xs">IsPaid</Tag>) → cộng thêm ngày nghỉ</li>
-            </ul>
-          </div>
-        ),
-      },
-      {
-        color: "blue",
-        children: (
-          <div>
-            <Text strong>Bước 3 — Tính lương ngày công</Text>
-            <div className="bg-gray-100 rounded px-3 py-2 text-sm font-mono mt-1">
-              Lương ngày công = Lương cơ bản ÷ Số ngày phân ca × Ngày công thực tế quy đổi
+  return (
+    <Card className="border-0 shadow-none">
+      <Alert
+        type="info" showIcon icon={<InfoCircleOutlined />} className="!mb-6"
+        message="Tỷ lệ BH, mức trần, và giảm trừ thuế có thể thay đổi tại Thiết lập Hệ thống → tab Kỳ lương & Tính lương. Tài liệu dưới đây phản ánh cấu hình đang được áp dụng."
+      />
+      <Timeline items={[
+        {
+          color: "blue",
+          children: (
+            <div>
+              <Text strong>Bước 1 — Xác định ngày công chuẩn (mẫu số)</Text>
+              <Paragraph className="text-gray-500 text-sm mb-0 mt-1">
+                Đếm số ngày được <strong>phân ca làm việc</strong> (<code>ShiftAssignment</code>) của nhân viên trong kỳ.
+                Fallback về đếm ngày T2–T6 nếu chưa có phân ca.
+              </Paragraph>
             </div>
-            <Paragraph className="text-gray-500 text-sm mt-1 mb-0">Căn cứ: Điều 101 – Bộ Luật Lao động 2019.</Paragraph>
-          </div>
-        ),
-      },
-      {
-        color: "blue",
-        children: (
-          <div>
-            <Text strong>Bước 4 — Cộng phụ cấp theo chính sách</Text>
-            <Paragraph className="text-gray-500 text-sm mb-0 mt-1">
-              Tổng hợp <code>PayrollPolicy</code> loại <Tag className="text-xs">Allowance</Tag> còn hiệu lực.
-              HR có thể bổ sung phụ cấp thủ công trực tiếp trên phiếu lương.
-            </Paragraph>
-          </div>
-        ),
-      },
-      {
-        color: "blue",
-        children: (
-          <div>
-            <Text strong>Bước 5 — Tính lương tăng ca (OT)</Text>
-            <Paragraph className="text-gray-500 text-sm mt-1 mb-1">
-              Tổng hợp <code>OvertimeRequest</code> trạng thái <Tag color="green" className="text-xs">Approved</Tag>.
-            </Paragraph>
-            <div className="bg-gray-100 rounded px-3 py-1 text-sm font-mono">
-              Lương OT = (Lương CB ÷ Số ngày phân ca ÷ 8) × Số giờ OT × Hệ số
+          ),
+        },
+        {
+          color: "blue",
+          children: (
+            <div>
+              <Text strong>Bước 2 — Xác định ngày công thực tế quy đổi (tử số)</Text>
+              <Paragraph className="text-gray-500 text-sm mb-1 mt-1">Tính <code>Σ (WorkingHours / ShiftStandardHours)</code> cho các bản ghi hợp lệ:</Paragraph>
+              <ul className="text-gray-500 text-sm list-disc pl-5 space-y-1 mb-1">
+                <li><Tag color="green" className="text-xs">Present</Tag> <Tag color="orange" className="text-xs">Late</Tag> → luôn tính công</li>
+                <li>Bất kỳ trạng thái nào có <Tag color="blue" className="text-xs">ExplanationStatus = Approved</Tag> → tính công</li>
+                <li>Giải trình <strong>chưa duyệt / bị từ chối</strong> → không tính công</li>
+                <li><code>LeaveRequest</code> duyệt có lương (<Tag color="blue" className="text-xs">IsPaid</Tag>) → cộng thêm ngày nghỉ</li>
+              </ul>
             </div>
-          </div>
-        ),
-      },
-      {
-        color: "green",
-        children: (
-          <div>
-            <Text strong className="text-green-600">Bước 6 — Thu nhập gộp (GROSS)</Text>
-            <div className="bg-green-50 border border-green-200 rounded px-3 py-2 text-sm font-mono mt-1">
-              Gross = Lương ngày công + Phụ cấp + OT + Thưởng
+          ),
+        },
+        {
+          color: "blue",
+          children: (
+            <div>
+              <Text strong>Bước 3 — Tính lương ngày công</Text>
+              <div className="bg-gray-100 rounded px-3 py-2 text-sm font-mono mt-1">
+                Lương ngày công = Lương cơ bản ÷ Số ngày phân ca × Ngày công thực tế quy đổi
+              </div>
+              <Paragraph className="text-gray-500 text-sm mt-1 mb-0">Căn cứ: Điều 101 – Bộ Luật Lao động 2019.</Paragraph>
             </div>
-          </div>
-        ),
-      },
-      {
-        color: "red",
-        children: (
-          <div>
-            <Text strong>Bước 7 — Khấu trừ BHXH / BHYT / BHTN</Text>
-            <div className="bg-red-50 border border-red-100 rounded px-3 py-2 text-sm font-mono mt-1">
-              Tổng BH = min(Gross, 46,800,000) × 10.5%
+          ),
+        },
+        {
+          color: "blue",
+          children: (
+            <div>
+              <Text strong>Bước 4 — Cộng phụ cấp theo chính sách</Text>
+              <Paragraph className="text-gray-500 text-sm mb-0 mt-1">
+                Tổng hợp <code>PayrollPolicy</code> loại <Tag className="text-xs">Allowance</Tag> còn hiệu lực.
+                HR có thể bổ sung phụ cấp thủ công trực tiếp trên phiếu lương.
+              </Paragraph>
             </div>
-            <Paragraph className="text-gray-500 text-sm mt-1 mb-0">BHXH 8% + BHYT 1.5% + BHTN 1% = 10.5%.</Paragraph>
-          </div>
-        ),
-      },
-      {
-        color: "red",
-        children: (
-          <div>
-            <Text strong>Bước 8 — Tính thuế TNCN (lũy tiến 7 bậc)</Text>
-            <div className="bg-red-50 border border-red-100 rounded px-3 py-2 text-sm font-mono mt-1">
-              Thu nhập tính thuế = Gross − Tổng BH − Giảm trừ bản thân (11tr) − Giảm trừ gia cảnh
+          ),
+        },
+        {
+          color: "blue",
+          children: (
+            <div>
+              <Text strong>Bước 5 — Tính lương tăng ca (OT)</Text>
+              <Paragraph className="text-gray-500 text-sm mt-1 mb-1">
+                Tổng hợp <code>OvertimeRequest</code> trạng thái <Tag color="green" className="text-xs">Approved</Tag>.
+              </Paragraph>
+              <div className="bg-gray-100 rounded px-3 py-1 text-sm font-mono">
+                Lương OT = (Lương CB ÷ Số ngày phân ca ÷ 8) × Số giờ OT × Hệ số
+              </div>
+              <div className="mt-1 text-xs text-gray-500">
+                Hệ số hiện tại — Ngày thường: ×{cfg.otWeekdayMultiplier} &ensp;|&ensp;
+                Cuối tuần: ×{cfg.otWeekendMultiplier} &ensp;|&ensp;
+                Ngày lễ: ×{cfg.otHolidayMultiplier}
+              </div>
             </div>
-          </div>
-        ),
-      },
-      {
-        color: "green",
-        children: (
-          <div>
-            <Text strong className="text-green-700">Bước 9 — Thực lĩnh (NET PAY)</Text>
-            <div className="bg-green-600 text-white rounded px-3 py-2 text-sm font-mono mt-1">
-              Net Pay = Gross − Tổng BH − Thuế TNCN − Khấu trừ khác
+          ),
+        },
+        {
+          color: "green",
+          children: (
+            <div>
+              <Text strong className="text-green-600">Bước 6 — Thu nhập gộp (GROSS)</Text>
+              <div className="bg-green-50 border border-green-200 rounded px-3 py-2 text-sm font-mono mt-1">
+                Gross = Lương ngày công + Phụ cấp + OT + Thưởng
+              </div>
             </div>
-          </div>
-        ),
-      },
-    ]} />
-  </Card>
-)
+          ),
+        },
+        {
+          color: "red",
+          children: (
+            <div>
+              <Text strong>Bước 7 — Khấu trừ BHXH / BHYT / BHTN</Text>
+              <div className="bg-red-50 border border-red-100 rounded px-3 py-2 text-sm font-mono mt-1">
+                Tổng BH = min(Gross, {capFmt}) × {totalBH}%
+              </div>
+              <Paragraph className="text-gray-500 text-sm mt-1 mb-0">
+                BHXH {cfg.bhxhRate}% + BHYT {cfg.bhytRate}% + BHTN {cfg.bhtnRate}% = {totalBH}%.
+              </Paragraph>
+            </div>
+          ),
+        },
+        {
+          color: "red",
+          children: (
+            <div>
+              <Text strong>Bước 8 — Tính thuế TNCN (lũy tiến 7 bậc)</Text>
+              <div className="bg-red-50 border border-red-100 rounded px-3 py-2 text-sm font-mono mt-1">
+                Thu nhập tính thuế = Gross − Tổng BH − Giảm trừ bản thân ({personalFmt}) − Giảm trừ gia cảnh
+              </div>
+            </div>
+          ),
+        },
+        {
+          color: "green",
+          children: (
+            <div>
+              <Text strong className="text-green-700">Bước 9 — Thực lĩnh (NET PAY)</Text>
+              <div className="bg-green-600 text-white rounded px-3 py-2 text-sm font-mono mt-1">
+                Net Pay = Gross − Tổng BH − Thuế TNCN − Khấu trừ khác
+              </div>
+            </div>
+          ),
+        },
+      ]} />
+    </Card>
+  )
+}
 
 const TabThueTNCN = () => (
   <Card className="border-0 shadow-none">
-    <Alert type="warning" showIcon className="mb-4"
+    <Alert type="warning" showIcon className="!mb-4"
       message="Căn cứ pháp lý: Luật Thuế TNCN số 04/2007/QH12, sửa đổi bởi Luật số 26/2012/QH13 và Nghị quyết 954/2020/UBTVQH14." />
     <Table size="small" dataSource={tncnBrackets} columns={tncnColumns} pagination={false} rowKey="bac" />
     <Divider />
@@ -196,103 +211,225 @@ const TabThueTNCN = () => (
   </Card>
 )
 
-const TabBaoHiem = () => (
-  <Card className="border-0 shadow-none">
-    <Alert type="error" showIcon className="mb-4"
-      message="Căn cứ pháp lý: Luật BHXH 58/2014/QH13 (Điều 85, 86); Luật BHYT 25/2008/QH12 sửa đổi bởi 46/2014/QH13 (Điều 13); Luật Việc làm 38/2013/QH13 (Điều 57). Quyết định 595/QĐ-BHXH ngày 14/4/2017." />
-    <Table size="small" dataSource={insuranceRates} columns={insuranceColumns} pagination={false} rowKey="loai" />
-    <div className="mt-3 text-xs text-gray-400">
-      * Mức đóng BH tối đa = 20 × Lương tối thiểu vùng I = 2,340,000 × 20 = <strong>46,800,000 đ/tháng</strong>.
-      (Nghị định 38/2022/NĐ-CP, hiệu lực 01/07/2022.)
+const TabBaoHiem = ({ cfg }: { cfg: PayrollCalculationSettings }) => {
+  const totalNV = (cfg.bhxhRate + cfg.bhytRate + cfg.bhtnRate).toFixed(1)
+  const isDefaultTotal = cfg.bhxhRate === DEFAULTS.bhxhRate && cfg.bhytRate === DEFAULTS.bhytRate && cfg.bhtnRate === DEFAULTS.bhtnRate
+
+  const rows = [
+    {
+      loai: "BHXH (Hưu trí, tử tuất, ốm đau, thai sản)",
+      nv: `${cfg.bhxhRate}%`,
+      dn: "17.5%",
+      tong: `${(cfg.bhxhRate + 17.5).toFixed(1)}%`,
+      cancu: cancu(cfg.bhxhRate, DEFAULTS.bhxhRate, "Luật BHXH 2014 – Điều 85, 86"),
+    },
+    {
+      loai: "BHYT (Khám chữa bệnh)",
+      nv: `${cfg.bhytRate}%`,
+      dn: "3%",
+      tong: `${(cfg.bhytRate + 3).toFixed(1)}%`,
+      cancu: cancu(cfg.bhytRate, DEFAULTS.bhytRate, "Luật BHYT 2008 (sửa đổi 2014) – Điều 13"),
+    },
+    {
+      loai: "BHTN (Thất nghiệp)",
+      nv: `${cfg.bhtnRate}%`,
+      dn: "1%",
+      tong: `${(cfg.bhtnRate + 1).toFixed(1)}%`,
+      cancu: cancu(cfg.bhtnRate, DEFAULTS.bhtnRate, "Luật Việc làm 2013 – Điều 57"),
+    },
+    {
+      loai: "Tổng NLĐ đóng",
+      nv: `${totalNV}%`,
+      dn: "—",
+      tong: "—",
+      cancu: isDefaultTotal ? "" : POLICY_LABEL,
+    },
+  ]
+
+  const columns = [
+    { title: "Loại bảo hiểm",  dataIndex: "loai", render: (v: string) => <Text strong>{v}</Text> },
+    { title: "NLĐ đóng",       dataIndex: "nv",   render: (v: string) => <Tag color="red">{v}</Tag> },
+    { title: "NSDLĐ đóng",     dataIndex: "dn",   render: (v: string) => v !== "—" ? <Tag color="volcano">{v}</Tag> : <Text type="secondary">—</Text> },
+    { title: "Tổng",            dataIndex: "tong", render: (v: string) => v !== "—" ? <Tag color="magenta">{v}</Tag> : <Text type="secondary">—</Text> },
+    {
+      title: "Căn cứ pháp lý", dataIndex: "cancu",
+      render: (v: string) => v === POLICY_LABEL
+        ? <Tag color="gold">{POLICY_LABEL}</Tag>
+        : <span className="text-xs text-gray-500">{v}</span>,
+    },
+  ]
+
+  return (
+    <Card className="border-0 shadow-none">
+      <Alert type="error" showIcon className="!mb-4"
+        message="Căn cứ pháp lý: Luật BHXH 58/2014/QH13 (Điều 85, 86); Luật BHYT 25/2008/QH12 sửa đổi bởi 46/2014/QH13 (Điều 13); Luật Việc làm 38/2013/QH13 (Điều 57). Quyết định 595/QĐ-BHXH ngày 14/4/2017." />
+      <Table size="small" dataSource={rows} columns={columns} pagination={false} rowKey="loai" />
+      <div className="mt-3 text-xs text-gray-400">
+        * Mức đóng BH tối đa = mức trần đang áp dụng: <strong>{fmtMoney(cfg.insuranceCap)}/tháng</strong>.
+        {cfg.insuranceCap !== DEFAULTS.insuranceCap && (
+          <Tag color="gold" className="ml-2">{POLICY_LABEL}</Tag>
+        )}
+        {cfg.insuranceCap === DEFAULTS.insuranceCap && (
+          <span className="ml-1">(Nghị định 38/2022/NĐ-CP, hiệu lực 01/07/2022.)</span>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+const TabLuongOT = ({ cfg }: { cfg: PayrollCalculationSettings }) => {
+  const rows = [
+    {
+      loai: "Ngày làm việc thường",
+      heso: `×${cfg.otWeekdayMultiplier}`,
+      cancu: cancu(cfg.otWeekdayMultiplier, DEFAULTS.otWeekdayMultiplier, "Điều 98.1a – Bộ Luật Lao động 2019"),
+    },
+    {
+      loai: "Ngày nghỉ hàng tuần (Thứ 7)",
+      heso: `×${cfg.otWeekendMultiplier}`,
+      cancu: cancu(cfg.otWeekendMultiplier, DEFAULTS.otWeekendMultiplier, "Điều 98.1b – Bộ Luật Lao động 2019"),
+    },
+    {
+      loai: "Ngày Chủ Nhật",
+      heso: `×${cfg.otWeekendMultiplier}`,
+      cancu: cancu(cfg.otWeekendMultiplier, DEFAULTS.otWeekendMultiplier, "Điều 98.1b – Bộ Luật Lao động 2019"),
+    },
+    {
+      loai: "Ngày lễ, Tết",
+      heso: `×${cfg.otHolidayMultiplier}`,
+      cancu: cancu(cfg.otHolidayMultiplier, DEFAULTS.otHolidayMultiplier, "Điều 98.1c – Bộ Luật Lao động 2019"),
+    },
+  ]
+
+  const columns = [
+    { title: "Loại ngày tăng ca", dataIndex: "loai", render: (v: string) => <Text strong>{v}</Text> },
+    { title: "Hệ số lương OT",   dataIndex: "heso", render: (v: string) => <Tag color="green" className="text-base font-bold">{v}</Tag> },
+    {
+      title: "Căn cứ pháp lý", dataIndex: "cancu",
+      render: (v: string) => v === POLICY_LABEL
+        ? <Tag color="gold">{POLICY_LABEL}</Tag>
+        : <span className="text-xs text-gray-500">{v}</span>,
+    },
+  ]
+
+  return (
+    <Card className="border-0 shadow-none">
+      <Alert type="success" showIcon className="!mb-4"
+        message="Căn cứ pháp lý: Điều 98 – Bộ Luật Lao động số 45/2019/QH14, có hiệu lực từ 01/01/2021." />
+      <Table size="small" dataSource={rows} columns={columns} pagination={false} rowKey="loai" />
+      <div className="mt-3 text-xs text-gray-400">
+        * Công thức: Lương giờ OT = (Lương CB ÷ Số ngày phân ca ÷ 8 giờ) × Số giờ × Hệ số.
+      </div>
+    </Card>
+  )
+}
+
+const TabGiamTru = ({ cfg }: { cfg: PayrollCalculationSettings }) => {
+  const personalChanged = cfg.personalDeduction !== DEFAULTS.personalDeduction
+  const dependentChanged = cfg.dependentDeduction !== DEFAULTS.dependentDeduction
+
+  return (
+    <Card className="border-0 shadow-none">
+      <Alert type="info" showIcon className="!mb-4"
+        message="Căn cứ pháp lý: Nghị quyết số 954/2020/UBTVQH14, có hiệu lực từ 01/07/2020." />
+      <Row gutter={16} className="mb-4">
+        <Col xs={24} sm={12}>
+          <Card size="small" className="bg-purple-50 border-purple-200 text-center">
+            <div className="text-purple-600 font-bold text-2xl">{fmtMoney(cfg.personalDeduction)}</div>
+            <div className="text-gray-500 text-sm mt-1">Giảm trừ bản thân / tháng</div>
+            <div className="text-xs mt-1">
+              {personalChanged
+                ? <Tag color="gold">{POLICY_LABEL}</Tag>
+                : <span className="text-gray-400">Điều 1 Nghị quyết 954/2020</span>
+              }
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12}>
+          <Card size="small" className="bg-blue-50 border-blue-200 text-center">
+            <div className="text-blue-600 font-bold text-2xl">{fmtMoney(cfg.dependentDeduction)}</div>
+            <div className="text-gray-500 text-sm mt-1">Giảm trừ mỗi người phụ thuộc / tháng</div>
+            <div className="text-xs mt-1">
+              {dependentChanged
+                ? <Tag color="gold">{POLICY_LABEL}</Tag>
+                : <span className="text-gray-400">Điều 1 Nghị quyết 954/2020</span>
+              }
+            </div>
+          </Card>
+        </Col>
+      </Row>
+      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+        <strong>Lưu ý:</strong> Hệ thống đang tính thuế với <strong>0 người phụ thuộc</strong>.
+        Để áp dụng giảm trừ gia cảnh, HR cần cập nhật thông tin người phụ thuộc cho từng nhân viên.
+      </div>
+    </Card>
+  )
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────
+
+const PayrollMethodology = () => {
+  const dispatch = useAppDispatch()
+  const cfg = useAppSelector(selectPayrollCalcSettings)
+
+  useEffect(() => {
+    dispatch(fetchPayrollCalcSettings())
+  }, [dispatch])
+
+  if (!cfg) {
+    return (
+      <div className="p-4 bg-gray-50 min-h-screen">
+        <Skeleton active paragraph={{ rows: 10 }} />
+      </div>
+    )
+  }
+
+  return (
+    <div className="p-4 bg-gray-50 min-h-screen">
+      <div className="mb-5">
+        <Title level={2} className="!mb-1">
+          <BookOutlined className="mr-2 text-blue-500" />
+          Quy tắc Tính Lương & Cơ sở Pháp lý
+        </Title>
+        <Paragraph className="text-gray-500 mb-0">
+          Mô tả toàn bộ quy trình tính lương đang áp dụng trong hệ thống, kèm căn cứ pháp lý từ các văn bản hiện hành của Việt Nam.
+        </Paragraph>
+      </div>
+
+      <Tabs
+        defaultActiveKey="1"
+        size="large"
+        tabBarStyle={{ marginBottom: 16 }}
+        items={[
+          {
+            key: "1",
+            label: <span><CalculatorOutlined className="mr-1" />Quy trình tính lương</span>,
+            children: <TabQuyTrinh cfg={cfg} />,
+          },
+          {
+            key: "2",
+            label: <span><SafetyCertificateOutlined className="mr-1 text-orange-500" />Thuế TNCN</span>,
+            children: <TabThueTNCN />,
+          },
+          {
+            key: "3",
+            label: <span><SafetyCertificateOutlined className="mr-1 text-red-500" />Bảo hiểm</span>,
+            children: <TabBaoHiem cfg={cfg} />,
+          },
+          {
+            key: "4",
+            label: <span><CalculatorOutlined className="mr-1 text-green-500" />Lương OT</span>,
+            children: <TabLuongOT cfg={cfg} />,
+          },
+          {
+            key: "5",
+            label: <span><FileTextOutlined className="mr-1 text-purple-500" />Giảm trừ gia cảnh</span>,
+            children: <TabGiamTru cfg={cfg} />,
+          },
+        ]}
+      />
     </div>
-  </Card>
-)
-
-const TabLuongOT = () => (
-  <Card className="border-0 shadow-none">
-    <Alert type="success" showIcon className="mb-4"
-      message="Căn cứ pháp lý: Điều 98 – Bộ Luật Lao động số 45/2019/QH14, có hiệu lực từ 01/01/2021." />
-    <Table size="small" dataSource={otRates} columns={otColumns} pagination={false} rowKey="loai" />
-    <div className="mt-3 text-xs text-gray-400">
-      * Công thức: Lương giờ OT = (Lương CB ÷ Số ngày phân ca ÷ 8 giờ) × Số giờ × Hệ số.
-    </div>
-  </Card>
-)
-
-const TabGiamTru = () => (
-  <Card className="border-0 shadow-none">
-    <Alert type="info" showIcon className="mb-4"
-      message="Căn cứ pháp lý: Nghị quyết số 954/2020/UBTVQH14, có hiệu lực từ 01/07/2020." />
-    <Row gutter={16} className="mb-4">
-      <Col xs={24} sm={12}>
-        <Card size="small" className="bg-purple-50 border-purple-200 text-center">
-          <div className="text-purple-600 font-bold text-2xl">11,000,000 đ</div>
-          <div className="text-gray-500 text-sm mt-1">Giảm trừ bản thân / tháng</div>
-          <div className="text-xs text-gray-400 mt-1">Điều 1 Nghị quyết 954/2020</div>
-        </Card>
-      </Col>
-      <Col xs={24} sm={12}>
-        <Card size="small" className="bg-blue-50 border-blue-200 text-center">
-          <div className="text-blue-600 font-bold text-2xl">4,400,000 đ</div>
-          <div className="text-gray-500 text-sm mt-1">Giảm trừ mỗi người phụ thuộc / tháng</div>
-          <div className="text-xs text-gray-400 mt-1">Điều 1 Nghị quyết 954/2020</div>
-        </Card>
-      </Col>
-    </Row>
-    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-      <strong>Lưu ý:</strong> Hệ thống đang tính thuế với <strong>0 người phụ thuộc</strong>.
-      Để áp dụng giảm trừ gia cảnh, HR cần cập nhật thông tin người phụ thuộc cho từng nhân viên.
-    </div>
-  </Card>
-)
-
-// ── MAIN ─────────────────────────────────────────────────────────
-
-const PayrollMethodology = () => (
-  <div className="p-4 bg-gray-50 min-h-screen">
-    <div className="mb-5">
-      <Title level={2} className="mb-1">
-        <BookOutlined className="mr-2 text-blue-500" />
-        Quy tắc Tính Lương & Cơ sở Pháp lý
-      </Title>
-      <Paragraph className="text-gray-500 mb-0">
-        Mô tả toàn bộ quy trình tính lương đang áp dụng trong hệ thống, kèm căn cứ pháp lý từ các văn bản hiện hành của Việt Nam.
-      </Paragraph>
-    </div>
-
-    <Tabs
-      defaultActiveKey="1"
-      size="large"
-      tabBarStyle={{ marginBottom: 16 }}
-      items={[
-        {
-          key: "1",
-          label: <span><CalculatorOutlined className="mr-1" />Quy trình tính lương</span>,
-          children: <TabQuyTrinh />,
-        },
-        {
-          key: "2",
-          label: <span><SafetyCertificateOutlined className="mr-1 text-orange-500" />Thuế TNCN</span>,
-          children: <TabThueTNCN />,
-        },
-        {
-          key: "3",
-          label: <span><SafetyCertificateOutlined className="mr-1 text-red-500" />Bảo hiểm</span>,
-          children: <TabBaoHiem />,
-        },
-        {
-          key: "4",
-          label: <span><CalculatorOutlined className="mr-1 text-green-500" />Lương OT</span>,
-          children: <TabLuongOT />,
-        },
-        {
-          key: "5",
-          label: <span><FileTextOutlined className="mr-1 text-purple-500" />Giảm trừ gia cảnh</span>,
-          children: <TabGiamTru />,
-        },
-      ]}
-    />
-  </div>
-)
+  )
+}
 
 export default PayrollMethodology

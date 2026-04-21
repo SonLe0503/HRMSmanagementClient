@@ -238,6 +238,78 @@ const PayrollCalculationSettingsCard = ({ form, loading, onFinish, onRefresh }: 
                     message="Biểu thuế lũy tiến 7 bậc (5%–35%) được cố định trong code theo luật hiện hành. Chỉ giảm trừ bản thân và người phụ thuộc được cấu hình tại đây."
                 />
 
+                {/* ── Hệ số lương tăng ca (OT) ── */}
+                <Divider className="text-sm font-semibold text-slate-600">
+                    Hệ số lương tăng ca (OT)
+                </Divider>
+
+                <div className="bg-slate-50 rounded-lg px-4 py-3 mb-4 text-xs text-gray-500">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="text-gray-400">
+                                <th className="text-left font-medium pb-1">Loại ngày tăng ca</th>
+                                <th className="text-left font-medium pb-1">Căn cứ pháp lý</th>
+                            </tr>
+                        </thead>
+                        <tbody className="space-y-1">
+                            <tr><td>Ngày làm việc thường</td><td className="text-gray-400">Điều 98.1a – BLLĐ 2019</td></tr>
+                            <tr><td>Ngày nghỉ hàng tuần (Thứ 7 & Chủ Nhật)</td><td className="text-gray-400">Điều 98.1b – BLLĐ 2019</td></tr>
+                            <tr><td>Ngày lễ, Tết</td><td className="text-gray-400">Điều 98.1c – BLLĐ 2019</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <Row gutter={16}>
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            name="otWeekdayMultiplier"
+                            label={
+                                <Space>
+                                    Ngày thường (×)
+                                    <Tooltip title="Điều 98.1a – BLLĐ 2019. Mặc định: 1.5">
+                                        <QuestionCircleOutlined className="text-gray-400" />
+                                    </Tooltip>
+                                </Space>
+                            }
+                            rules={[{ required: true }, { type: "number", min: 0.01 }]}
+                        >
+                            <InputNumber min={0.01} step={0.1} precision={2} addonBefore="×" style={{ width: "100%" }} />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            name="otWeekendMultiplier"
+                            label={
+                                <Space>
+                                    Thứ 7 & Chủ Nhật (×)
+                                    <Tooltip title="Điều 98.1b – BLLĐ 2019. Mặc định: 2.0">
+                                        <QuestionCircleOutlined className="text-gray-400" />
+                                    </Tooltip>
+                                </Space>
+                            }
+                            rules={[{ required: true }, { type: "number", min: 0.01 }]}
+                        >
+                            <InputNumber min={0.01} step={0.1} precision={2} addonBefore="×" style={{ width: "100%" }} />
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                        <Form.Item
+                            name="otHolidayMultiplier"
+                            label={
+                                <Space>
+                                    Ngày lễ, Tết (×)
+                                    <Tooltip title="Điều 98.1c – BLLĐ 2019. Mặc định: 3.0">
+                                        <QuestionCircleOutlined className="text-gray-400" />
+                                    </Tooltip>
+                                </Space>
+                            }
+                            rules={[{ required: true }, { type: "number", min: 0.01 }]}
+                        >
+                            <InputNumber min={0.01} step={0.1} precision={2} addonBefore="×" style={{ width: "100%" }} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
                 <Form.Item className="mb-0">
                     <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={loading}>
                         Lưu cấu hình
