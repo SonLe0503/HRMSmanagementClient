@@ -116,6 +116,24 @@ export const fetchAllCycles = createAsyncThunk(
   }
 );
 
+export const fetchActiveAndCompletedCycles = createAsyncThunk(
+  "evaluationCycle/fetchActiveAndCompleted",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      const response = await request({
+        url: "/evaluationcycle/active-and-completed",
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
 export const fetchActiveCycles = createAsyncThunk(
   "evaluationCycle/fetchActive",
   async (_, { rejectWithValue, getState }) => {
@@ -268,6 +286,30 @@ export const evaluationCycleSlice = createSlice({
         state.cycles = action.payload;
       })
       .addCase(fetchAllCycles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchActiveCycles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchActiveCycles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cycles = action.payload;
+      })
+      .addCase(fetchActiveCycles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchActiveAndCompletedCycles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchActiveAndCompletedCycles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cycles = action.payload;
+      })
+      .addCase(fetchActiveAndCompletedCycles.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

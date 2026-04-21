@@ -2,7 +2,7 @@ import { UserOutlined, PlusOutlined, CalendarOutlined, EditOutlined, DeleteOutli
 import { Table, Button, Card, Space, Select, DatePicker, Typography, Tag, Avatar, Popconfirm, message, Tooltip } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchShiftAssignments, selectAssignments, selectShiftAssignmentLoading, deactivateShiftAssignment, activateShiftAssignment, deleteShiftAssignment, type IShiftAssignment } from "../../../store/shiftAssignmentSlide";
-import { selectEmployees, fetchAllEmployees } from "../../../store/employeeSlide";
+import { selectEmployees, fetchActiveEmployees } from "../../../store/employeeSlide";
 import AssignShiftModal from "./modal/AssignShiftModal";
 import EditAssignmentModal from "./modal/EditAssignmentModal";
 import dayjs from "dayjs";
@@ -24,7 +24,7 @@ const ManageShiftAssignment = () => {
     const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
     useEffect(() => {
-        dispatch(fetchAllEmployees());
+        dispatch(fetchActiveEmployees());
     }, [dispatch]);
 
     useEffect(() => {

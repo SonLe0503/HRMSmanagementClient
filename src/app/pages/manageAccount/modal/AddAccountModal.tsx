@@ -96,11 +96,11 @@ const AddAccountModal = ({ open, onCancel, onSuccess }: AddAccountModalProps) =>
                 </Form.Item>
 
                 <Form.Item
-                    name="roleIds"
-                    label="Roles"
-                    rules={[{ required: true, message: "Please select at least one role!" }]}
+                    name="roleId"
+                    label="Role"
+                    rules={[{ required: true, message: "Please select a role!" }]}
                 >
-                    <Select mode="multiple" placeholder="Select roles">
+                    <Select placeholder="Select a role">
                         {roles.map((role) => (
                             <Select.Option key={role.roleId} value={role.roleId}>
                                 {role.roleName}

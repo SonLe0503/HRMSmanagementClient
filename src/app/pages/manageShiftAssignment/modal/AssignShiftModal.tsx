@@ -2,7 +2,7 @@ import { Modal, Form, Select, DatePicker, message, Checkbox, InputNumber } from 
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { assignShift, fetchShiftAssignments, type AssignShiftDto } from "../../../../store/shiftAssignmentSlide";
 import { selectShifts, fetchAllShifts } from "../../../../store/shiftSlide";
-import { selectEmployees, fetchAllEmployees } from "../../../../store/employeeSlide";
+import { selectEmployees, fetchActiveEmployees } from "../../../../store/employeeSlide";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
@@ -35,7 +35,7 @@ const AssignShiftModal = ({ open, onCancel, initialDate, initialEmployeeId }: As
     useEffect(() => {
         if (open) {
             dispatch(fetchAllShifts(true));
-            dispatch(fetchAllEmployees());
+            dispatch(fetchActiveEmployees());
             
             form.setFieldsValue({
                 employeeId: initialEmployeeId,

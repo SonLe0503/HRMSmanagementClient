@@ -4,7 +4,7 @@ import { UserAddOutlined, RobotOutlined, DeploymentUnitOutlined } from "@ant-des
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { fetchActiveCycles, selectCycles } from "../../../store/evaluationCycleSlide";
 import { fetchActiveTemplates, selectTemplates } from "../../../store/evaluationTemplateSlide";
-import { fetchAllEmployees, selectEmployees } from "../../../store/employeeSlide";
+import { fetchActiveEmployees, selectEmployees } from "../../../store/employeeSlide";
 import {
     fetchAssignmentPreview,
     selectAssignmentPreview,
@@ -33,7 +33,7 @@ const EvaluatorAssignments = () => {
     useEffect(() => {
         dispatch(fetchActiveCycles());
         dispatch(fetchActiveTemplates());
-        dispatch(fetchAllEmployees());
+        dispatch(fetchActiveEmployees());
     }, [dispatch]);
 
     const handleFetchPreview = () => {
@@ -104,9 +104,9 @@ const EvaluatorAssignments = () => {
             width: 100,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="Phân công thủ công">
+                    <Tooltip title={record.isAssigned ? "Đã phân công" : "Phân công thủ công"}>
                         <Button
-                            disabled={!selectedTemplateId}
+                            disabled={!selectedTemplateId || record.isAssigned}
                             size="small"
                             icon={<UserAddOutlined />}
                             onClick={() => {
@@ -136,7 +136,11 @@ const EvaluatorAssignments = () => {
                         <Select
                             style={{ width: "100%", marginTop: 8 }}
                             placeholder="Chọn đợt đánh giá"
-                            onChange={(val) => setSelectedCycleId(val)}
+                            onChange={(val) => {
+                                setSelectedCycleId(val);
+                                dispatch(fetchAssignmentPreview(val));
+                            }}
+                            value={selectedCycleId || undefined}
                         >
                             {(cycles || []).map(c => (
                                 <Select.Option key={c.cycleId} value={c.cycleId}>{c.cycleName}</Select.Option>

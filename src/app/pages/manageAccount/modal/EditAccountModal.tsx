@@ -33,7 +33,7 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
 
             form.setFieldsValue({
                 ...editingUser,
-                roleIds: roleIds,
+                roleId: roleIds.length > 0 ? roleIds[0] : undefined,
             });
         }
     }, [open, editingUser, roles, form]);
@@ -112,10 +112,10 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
 
                 <Form.Item
                     name="roleIds"
-                    label="Roles"
-                    rules={[{ required: true, message: "Please select at least one role!" }]}
+                    label="Role"
+                    rules={[{ required: true, message: "Please select a role!" }]}
                 >
-                    <Select mode="multiple" placeholder="Select roles">
+                    <Select placeholder="Select a role">
                         {roles.map((role) => (
                             <Select.Option key={role.roleId} value={role.roleId}>
                                 {role.roleName}
