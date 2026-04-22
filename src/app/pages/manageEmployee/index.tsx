@@ -32,8 +32,14 @@ const ManageEmployee = () => {
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState<string | null>(null);
     const [genderFilter, setGenderFilter] = useState<string | null>(null);
+    const [departmentFilter, setDepartmentFilter] = useState<string | null>(null);
+    const [phoneSearch, setPhoneSearch] = useState("");
 
     useEffect(() => { dispatch(fetchAllEmployees()); }, [dispatch]);
+
+    const departmentOptions = Array.from(
+        new Set(employees.map(e => e.departmentName).filter(Boolean))
+    ).sort().map(d => ({ label: d, value: d }));
 
     const handleEdit = (record: IEmployeeList) => {
         navigate(URL.EditEmployee.replace(":id", record.employeeId.toString()));
@@ -58,7 +64,9 @@ const ManageEmployee = () => {
             e.email.toLowerCase().includes(q);
         const matchStatus = statusFilter ? e.employmentStatus === statusFilter : true;
         const matchGender = genderFilter ? e.gender === genderFilter : true;
-        return matchSearch && matchStatus && matchGender;
+        const matchDepartment = departmentFilter ? e.departmentName === departmentFilter : true;
+        const matchPhone = phoneSearch ? (e.phone ?? "").toLowerCase().includes(phoneSearch.toLowerCase()) : true;
+        return matchSearch && matchStatus && matchGender && matchDepartment && matchPhone;
     });
 
     const columns = [
@@ -127,6 +135,9 @@ const ManageEmployee = () => {
                     searchText={searchText} setSearchText={setSearchText}
                     statusFilter={statusFilter} setStatusFilter={setStatusFilter}
                     genderFilter={genderFilter} setGenderFilter={setGenderFilter}
+                    departmentFilter={departmentFilter} setDepartmentFilter={setDepartmentFilter}
+                    phoneSearch={phoneSearch} setPhoneSearch={setPhoneSearch}
+                    departmentOptions={departmentOptions}
                 />
                 <Table
                     columns={columns} dataSource={filtered} rowKey={(record) => record.employeeId || (record as any).id}

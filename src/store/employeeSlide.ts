@@ -14,6 +14,7 @@ export interface IEmployeeList {
     employmentStatus: string;
     departmentName: string;
     positionName: string;
+    managerId: number | null;
     managerName: string | null;
     departmentId?: number;
     roleName?: string;
