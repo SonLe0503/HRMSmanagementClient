@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Form, Button, InputNumber, Space, Alert, Row, Col, Divider } from "antd";
+import { Card, Form, Button, InputNumber, Space, Alert, Row, Col, Divider, Slider } from "antd";
 import { ReloadOutlined, SaveOutlined, EnvironmentOutlined, AimOutlined } from "@ant-design/icons";
 
 interface LocationConfigurationCardProps {
@@ -69,10 +69,34 @@ const LocationConfigurationCard: React.FC<LocationConfigurationCardProps> = ({
                 <Form.Item
                     label="Bán kính cho phép (Mét)"
                     name="attendanceAllowedRadius"
-                    tooltip="Nhân viên phải đứng trong vòng tròn có bán kính này để được phép điểm danh."
-                    rules={[{ required: true, message: 'Vui lòng nhập bán kính' }]}
+                    tooltip="Nhân viên phải đứng trong vòng tròn có bán kính này để được phép điểm danh. Cho phép từ 10m đến 200m."
+                    rules={[
+                        { required: true, message: 'Vui lòng nhập bán kính' },
+                        {
+                            type: 'number',
+                            min: 10,
+                            message: 'Bán kính tối thiểu là 10 mét',
+                        },
+                        {
+                            type: 'number',
+                            max: 200,
+                            message: 'Bán kính tối đa là 200 mét',
+                        },
+                    ]}
                 >
-                    <InputNumber style={{ width: '100%' }} min={1} max={10000} />
+                    <Slider
+                        min={10}
+                        max={200}
+                        step={10}
+                        marks={{
+                            10: '10m',
+                            50: '50m',
+                            100: '100m',
+                            150: '150m',
+                            200: '200m',
+                        }}
+                        tooltip={{ formatter: (v) => `${v} mét` }}
+                    />
                 </Form.Item>
 
                 <Divider />
