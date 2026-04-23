@@ -32,7 +32,7 @@ const DefaultFallbackApprovalCard: React.FC<DefaultFallbackApprovalCardProps> = 
                 description="Dùng cho các trường hợp nhân viên bình thường nhưng chưa được gán ManagerId."
                 type="info"
                 showIcon
-                className="mb-6"
+                className="!mb-6"
             />
 
             <Form

@@ -69,7 +69,7 @@ const ApprovalAnalysisTable: React.FC<ApprovalAnalysisTableProps> = ({
                 description="Báo cáo này giúp bạn kiểm tra xem mỗi nhân viên sẽ gửi đơn cho ai. Hãy chú ý các trường hợp 'DefaultFallback' hoặc 'SystemAdminFallback' - đây là những nhân viên chưa có sếp trực tiếp."
                 type="info"
                 showIcon
-                className="mb-6"
+                className="!mb-6"
             />
             <Table
                 dataSource={data}

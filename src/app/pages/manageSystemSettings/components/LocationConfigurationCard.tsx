@@ -37,7 +37,7 @@ const LocationConfigurationCard: React.FC<LocationConfigurationCardProps> = ({
                 description="Cấu hình phương thức xác minh khi nhân viên Check-in/Check-out. Có thể dùng GPS, IP mạng văn phòng, hoặc cho phép cả hai."
                 type="info"
                 showIcon
-                className="mb-6"
+                className="!mb-6"
             />
 
             <Form

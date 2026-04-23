@@ -1,5 +1,6 @@
-import { Card, Form, Select, DatePicker, Input, Button, InputNumber, Modal, message } from "antd";
-import { useEffect, useState } from "react";
+import { Card, Form, Select, DatePicker, Input, Button, InputNumber, Modal, message, AutoComplete } from "antd";
+import { useEffect, useState, useMemo } from "react";
+import { SUGGESTIONS_LEAVE_REASON } from "../../../../constants/explanationTemplates";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { 
     createLeaveRequest, 
@@ -34,6 +35,14 @@ const LeaveRequestForm = () => {
     const myRequests = useAppSelector(selectMyLeaveRequests);
     const [submitAnywayModal, setSubmitAnywayModal] = useState(false);
     const [formData, setFormData] = useState<any>(null);
+
+    const reasonValue: string = Form.useWatch("reason", form) ?? "";
+    const reasonOptions = useMemo(() =>
+        SUGGESTIONS_LEAVE_REASON
+            .filter(s => !reasonValue.trim() || s.toLowerCase().includes(reasonValue.toLowerCase()))
+            .map(s => ({ value: s, label: s })),
+        [reasonValue]
+    );
 
     useEffect(() => {
         dispatch(fetchActiveLeaveTypes());
@@ -175,7 +184,9 @@ const LeaveRequestForm = () => {
                 </Form.Item>
 
                 <Form.Item name="reason" label="Lý do" rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}>
-                    <TextArea rows={4} placeholder="Mô tả lý do nghỉ phép..." className="rounded-lg" />
+                    <AutoComplete options={reasonOptions} style={{ width: "100%" }} popupMatchSelectWidth>
+                        <TextArea rows={4} placeholder="Nhập lý do hoặc chọn gợi ý từ danh sách..." className="rounded-lg" showCount maxLength={500} />
+                    </AutoComplete>
                 </Form.Item>
 
                 <Button type="primary" htmlType="submit" block loading={loading} className="h-12 text-md font-bold rounded-xl mt-4 shadow-blue-200 shadow-lg">
