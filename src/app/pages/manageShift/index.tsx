@@ -147,7 +147,7 @@ const ManageShift = () => {
     ];
 
     return (
-        <div className="p-4 bg-gray-50/50 min-h-full">
+        <div className="p-2 bg-gray-50/50 min-h-full">
             <Card
                 className="shadow-sm border-0 rounded-xl overflow-hidden"
                 title={

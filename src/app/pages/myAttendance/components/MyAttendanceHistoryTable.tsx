@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Table, Button, Space, Select, Card, Tag, Tooltip, Modal, Input, message, Form, Alert, Typography, Row, Col, Statistic, Divider } from "antd";
+import { Table, Button, Space, Select, Card, Tag, Tooltip, message, Form, Alert, Typography, Row, Col, Statistic, Divider } from "antd";
 import {
     SearchOutlined, ReloadOutlined, ExclamationCircleOutlined,
     EditOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined, WarningOutlined,
@@ -12,6 +12,7 @@ import {
 } from "../../../../store/attendanceSlide";
 import { fetchPayrollSettings, selectPayrollSettings } from "../../../../store/systemSettingSlide";
 import dayjs from "dayjs";
+import ExplanationModal from "../modal/ExplanationModal";
 
 const { Text } = Typography;
 
@@ -382,31 +383,14 @@ const MyAttendanceHistoryTable = () => {
             />
 
             {/* ── Modal giải trình ── */}
-            <Modal
-                title={<Space><ExclamationCircleOutlined style={{ color: "#fa8c16" }} /><span>Phiếu giải trình chấm công</span></Space>}
+            <ExplanationModal
                 open={modalOpen}
+                loading={loading}
+                selectedRecord={selectedRecord}
+                form={form}
                 onOk={handleSubmitExplanation}
                 onCancel={() => setModalOpen(false)}
-                okText="Gửi giải trình"
-                cancelText="Hủy"
-                confirmLoading={loading}
-                destroyOnHidden
-            >
-                {selectedRecord && (
-                    <Alert type="info" showIcon className="mb-4"
-                        message={`Ngày: ${dayjs(selectedRecord.attendanceDate).format("DD/MM/YYYY")} — Trạng thái: ${selectedRecord.status}`}
-                        description="Giờ công đang bị tạm khóa. Hãy nhập lý do để Quản lý xem xét."
-                    />
-                )}
-                {selectedRecord?.explanationStatus === "Rejected" && selectedRecord.explanationResponse && (
-                    <Alert type="error" showIcon className="mb-4" message={`Phiếu bị từ chối: "${selectedRecord.explanationResponse}"`} />
-                )}
-                <Form form={form} layout="vertical">
-                    <Form.Item name="message" label="Lý do giải trình" rules={[{ required: true, message: "Vui lòng nhập lý do!" }]}>
-                        <Input.TextArea rows={4} placeholder="Ví dụ: Tôi làm việc tại văn phòng đối tác, quên check-out do họp khẩn..." />
-                    </Form.Item>
-                </Form>
-            </Modal>
+            />
         </Card>
     );
 };

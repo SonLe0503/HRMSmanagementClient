@@ -1,7 +1,8 @@
-import { Button, Form, Input, DatePicker, TimePicker, message, Card, Typography, Radio, Row, Col, Alert } from "antd";
+import { Button, Form, Input, DatePicker, TimePicker, message, Card, Typography, Radio, Row, Col, Alert, AutoComplete } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { createOvertimeRequest, selectOvertimeLoading, fetchMyOvertimeRequests } from "../../../../store/overtimeSlide";
 import { fetchMySchedule, selectMySchedule } from "../../../../store/shiftAssignmentSlide";
+import { SUGGESTIONS_OVERTIME_REASON } from "../../../../constants/explanationTemplates";
 import dayjs from "dayjs";
 import { useEffect, useMemo } from "react";
 
@@ -17,6 +18,14 @@ const OvertimeRequestForm = () => {
     // Watch values in form
     const overtimeDate = Form.useWatch("overtimeDate", form);
     const otMode = Form.useWatch("otMode", form);
+
+    const reasonValue: string = Form.useWatch("reason", form) ?? "";
+    const reasonOptions = useMemo(() =>
+        SUGGESTIONS_OVERTIME_REASON
+            .filter(s => !reasonValue.trim() || s.toLowerCase().includes(reasonValue.toLowerCase()))
+            .map(s => ({ value: s, label: s })),
+        [reasonValue]
+    );
 
     // Check if the selected date has an active shift assignment
     const selectedDateShift = useMemo(() => {
@@ -312,7 +321,9 @@ const OvertimeRequestForm = () => {
                 )}
 
                 <Form.Item name="reason" label={<Text strong>Lý do tăng ca</Text>} rules={[{ required: true, message: "Vui lòng nhập lý do!" }]}>
-                    <TextArea rows={3} placeholder="Ví dụ: Hoàn thành báo cáo tháng..." className="rounded-lg" />
+                    <AutoComplete options={reasonOptions} style={{ width: "100%" }} popupMatchSelectWidth>
+                        <TextArea rows={3} placeholder="Nhập lý do hoặc chọn gợi ý từ danh sách..." className="rounded-lg" showCount maxLength={500} />
+                    </AutoComplete>
                 </Form.Item>
 
                 <Form.Item name="taskDescription" label={<Text strong>Nội dung công việc</Text>}>

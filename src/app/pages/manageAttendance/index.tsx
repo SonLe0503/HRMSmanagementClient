@@ -42,10 +42,15 @@ const ManageAttendance = () => {
                                 <span>
                                     <ExclamationCircleOutlined />
                                     Giải trình chờ duyệt
+                                    <span
+                                        style={{
+                                            marginLeft: 8,
+                                        }}
+                                    >
+                                    </span>
                                     {pendingCount > 0 && (
                                         <span
                                             style={{
-                                                marginLeft: 8,
                                                 background: "#fa8c16",
                                                 color: "#fff",
                                                 borderRadius: 10,

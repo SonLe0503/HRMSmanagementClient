@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Space, DatePicker, Select, Tag, Card, Tooltip } from "antd";
-import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { Table, Button, Space, DatePicker, Select, Tag, Card, Tooltip, message } from "antd";
+import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined, ExclamationCircleOutlined, ReloadOutlined, TeamOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { searchAttendance, selectAdminAttendance, selectAttendanceLoading, lockAttendance, unlockAttendance } from "../../../../store/attendanceSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
+import { selectInfoLogin } from "../../../../store/authSlide";
+import { EUserRole } from "../../../../interface/app";
 import dayjs from "dayjs";
 import AttendanceDetailModal from "../modal/AttendanceDetailModal";
 import ManualAdjustModal from "../modal/ManualAdjustModal";
@@ -16,12 +18,26 @@ const AttendanceTable = () => {
     const dispatch = useAppDispatch();
     const records = useAppSelector(selectAdminAttendance);
     const loading = useAppSelector(selectAttendanceLoading);
-    const employees = useAppSelector(selectEmployees);
+    const allEmployees = useAppSelector(selectEmployees);
+    const infoLogin = useAppSelector(selectInfoLogin);
+
+    const employees = infoLogin?.role === EUserRole.MANAGE
+        ? allEmployees.filter(e => e.managerId === infoLogin.employeeId)
+        : allEmployees;
+
+    const allowedEmployeeIds = infoLogin?.role === EUserRole.MANAGE
+        ? new Set(employees.map(e => e.employeeId))
+        : null;
+
+    const managerProfile = infoLogin?.role === EUserRole.MANAGE
+        ? allEmployees.find(e => e.employeeId === infoLogin.employeeId)
+        : null;
 
     const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([dayjs().startOf('month'), dayjs()]);
     const [selectedEmployee, setSelectedEmployee] = useState<number | undefined>(undefined);
     const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-    
+    const [refreshing, setRefreshing] = useState(false);
+
     // Modals config
     const [detailModal, setDetailModal] = useState({ open: false, employeeId: 0, employeeName: "", date: "" });
     const [adjustModal, setAdjustModal] = useState({ open: false, record: null as any });
@@ -42,6 +58,25 @@ const AttendanceTable = () => {
         }));
     };
 
+    const handleRefresh = async () => {
+        const defaultFrom = dayjs().startOf('month');
+        const defaultTo = dayjs();
+        setDateRange([defaultFrom, defaultTo]);
+        setSelectedEmployee(undefined);
+        setStatusFilter(undefined);
+        setRefreshing(true);
+        await Promise.all([
+            dispatch(fetchAllEmployees()),
+            dispatch(searchAttendance({
+                fromDate: defaultFrom.format("YYYY-MM-DD"),
+                toDate: defaultTo.format("YYYY-MM-DD"),
+                employeeId: undefined,
+                status: undefined
+            }))
+        ]);
+        setRefreshing(false);
+    };
+
     const handleToday = () => {
         setDateRange([dayjs(), dayjs()]);
         dispatch(searchAttendance({
@@ -53,10 +88,16 @@ const AttendanceTable = () => {
     };
 
     const handleToggleLock = async (record: any) => {
-        if (record.isLocked) {
-            await dispatch(unlockAttendance(record.attendanceId));
-        } else {
-            await dispatch(lockAttendance(record.attendanceId));
+        try {
+            if (record.isLocked) {
+                await dispatch(unlockAttendance(record.attendanceId)).unwrap();
+                message.success("Đã mở khóa bản ghi chấm công.");
+            } else {
+                await dispatch(lockAttendance(record.attendanceId)).unwrap();
+                message.success("Đã khóa bản ghi chấm công.");
+            }
+        } catch (err: any) {
+            message.error(typeof err === "string" ? err : "Thao tác thất bại.");
         }
     };
 
@@ -144,16 +185,20 @@ const AttendanceTable = () => {
             key: "isLocked",
             width: 65,
             align: 'center' as const,
-            render: (locked: boolean, record: any) => (
-                <Tooltip title={locked ? "Bản ghi đã khóa (Click để mở)" : "Bản ghi đang mở (Click để khóa)"}>
-                    <Button 
-                        type="text" 
-                        danger={locked}
-                        icon={locked ? <LockOutlined /> : <UnlockOutlined />} 
-                        onClick={() => handleToggleLock(record)}
-                    />
-                </Tooltip>
-            )
+            render: (locked: boolean, record: any) => {
+                const isVirtual = !record.attendanceId || record.attendanceId === 0;
+                if (isVirtual) return <Tooltip title="Bản ghi ảo, không thể khóa">—</Tooltip>;
+                return (
+                    <Tooltip title={locked ? "Bản ghi đã khóa (Click để mở)" : "Bản ghi đang mở (Click để khóa)"}>
+                        <Button
+                            type="text"
+                            danger={locked}
+                            icon={locked ? <LockOutlined /> : <UnlockOutlined />}
+                            onClick={() => handleToggleLock(record)}
+                        />
+                    </Tooltip>
+                );
+            }
         },
         {
             title: "Thao tác",
@@ -188,6 +233,18 @@ const AttendanceTable = () => {
 
     return (
         <Card className="shadow-sm" style={{ overflow: 'hidden' }}>
+            {managerProfile && (
+                <div style={{ marginBottom: 16, padding: '10px 14px', background: '#f0f5ff', borderRadius: 6, border: '1px solid #d6e4ff', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <TeamOutlined style={{ color: '#1677ff', fontSize: 16 }} />
+                    <span style={{ fontWeight: 600, color: '#1677ff' }}>Phòng ban của bạn:</span>
+                    <Tag color="blue" style={{ margin: 0, fontSize: 13 }}>
+                        {managerProfile.departmentName || "Chưa phân công"}
+                    </Tag>
+                    <span style={{ color: '#555' }}>
+                        Đang quản lý <strong>{employees.length}</strong> nhân viên
+                    </span>
+                </div>
+            )}
             <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
                 <Space wrap style={{ rowGap: 8 }}>
                     <RangePicker
@@ -226,6 +283,9 @@ const AttendanceTable = () => {
                     <Button onClick={handleToday}>
                         Hôm nay
                     </Button>
+                    <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={refreshing}>
+                        Làm mới
+                    </Button>
                     <Button type="primary" danger icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
                         Tạo chấm công Manual
                     </Button>
@@ -234,7 +294,7 @@ const AttendanceTable = () => {
 
             <Table
                 columns={columns}
-                dataSource={records}
+                dataSource={allowedEmployeeIds ? records.filter(r => allowedEmployeeIds.has(r.employeeId)) : records}
                 loading={loading}
                 rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}-${record.employeeId}`}
                 pagination={{ pageSize: 15 }}

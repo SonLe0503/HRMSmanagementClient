@@ -51,6 +51,7 @@ const SystemSettingPage: React.FC = () => {
     const loading = useAppSelector(selectSystemSettingLoading);
     
     const [detecting, setDetecting] = useState(false);
+    const [detectingIp, setDetectingIp] = useState(false);
 
     // Initial data fetch
     useEffect(() => {
@@ -169,6 +170,27 @@ const SystemSettingPage: React.FC = () => {
         );
     };
 
+    const handleGetCurrentIp = async () => {
+        setDetectingIp(true);
+        try {
+            const res = await fetch("https://api.ipify.org?format=json");
+            const data = await res.json();
+            const currentIps = locationForm.getFieldValue("allowedIpAddresses") || "";
+            const list = currentIps.split(",").map((s: string) => s.trim()).filter(Boolean);
+            if (!list.includes(data.ip)) {
+                list.push(data.ip);
+                locationForm.setFieldsValue({ allowedIpAddresses: list.join(", ") });
+                message.info(`Đã thêm IP hiện tại: ${data.ip}`);
+            } else {
+                message.info(`IP ${data.ip} đã có trong danh sách.`);
+            }
+        } catch {
+            message.error("Không thể lấy IP hiện tại.");
+        } finally {
+            setDetectingIp(false);
+        }
+    };
+
     // Tab Items Definition
     const tabItems = [
         {
@@ -209,13 +231,15 @@ const SystemSettingPage: React.FC = () => {
                 <div className="animate-in fade-in duration-500">
                     <Row gutter={[32, 32]}>
                         <Col xs={24} lg={16}>
-                            <LocationConfigurationCard 
+                            <LocationConfigurationCard
                                 form={locationForm}
                                 loading={loading}
                                 detecting={detecting}
+                                detectingIp={detectingIp}
                                 onFinish={onLocationFinish}
                                 onRefresh={() => dispatch(fetchLocationSettings())}
                                 onDetect={handleGetCurrentLocation}
+                                onDetectIp={handleGetCurrentIp}
                             />
                         </Col>
                         <Col xs={24} lg={8}>

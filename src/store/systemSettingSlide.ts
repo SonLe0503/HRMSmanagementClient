@@ -5,6 +5,8 @@ interface LocationSettings {
     officeLatitude: number;
     officeLongitude: number;
     attendanceAllowedRadius: number;
+    checkInMethod: string;
+    allowedIpAddresses: string | null;
 }
 
 interface ApprovalSettings {

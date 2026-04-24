@@ -32,7 +32,7 @@ const TopLevelApprovalCard: React.FC<TopLevelApprovalCardProps> = ({
                 description="Dùng cho nhân sự quản lý cấp cao nhất (CEO, Manager không có sếp trực tiếp)."
                 type="info"
                 showIcon
-                className="mb-6"
+                className="!mb-6"
             />
 
             <Form

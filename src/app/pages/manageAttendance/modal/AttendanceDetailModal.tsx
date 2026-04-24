@@ -1,4 +1,4 @@
-import { Modal, Descriptions, Spin, Tag, Button, Space, Typography } from "antd";
+import { Modal, Descriptions, Spin, Tag, Button, Space, Typography, Tooltip, message } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchAttendanceDetail, selectSelectedDetail, selectAttendanceLoading, lockAttendance, unlockAttendance } from "../../../../store/attendanceSlide";
 import { useEffect, useState } from "react";
@@ -21,26 +21,36 @@ const AttendanceDetailModal = ({ open, onClose, employeeId, employeeName, date }
     const detailPayload = useAppSelector(selectSelectedDetail);
     const loading = useAppSelector(selectAttendanceLoading);
     const [logsOpen, setLogsOpen] = useState(false);
+    const [isPayrollLocked, setIsPayrollLocked] = useState(false);
 
     useEffect(() => {
         if (open && employeeId && date) {
             dispatch(fetchAttendanceDetail({ employeeId, date }));
+            setIsPayrollLocked(false);
         }
     }, [open, employeeId, date, dispatch]);
 
     const detail = detailPayload?.attendance;
 
     const handleLock = async () => {
-        if (detail?.attendanceId) {
-            await dispatch(lockAttendance(detail.attendanceId));
-            dispatch(fetchAttendanceDetail({ employeeId, date })); // Refresh if needed, though slide updates the state
+        if (!detail?.attendanceId) return;
+        try {
+            await dispatch(lockAttendance(detail.attendanceId)).unwrap();
+            message.success("Đã khóa bản ghi chấm công.");
+        } catch (err: any) {
+            message.error(typeof err === "string" ? err : "Khóa bản ghi thất bại.");
         }
     };
 
     const handleUnlock = async () => {
-        if (detail?.attendanceId) {
-            await dispatch(unlockAttendance(detail.attendanceId));
-            dispatch(fetchAttendanceDetail({ employeeId, date }));
+        if (!detail?.attendanceId) return;
+        try {
+            await dispatch(unlockAttendance(detail.attendanceId)).unwrap();
+            message.success("Đã mở khóa bản ghi chấm công.");
+        } catch (err: any) {
+            const errMsg = typeof err === "string" ? err : "Mở khóa bản ghi thất bại.";
+            message.error(errMsg);
+            if (errMsg.includes("kỳ lương")) setIsPayrollLocked(true);
         }
     };
 
@@ -72,6 +82,8 @@ const AttendanceDetailModal = ({ open, onClose, employeeId, employeeName, date }
                             {detail.status === "Late" && <Tag color="orange">Đi muộn</Tag>}
                             {detail.status === "Absent" && <Tag color="red">Vắng mặt</Tag>}
                             {detail.status === "Incomplete" && <Tag color="blue">Chưa hoàn tất</Tag>}
+                            {detail.status === "PaidLeave" && <Tag color="cyan">Nghỉ phép có lương</Tag>}
+                            {detail.status === "UnpaidLeave" && <Tag color="purple">Nghỉ phép không lương</Tag>}
                         </Descriptions.Item>
 
                         <Descriptions.Item label="Giờ Check-in">
@@ -100,7 +112,7 @@ const AttendanceDetailModal = ({ open, onClose, employeeId, employeeName, date }
                         <Descriptions.Item label="Vị trí">
                             {detail.location || "—"}
                         </Descriptions.Item>
-                        
+
                         <Descriptions.Item label="Ghi chú" span={2}>
                             {detail.remarks || "—"}
                         </Descriptions.Item>
@@ -110,18 +122,35 @@ const AttendanceDetailModal = ({ open, onClose, employeeId, employeeName, date }
                         <div>
                             <Text strong>Trạng thái khóa: </Text>
                             {detail.isLocked ? (
-                                <Tag color="red" icon={<LockOutlined />}>Đã khóa</Tag>
+                                isPayrollLocked
+                                    ? <Tag color="red" icon={<LockOutlined />}>Khóa bởi kỳ lương</Tag>
+                                    : <Tag color="red" icon={<LockOutlined />}>Đã khóa</Tag>
                             ) : (
                                 <Tag color="green" icon={<UnlockOutlined />}>Đang mở</Tag>
                             )}
-                            <br/>
-                            <Text type="secondary" className="text-xs">Bản ghi bị khóa sẽ không thể điều chỉnh được.</Text>
+                            <br />
+                            <Text type="secondary" className="text-xs">
+                                {isPayrollLocked
+                                    ? "Bản ghi thuộc kỳ lương đã phê duyệt, không thể mở khóa."
+                                    : "Bản ghi bị khóa sẽ không thể điều chỉnh được."}
+                            </Text>
                         </div>
                         <Space>
                             {detail.isLocked ? (
-                                <Button danger icon={<UnlockOutlined />} onClick={handleUnlock}>Mở khóa bản ghi</Button>
+                                <Tooltip title={isPayrollLocked ? "Bản ghi thuộc kỳ lương đã phê duyệt, không thể mở khóa" : ""}>
+                                    <Button
+                                        danger
+                                        icon={<UnlockOutlined />}
+                                        onClick={handleUnlock}
+                                        disabled={isPayrollLocked}
+                                    >
+                                        Mở khóa bản ghi
+                                    </Button>
+                                </Tooltip>
                             ) : (
-                                <Button type="primary" icon={<LockOutlined />} onClick={handleLock}>Khóa bản ghi</Button>
+                                <Button type="primary" icon={<LockOutlined />} onClick={handleLock}>
+                                    Khóa bản ghi
+                                </Button>
                             )}
                         </Space>
                     </div>

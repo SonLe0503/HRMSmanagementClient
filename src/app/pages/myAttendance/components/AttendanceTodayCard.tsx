@@ -3,6 +3,7 @@ import { Card, Button, Typography, Tag, Space, message, Row, Col, Statistic, Spi
 import { CheckCircleOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { checkIn, checkOut, fetchMyToday, selectMyToday, selectAttendanceLoading } from "../../../../store/attendanceSlide";
+import { fetchLocationSettings, selectLocationSettings } from "../../../../store/systemSettingSlide";
 import dayjs from "dayjs";
 import CameraCaptureModal from "../modal/CameraCaptureModal";
 
@@ -12,38 +13,80 @@ const AttendanceTodayCard = () => {
     const dispatch = useAppDispatch();
     const myToday = useAppSelector(selectMyToday);
     const loading = useAppSelector(selectAttendanceLoading);
-    
+    const locationSettings = useAppSelector(selectLocationSettings);
+    const checkInMethod = locationSettings?.checkInMethod ?? "Location";
+
     const [checkInOpen, setCheckInOpen] = useState(false);
     const [checkOutOpen, setCheckOutOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchMyToday());
+        dispatch(fetchLocationSettings());
     }, [dispatch]);
+
+    const getGpsCoords = (): Promise<{ latitude: number; longitude: number } | null> =>
+        new Promise((resolve) => {
+            if (!navigator.geolocation) { resolve(null); return; }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+                () => resolve(null),
+                { timeout: 10000, enableHighAccuracy: true }
+            );
+        });
+
+    const getCurrentPublicIp = async (): Promise<string | undefined> => {
+        try {
+            const res = await fetch("https://api.ipify.org?format=json");
+            const data = await res.json();
+            return data.ip;
+        } catch {
+            return undefined;
+        }
+    };
+
+    const buildLocationPayload = async () => {
+        let latitude: number | undefined;
+        let longitude: number | undefined;
+        let ipAddress: string | undefined;
+        let location: string | undefined;
+
+        if (checkInMethod === "Location") {
+            const coords = await getGpsCoords();
+            if (!coords) {
+                message.error("Hệ thống yêu cầu quyền truy cập vị trí GPS để thực hiện điểm danh. Vui lòng cấp quyền trình duyệt.");
+                return null;
+            }
+            latitude = coords.latitude;
+            longitude = coords.longitude;
+            location = `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        } else if (checkInMethod === "IP") {
+            ipAddress = await getCurrentPublicIp();
+            if (!ipAddress) {
+                message.error("Không thể xác định địa chỉ IP hiện tại.");
+                return null;
+            }
+            location = `IP: ${ipAddress}`;
+        } else {
+            // Either: try GPS optionally, always get IP
+            const [coords, ip] = await Promise.all([getGpsCoords(), getCurrentPublicIp()]);
+            latitude = coords?.latitude;
+            longitude = coords?.longitude;
+            ipAddress = ip;
+            location = coords
+                ? `GPS: ${latitude!.toFixed(6)}, ${longitude!.toFixed(6)}`
+                : `IP: ${ipAddress ?? "unknown"}`;
+        }
+
+        return { latitude, longitude, ipAddress, location };
+    };
 
     const handleCheckInCapture = async (faceImage: string) => {
         try {
-            let latitude: number | undefined = undefined;
-            let longitude: number | undefined = undefined;
-            
-            try {
-                const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { 
-                        timeout: 10000,
-                        enableHighAccuracy: true 
-                    });
-                });
-                latitude = position.coords.latitude;
-                longitude = position.coords.longitude;
-            } catch (geoError) {
-                console.error("Geolocation error:", geoError);
-                message.error("Hệ thống yêu cầu quyền truy cập vị trí GPS để thực hiện điểm danh. Vui lòng cấp quyền trình duyệt.");
-                return;
-            }
+            const payload = await buildLocationPayload();
+            if (!payload) return;
 
             await dispatch(checkIn({
-                location: `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-                latitude,
-                longitude,
+                ...payload,
                 remarks: "Check-in từ Web Face-ID",
                 faceImageBase64: faceImage,
                 deviceInfo: navigator.userAgent
@@ -58,28 +101,11 @@ const AttendanceTodayCard = () => {
 
     const handleCheckOutCapture = async (faceImage: string) => {
         try {
-            let latitude: number | undefined = undefined;
-            let longitude: number | undefined = undefined;
-
-            try {
-                const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { 
-                        timeout: 10000,
-                        enableHighAccuracy: true
-                    });
-                });
-                latitude = position.coords.latitude;
-                longitude = position.coords.longitude;
-            } catch (geoError) {
-                console.error("Geolocation error:", geoError);
-                message.error("Hệ thống yêu cầu quyền truy cập vị trí GPS để thực hiện điểm danh. Vui lòng cấp quyền trình duyệt.");
-                return;
-            }
+            const payload = await buildLocationPayload();
+            if (!payload) return;
 
             await dispatch(checkOut({
-                location: `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-                latitude,
-                longitude,
+                ...payload,
                 remarks: "Check-out từ Web Face-ID",
                 faceImageBase64: faceImage,
                 deviceInfo: navigator.userAgent

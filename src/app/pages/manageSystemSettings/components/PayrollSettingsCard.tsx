@@ -29,7 +29,7 @@ const PayrollSettingsCard: React.FC<Props> = ({ form, loading, onFinish, onRefre
             <Alert
                 type="info"
                 showIcon
-                className="mb-6"
+                className="!mb-6"
                 message="Cách tính kỳ lương"
                 description={
                     <div className="text-sm mt-1">

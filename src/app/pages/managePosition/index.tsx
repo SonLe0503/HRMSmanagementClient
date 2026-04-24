@@ -119,7 +119,7 @@ const ManagePosition = () => {
     ];
 
     return (
-        <div className="p-4">
+        <div className="p-2">
             <Card
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
