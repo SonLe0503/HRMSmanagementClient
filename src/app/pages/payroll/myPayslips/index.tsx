@@ -26,15 +26,29 @@ const MyPayslips = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!res.ok) throw new Error("Tải PDF thất bại")
+      
+      // // Lấy content-type để kiểm tra
+      // const contentType = res.headers.get("content-type")
+      // console.log("Content-Type:", contentType)
+      
       const blob = await res.blob()
+
+      
+      if (blob.size === 0) {
+        throw new Error("File PDF rỗng")
+      }
+      
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
       a.download = `PhieuLuong_Thang${month}_${year}.pdf`
+      document.body.appendChild(a)
       a.click()
+      document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
     } catch (err: any) {
       console.error(err)
+      alert(err.message || "Tải PDF thất bại")
     }
   }
 
