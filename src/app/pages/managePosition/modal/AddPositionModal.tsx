@@ -3,21 +3,12 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { createPosition, selectPositionLoading } from "../../../../store/positionSlide";
 import { useNavigate } from "react-router-dom";
+import { POSITION_SUGGESTIONS } from "../../../../constants/suggestions";
 
 interface AddPositionModalProps {
     open: boolean;
     onCancel: () => void;
 }
-
-const POSITION_SUGGESTIONS = [
-    { code: "POS_CEO", name: "Giám đốc điều hành", level: 10, isTopLevel: true },
-    { code: "POS_DEP", name: "Phó Giám đốc", level: 9, isTopLevel: true },
-    { code: "POS_CFO", name: "Kế toán trưởng", level: 8, isTopLevel: true },
-    { code: "POS_MGR", name: "Trưởng phòng", level: 7, isTopLevel: false },
-    { code: "POS_DMGR", name: "Phó Trưởng phòng", level: 6, isTopLevel: false },
-    { code: "POS_TL", name: "Trưởng nhóm", level: 5, isTopLevel: false },
-    { code: "POS_EMP", name: "Nhân viên", level: 1, isTopLevel: false },
-];
 
 const AddPositionModal = ({ open, onCancel }: AddPositionModalProps) => {
     const [form] = Form.useForm();

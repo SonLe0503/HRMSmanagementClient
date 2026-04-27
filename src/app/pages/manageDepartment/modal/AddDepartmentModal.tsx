@@ -1,4 +1,5 @@
-import { Modal, Form, Input, Select, message } from "antd";
+import { Modal, Form, Input, Select, message, AutoComplete } from "antd";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { createDepartment, selectDepartmentLoading } from "../../../../store/departmentSlide";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import { useEffect } from "react";
 import { fetchAllEmployees, selectEmployees } from "../../../../store/employeeSlide";
 import { fetchAllUsers, selectUsers } from "../../../../store/userSlide";
 import { EUserRole } from "../../../../interface/app";
+import { DEPARTMENT_SUGGESTIONS } from "../../../../constants/suggestions";
 
 interface AddDepartmentModalProps {
     open: boolean;
@@ -19,6 +21,7 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
     const loading = useAppSelector(selectDepartmentLoading);
     const employees = useAppSelector(selectEmployees);
     const users = useAppSelector(selectUsers);
+    const [nameOptions, setNameOptions] = useState<{ value: string }[]>([]);
 
     useEffect(() => {
         if (open) {
@@ -53,6 +56,13 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
         });
     };
 
+    const handleNameSearch = (text: string) => {
+        const filtered = DEPARTMENT_SUGGESTIONS.filter((s) =>
+            s.toLowerCase().includes(text.toLowerCase())
+        );
+        setNameOptions(filtered.map((s) => ({ value: s })));
+    };
+
     return (
         <Modal
             title="Thêm phòng ban mới"
@@ -71,19 +81,18 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
                 onFinish={onFinish}
             >
                 <Form.Item
-                    name="departmentCode"
-                    label="Mã phòng ban"
-                    rules={[{ required: true, message: "Vui lòng nhập mã phòng ban!" }]}
-                >
-                    <Input maxLength={20} />
-                </Form.Item>
-
-                <Form.Item
                     name="departmentName"
                     label="Tên phòng ban"
                     rules={[{ required: true, message: "Vui lòng nhập tên phòng ban!" }]}
                 >
-                    <Input maxLength={100} />
+                    <AutoComplete
+                        options={nameOptions}
+                        onSearch={handleNameSearch}
+                        onFocus={() => setNameOptions(DEPARTMENT_SUGGESTIONS.map((s) => ({ value: s })))}
+                        onBlur={() => setNameOptions([])}
+                    >
+                        <Input maxLength={100} placeholder="Nhập hoặc chọn tên phòng ban" />
+                    </AutoComplete>
                 </Form.Item>
 
                 <Form.Item
@@ -93,17 +102,19 @@ const AddDepartmentModal = ({ open, onCancel }: AddDepartmentModalProps) => {
                     <Input.TextArea maxLength={500} />
                 </Form.Item>
 
-
-
                 <Form.Item
                     name="managerId"
                     label="Quản lý"
                 >
-                    <Select allowClear placeholder="Chọn quản lý" showSearch optionFilterProp="children">
-                        {managerOptions.map(e => (
-                            <Select.Option key={e.value} value={e.value}>{e.label}</Select.Option>
-                        ))}
-                    </Select>
+                    <Select
+                        allowClear
+                        placeholder="Chọn quản lý"
+                        showSearch
+                        options={managerOptions}
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                    />
                 </Form.Item>
             </Form>
         </Modal>
