@@ -38,7 +38,7 @@ const EditPositionModal = ({ open, onCancel, positionId, initialValues }: EditPo
 
     return (
         <Modal
-            title="Edit Position"
+            title="Chỉnh sửa chức vụ"
             open={open}
             onCancel={() => {
                 form.resetFields();
@@ -54,32 +54,24 @@ const EditPositionModal = ({ open, onCancel, positionId, initialValues }: EditPo
                 onFinish={onFinish}
             >
                 <Form.Item
-                    name="positionCode"
-                    label="Position Code"
-                    rules={[{ required: true, message: "Please input the position code!" }]}
-                >
-                    <Input maxLength={20} />
-                </Form.Item>
-
-                <Form.Item
                     name="positionName"
-                    label="Position Name"
-                    rules={[{ required: true, message: "Please input the position name!" }]}
+                    label="Tên chức vụ"
+                    rules={[{ required: true, message: "Vui lòng nhập tên chức vụ!" }]}
                 >
                     <Input maxLength={100} />
                 </Form.Item>
 
                 <Form.Item
                     name="description"
-                    label="Description"
+                    label="Mô tả"
                 >
                     <Input.TextArea maxLength={500} />
                 </Form.Item>
 
                 <Form.Item
                     name="level"
-                    label="Level"
-                    rules={[{ required: true, message: "Please input the level (1-10)!" }]}
+                    label="Cấp bậc"
+                    rules={[{ required: true, message: "Vui lòng nhập cấp bậc (1-10)!" }]}
                 >
                     <InputNumber min={1} max={10} style={{ width: '100%' }} />
                 </Form.Item>
@@ -88,7 +80,7 @@ const EditPositionModal = ({ open, onCancel, positionId, initialValues }: EditPo
                     name="isTopLevel"
                     valuePropName="checked"
                 >
-                    <Checkbox>Is Top-Level Management Position</Checkbox>
+                    <Checkbox>Là chức vụ quản lý cấp cao</Checkbox>
                 </Form.Item>
             </Form>
         </Modal>

@@ -1,4 +1,5 @@
-import { Modal, Form, Input, InputNumber, message, Checkbox } from "antd";
+import { Modal, Form, Input, InputNumber, message, Checkbox, AutoComplete } from "antd";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { createPosition, selectPositionLoading } from "../../../../store/positionSlide";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +9,22 @@ interface AddPositionModalProps {
     onCancel: () => void;
 }
 
+const POSITION_SUGGESTIONS = [
+    { code: "POS_CEO", name: "Giám đốc điều hành", level: 10, isTopLevel: true },
+    { code: "POS_DEP", name: "Phó Giám đốc", level: 9, isTopLevel: true },
+    { code: "POS_CFO", name: "Kế toán trưởng", level: 8, isTopLevel: true },
+    { code: "POS_MGR", name: "Trưởng phòng", level: 7, isTopLevel: false },
+    { code: "POS_DMGR", name: "Phó Trưởng phòng", level: 6, isTopLevel: false },
+    { code: "POS_TL", name: "Trưởng nhóm", level: 5, isTopLevel: false },
+    { code: "POS_EMP", name: "Nhân viên", level: 1, isTopLevel: false },
+];
+
 const AddPositionModal = ({ open, onCancel }: AddPositionModalProps) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const loading = useAppSelector(selectPositionLoading);
+    const [nameOptions, setNameOptions] = useState<{ value: string }[]>([]);
 
     const onFinish = (values: any) => {
         dispatch(createPosition(values)).then((res: any) => {
@@ -27,6 +39,24 @@ const AddPositionModal = ({ open, onCancel }: AddPositionModalProps) => {
                 message.error(msg);
             }
         });
+    };
+
+    const handleNameSearch = (text: string) => {
+        const filtered = POSITION_SUGGESTIONS.filter((s) =>
+            s.name.toLowerCase().includes(text.toLowerCase())
+        );
+        setNameOptions(filtered.map((s) => ({ value: s.name })));
+    };
+
+    const handleNameSelect = (value: string) => {
+        const match = POSITION_SUGGESTIONS.find((s) => s.name === value);
+        if (match) {
+            form.setFieldsValue({
+                positionName: match.name,
+                level: match.level,
+                isTopLevel: match.isTopLevel,
+            });
+        }
     };
 
     return (
@@ -48,19 +78,19 @@ const AddPositionModal = ({ open, onCancel }: AddPositionModalProps) => {
                 initialValues={{ level: 1 }}
             >
                 <Form.Item
-                    name="positionCode"
-                    label="Mã chức vụ"
-                    rules={[{ required: true, message: "Vui lòng nhập mã chức vụ!" }]}
-                >
-                    <Input maxLength={20} />
-                </Form.Item>
-
-                <Form.Item
                     name="positionName"
                     label="Tên chức vụ"
                     rules={[{ required: true, message: "Vui lòng nhập tên chức vụ!" }]}
                 >
-                    <Input maxLength={100} />
+                    <AutoComplete
+                        options={nameOptions}
+                        onSearch={handleNameSearch}
+                        onSelect={handleNameSelect}
+                        onFocus={() => setNameOptions(POSITION_SUGGESTIONS.map((s) => ({ value: s.name })))}
+                        onBlur={() => setNameOptions([])}
+                    >
+                        <Input maxLength={100} placeholder="Nhập hoặc chọn tên chức vụ" />
+                    </AutoComplete>
                 </Form.Item>
 
                 <Form.Item
