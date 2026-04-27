@@ -78,14 +78,6 @@ const EditDepartmentModal = ({ open, onCancel, departmentId, initialValues }: Ed
                 onFinish={onFinish}
             >
                 <Form.Item
-                    name="departmentCode"
-                    label="Mã phòng ban"
-                    rules={[{ required: true, message: "Vui lòng nhập mã phòng ban!" }]}
-                >
-                    <Input maxLength={20} />
-                </Form.Item>
-
-                <Form.Item
                     name="departmentName"
                     label="Tên phòng ban"
                     rules={[{ required: true, message: "Vui lòng nhập tên phòng ban!" }]}
@@ -100,17 +92,19 @@ const EditDepartmentModal = ({ open, onCancel, departmentId, initialValues }: Ed
                     <Input.TextArea maxLength={500} />
                 </Form.Item>
 
-
-
                 <Form.Item
                     name="managerId"
                     label="Quản lý"
                 >
-                    <Select allowClear placeholder="Chọn quản lý" showSearch optionFilterProp="children">
-                        {managerOptions.map(e => (
-                            <Select.Option key={e.value} value={e.value}>{e.label}</Select.Option>
-                        ))}
-                    </Select>
+                    <Select
+                        allowClear
+                        placeholder="Chọn quản lý"
+                        showSearch
+                        options={managerOptions}
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                    />
                 </Form.Item>
             </Form>
         </Modal>
