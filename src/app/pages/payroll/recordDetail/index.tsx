@@ -7,6 +7,7 @@ import {
   fetchRecordById,
   calculateOneEmployee,
   generatePayslip,
+  downloadPayslipPdf,
   selectCurrentRecord,
 } from "../../../../store/payrollSlide"
 import { selectInfoLogin } from "../../../../store/authSlide"
@@ -49,7 +50,9 @@ const PayrollRecordDetail = () => {
     try {
       await dispatch(generatePayslip(record.payrollRecordId)).unwrap()
       message.success("Đã tạo phiếu lương thành công!")
-      window.open(`http://localhost:5103/api/Payroll/payslips/${record.payrollRecordId}/pdf`, "_blank")
+      const blob = await dispatch(downloadPayslipPdf(record.payrollRecordId)).unwrap()
+      const url = window.URL.createObjectURL(blob)
+      window.open(url, "_blank")
     } catch (err: any) {
       message.error(err.message || "Lỗi khi tạo phiếu lương")
     }

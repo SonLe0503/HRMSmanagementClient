@@ -330,6 +330,40 @@ export const fetchMyPayslips = createAsyncThunk(
   }
 )
 
+export const downloadPayslipPdf = createAsyncThunk(
+  "payroll/downloadPayslipPdf",
+  async (payslipId: number, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/payslips/${payslipId}/pdf`,
+        method: "GET",
+        headers: getAuthHeader(getState()),
+        responseType: "blob",
+      })
+      return res.data as Blob
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Tải PDF thất bại")
+    }
+  }
+)
+
+export const exportPayrollExcel = createAsyncThunk(
+  "payroll/exportPayrollExcel",
+  async (periodId: number, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/export/${periodId}`,
+        method: "GET",
+        headers: getAuthHeader(getState()),
+        responseType: "blob",
+      })
+      return res.data as Blob
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Xuất Excel thất bại")
+    }
+  }
+)
+
 // ─────────────────────────────────────────────────────────
 // SLICE
 // ─────────────────────────────────────────────────────────

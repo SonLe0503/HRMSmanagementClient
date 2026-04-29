@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { Table, Card, Button, Typography, Tag } from "antd"
 import { FilePdfOutlined } from "@ant-design/icons"
 import { useAppDispatch, useAppSelector } from "../../../../store"
-import { fetchMyPayslips, selectMyPayslips, selectPayrollLoading } from "../../../../store/payrollSlide"
+import { fetchMyPayslips, downloadPayslipPdf, selectMyPayslips, selectPayrollLoading } from "../../../../store/payrollSlide"
 import type { IPayslip } from "../../../../types/payroll"
 
 const { Title } = Typography
@@ -21,23 +21,8 @@ const MyPayslips = () => {
 
   const handleDownload = async (payslipId: number, month: number, year: number) => {
     try {
-      const token = currentUser?.accessToken
-      const res = await fetch(`http://localhost:5103/api/Payroll/payslips/${payslipId}/pdf`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!res.ok) throw new Error("Tải PDF thất bại")
-      
-      // // Lấy content-type để kiểm tra
-      // const contentType = res.headers.get("content-type")
-      // console.log("Content-Type:", contentType)
-      
-      const blob = await res.blob()
-
-      
-      if (blob.size === 0) {
-        throw new Error("File PDF rỗng")
-      }
-      
+      const blob = await dispatch(downloadPayslipPdf(payslipId)).unwrap()
+      if (blob.size === 0) throw new Error("File PDF rỗng")
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
@@ -47,7 +32,6 @@ const MyPayslips = () => {
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
     } catch (err: any) {
-      console.error(err)
       alert(err.message || "Tải PDF thất bại")
     }
   }

@@ -1,5 +1,5 @@
 import { Form, Input, Button, Typography, ConfigProvider } from 'antd';
-import { UserOutlined, LockOutlined, ArrowRightOutlined, GlobalOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import imghrm from '../../../assets/images/hrm.jpg';
 import { actionLogin, selectInfoLogin } from '../../../store/authSlide';
 import { useAppDispatch, useAppSelector } from '../../../store';
@@ -95,9 +95,9 @@ const LoginPage = () => {
                                 initial={{ y: -20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.3 }}
-                                className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl text-white shadow-xl shadow-indigo-200 mb-6"
+                                className="inline-flex items-center justify-center mb-6"
                             >
-                                <GlobalOutlined style={{ fontSize: '28px' }} />
+                                <img src="/logo.png" alt="PeopleCore Logo" className="w-24 h-24 object-contain" />
                             </motion.div>
                             <Title level={2} className="!m-0 !text-3xl font-black tracking-tight text-slate-900">
                                 HRMS <span className="text-indigo-600">Portal</span>

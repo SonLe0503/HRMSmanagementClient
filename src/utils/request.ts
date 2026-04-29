@@ -6,7 +6,7 @@ import axios from "axios"
 
 
 const instance = axios.create({
-  baseURL: "http://localhost:5103/api",
+  baseURL: "https://api.peoplecore.tech/api",
   headers: {
     "Content-Type": "application/json"
   }

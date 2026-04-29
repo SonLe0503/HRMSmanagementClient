@@ -17,6 +17,7 @@ import {
   calculateAllEmployees,
   approvePayrollPeriod,
   generatePayslipsForPeriod,
+  exportPayrollExcel,
   selectCurrentPeriod,
   selectPayrollRecords,
   selectPayrollLoading,
@@ -85,13 +86,7 @@ const PayrollPeriodDetail = () => {
 
   const handleExport = async () => {
     try {
-      const token = infoLogin?.accessToken
-      const res = await fetch(`http://localhost:5103/api/Payroll/export/${periodId}`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!res.ok) throw new Error("Xuất Excel thất bại")
-      const blob = await res.blob()
+      const blob = await dispatch(exportPayrollExcel(periodId)).unwrap()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
