@@ -4,6 +4,25 @@ import { DEFAULT_LAYOUT, NONE_LAYOUT } from "../constants/layout"
 import { Navigate, Route, Routes } from "react-router-dom"
 import PrivateLayout from "./PrivateLayout"
 import DefaultLayout from "./DefaultLayout"
+import { useIsMobile } from "../hooks/useIsMobile"
+import { useAppSelector } from "../store"
+import { selectInfoLogin } from "../store/authSlide"
+import { EUserRole } from "../interface/app"
+import type { JSX } from "react"
+
+// Mobile pages (lazy loaded)
+const MobileAttendance      = lazy(() => import("../app/mobile/pages/MobileAttendance"))
+const MobileLeaveRequest    = lazy(() => import("../app/mobile/pages/MobileLeaveRequest"))
+const MobileOvertimeRequest = lazy(() => import("../app/mobile/pages/MobileOvertimeRequest"))
+const MobileProfile         = lazy(() => import("../app/mobile/pages/MobileProfile"))
+
+// Renders mobile page for EMPLOYEE on small screens, desktop page otherwise
+const AdaptivePage = ({ desktop, mobile }: { desktop: JSX.Element; mobile: JSX.Element }) => {
+    const isMobile = useIsMobile()
+    const infoLogin = useAppSelector(selectInfoLogin)
+    if (isMobile && infoLogin?.role === EUserRole.EMPLOYEE) return mobile
+    return desktop
+}
 
 
 
@@ -157,7 +176,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyAttendance,
-        element: <MyAttendance />,
+        element: <AdaptivePage desktop={<MyAttendance />} mobile={<MobileAttendance />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -199,7 +218,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyLeaveRequest,
-        element: <MyLeaveRequest />,
+        element: <AdaptivePage desktop={<MyLeaveRequest />} mobile={<MobileLeaveRequest />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -217,7 +236,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyOvertimeRequest,
-        element: <MyOvertimeRequest />,
+        element: <AdaptivePage desktop={<MyOvertimeRequest />} mobile={<MobileOvertimeRequest />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -313,7 +332,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyProfile,
-        element: <MyProfile />,
+        element: <AdaptivePage desktop={<MyProfile />} mobile={<MobileProfile />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
