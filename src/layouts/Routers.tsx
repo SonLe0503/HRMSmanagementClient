@@ -11,10 +11,15 @@ import { EUserRole } from "../interface/app"
 import type { JSX } from "react"
 
 // Mobile pages (lazy loaded)
-const MobileAttendance      = lazy(() => import("../app/mobile/pages/MobileAttendance"))
-const MobileLeaveRequest    = lazy(() => import("../app/mobile/pages/MobileLeaveRequest"))
-const MobileOvertimeRequest = lazy(() => import("../app/mobile/pages/MobileOvertimeRequest"))
-const MobileProfile         = lazy(() => import("../app/mobile/pages/MobileProfile"))
+const MobileAttendance        = lazy(() => import("../app/mobile/pages/MobileAttendance"))
+const MobileLeaveRequest      = lazy(() => import("../app/mobile/pages/MobileLeaveRequest"))
+const MobileOvertimeRequest   = lazy(() => import("../app/mobile/pages/MobileOvertimeRequest"))
+const MobileProfile           = lazy(() => import("../app/mobile/pages/MobileProfile"))
+const MobileResignation       = lazy(() => import("../app/mobile/pages/MobileResignation"))
+const MobileManageTask        = lazy(() => import("../app/mobile/pages/MobileManageTask"))
+const MobilePayslips          = lazy(() => import("../app/mobile/pages/MobilePayslips"))
+const MobileEvaluationList    = lazy(() => import("../app/mobile/pages/MobileEvaluationList"))
+const MobileEvaluationResults = lazy(() => import("../app/mobile/pages/MobileEvaluationResults"))
 
 // Renders mobile page for EMPLOYEE on small screens, desktop page otherwise
 const AdaptivePage = ({ desktop, mobile }: { desktop: JSX.Element; mobile: JSX.Element }) => {
@@ -122,7 +127,7 @@ const privateResourceItem = [
 
     {
         key: URL.ManageTask,
-        element: <ManageTask />,
+        element: <AdaptivePage desktop={<ManageTask />} mobile={<MobileManageTask />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -284,7 +289,7 @@ const privateResourceItem = [
     },
     {
         key: URL.EvaluationList,
-        element: <EvaluationList />,
+        element: <AdaptivePage desktop={<EvaluationList />} mobile={<MobileEvaluationList />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -302,7 +307,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyEvaluationResults,
-        element: <MyEvaluationResults />,
+        element: <AdaptivePage desktop={<MyEvaluationResults />} mobile={<MobileEvaluationResults />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -356,7 +361,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyPayslips,
-        element: <MyPayslips />,
+        element: <AdaptivePage desktop={<MyPayslips />} mobile={<MobilePayslips />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -374,7 +379,7 @@ const privateResourceItem = [
     },
     {
         key: URL.MyResignationRequest,
-        element: <MyResignationRequest />,
+        element: <AdaptivePage desktop={<MyResignationRequest />} mobile={<MobileResignation />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
