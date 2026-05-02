@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
-import { Avatar, Skeleton, Tag, Divider, Modal } from "antd";
+import { Avatar, Skeleton, Tag } from "antd";
 import {
-    UserOutlined, MailOutlined,
-    KeyOutlined, LogoutOutlined,
+    UserOutlined, MailOutlined
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchEmployeeById, selectSelectedEmployee, selectEmployeeLoading } from "../../../../store/employeeSlide";
-import { logout, selectInfoLogin } from "../../../../store/authSlide";
-import URL from "../../../../constants/url";
+import { selectInfoLogin } from "../../../../store/authSlide";
 import { stringToColor, getInitial } from "../../../../utils/common";
 import ChangePasswordModal from "../../../pages/auth/ChangePasswordModal";
 import MobileCard from "../../components/MobileCard";
@@ -34,7 +31,6 @@ const InfoRow = ({ label, value }: { label: string; value?: string | null }) => 
 
 const MobileProfile = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
     const employee = useAppSelector(selectSelectedEmployee);
     const loading = useAppSelector(selectEmployeeLoading);
@@ -46,20 +42,6 @@ const MobileProfile = () => {
         }
     }, [infoLogin, dispatch]);
 
-    const handleLogout = () => {
-        Modal.confirm({
-            title: "Đăng xuất?",
-            content: "Bạn có chắc chắn muốn đăng xuất không?",
-            okText: "Đăng xuất",
-            okButtonProps: { danger: true },
-            cancelText: "Hủy",
-            centered: true,
-            onOk: () => {
-                dispatch(logout());
-                navigate(URL.Login);
-            },
-        });
-    };
 
     const avatarColor = infoLogin?.userName ? stringToColor(infoLogin.userName) : "#bfbfbf";
     const initial = getInitial(infoLogin?.userName);
@@ -139,7 +121,7 @@ const MobileProfile = () => {
             )}
 
             {/* ── Account actions ── */}
-            <MobileCard>
+            {/* <MobileCard>
                 <h3 className="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
                     <KeyOutlined className="text-blue-500" /> Tài khoản
                 </h3>
@@ -158,7 +140,7 @@ const MobileProfile = () => {
                     <LogoutOutlined />
                     <span>Đăng xuất</span>
                 </button>
-            </MobileCard>
+            </MobileCard> */}
 
             <ChangePasswordModal
                 open={changePwOpen}

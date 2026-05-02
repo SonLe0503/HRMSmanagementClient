@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Drawer, Popconfirm, Skeleton, message } from "antd";
+import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import { PlusOutlined, InboxOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -26,6 +27,7 @@ const MobileLeaveRequest = () => {
     const requests = useAppSelector(selectMyLeaveRequests);
     const loading = useAppSelector(selectLeaveRequestLoading);
     const [formOpen, setFormOpen] = useState(false);
+    useAndroidBack(formOpen, () => setFormOpen(false));
 
     useEffect(() => {
         dispatch(fetchMyBalance());

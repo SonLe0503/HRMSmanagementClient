@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Drawer, Modal, Skeleton, message } from "antd";
+import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import { PlusOutlined, InboxOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -27,6 +28,7 @@ const MobileOvertimeRequest = () => {
     const requests = useAppSelector(selectMyOvertimeRequests);
     const loading = useAppSelector(selectOvertimeLoading);
     const [formOpen, setFormOpen] = useState(false);
+    useAndroidBack(formOpen, () => setFormOpen(false));
 
     useEffect(() => {
         dispatch(fetchMyOvertimeRequests());

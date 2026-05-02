@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Drawer, Select, Button, Tag, Skeleton, message } from "antd";
+import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import {
     CheckCircleOutlined, LogoutOutlined,
     CalendarOutlined, SearchOutlined,
@@ -153,6 +154,10 @@ const MobileAttendance = () => {
             dispatch(fetchMyToday());
         } catch (err: any) { message.error(err || "Check-out thất bại"); }
     };
+
+    useAndroidBack(checkInOpen,   () => setCheckInOpen(false));
+    useAndroidBack(checkOutOpen,  () => setCheckOutOpen(false));
+    useAndroidBack(historyOpen,   () => setHistoryOpen(false));
 
     const attendance = myToday?.attendance;
     const hasCheckedIn = !!attendance?.checkInTime;

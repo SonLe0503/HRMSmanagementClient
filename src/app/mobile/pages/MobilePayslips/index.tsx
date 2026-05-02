@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Tag, Drawer, Button, Skeleton } from "antd";
+import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import { FilePdfOutlined, WalletOutlined, InboxOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchMyPayslips, downloadPayslipPdf, selectMyPayslips, selectPayrollLoading } from "../../../../store/payrollSlide";
@@ -18,6 +19,7 @@ const MobilePayslips = () => {
     const [selectedPayslip, setSelectedPayslip] = useState<IPayslip | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    useAndroidBack(detailOpen, () => setDetailOpen(false));
 
     useEffect(() => {
         if (infoLogin?.employeeId) {

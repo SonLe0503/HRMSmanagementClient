@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Drawer, Popconfirm, Skeleton, Tag, message } from "antd";
+import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import { PlusOutlined, InboxOutlined, WarningOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -23,6 +24,7 @@ const MobileResignation = () => {
     const requests = useAppSelector(selectMyResignationRequests);
     const loading = useAppSelector(selectResignationRequestLoading);
     const [formOpen, setFormOpen] = useState(false);
+    useAndroidBack(formOpen, () => setFormOpen(false));
 
     useEffect(() => {
         dispatch(fetchMyResignationRequests());

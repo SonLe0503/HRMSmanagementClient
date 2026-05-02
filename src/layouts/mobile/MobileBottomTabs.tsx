@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAndroidBack } from "../../hooks/useAndroidBack";
 import { Drawer } from "antd";
 import {
     ClockCircleOutlined,
@@ -81,6 +82,9 @@ const MobileBottomTabs = () => {
         },
     ];
 
+    useAndroidBack(donTuOpen, () => setDonTuOpen(false));
+    useAndroidBack(morePagesOpen, () => setMorePagesOpen(false));
+
     const isActive = (tab: TabItem) =>
         tab.routes.some((r) => location.pathname === r || location.pathname.startsWith(r + "/"));
 
@@ -106,18 +110,18 @@ const MobileBottomTabs = () => {
                         return (
                             <button
                                 key={tab.key}
-                                className={`flex-1 flex flex-col items-center justify-center gap-1 transition-colors ${active ? "text-blue-600" : "text-gray-400"}`}
+                                className={`flex-1 flex flex-col items-center justify-center gap-1 transition-colors relative ${active ? "text-blue-600" : "text-gray-400"}`}
                                 onClick={() => handleTabPress(tab)}
                             >
+                                {active && (
+                                    <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-600 rounded-full" />
+                                )}
                                 <span className={`text-xl leading-none ${active ? "text-blue-600" : "text-gray-400"}`}>
                                     {tab.icon}
                                 </span>
                                 <span className={`text-[10px] font-medium leading-none ${active ? "text-blue-600 font-semibold" : "text-gray-400"}`}>
                                     {tab.label}
                                 </span>
-                                {active && (
-                                    <span className="absolute top-0 w-8 h-0.5 bg-blue-600 rounded-full" style={{ position: "relative" }} />
-                                )}
                             </button>
                         );
                     })}

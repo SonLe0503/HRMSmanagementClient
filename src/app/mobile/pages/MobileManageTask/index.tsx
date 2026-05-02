@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Tag, Drawer, Button, Skeleton, message } from "antd";
+import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import { InboxOutlined, ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -35,6 +36,7 @@ const MobileManageTask = () => {
     const [activeFilter, setActiveFilter] = useState("all");
     const [selectedTask, setSelectedTask] = useState<any>(null);
     const [detailOpen, setDetailOpen] = useState(false);
+    useAndroidBack(detailOpen, () => setDetailOpen(false));
 
     const currentUserId = Number(infoLogin?.userId);
 

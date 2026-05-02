@@ -28,6 +28,10 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
         if (open) {
             setImage(null);
             setIsCameraReady(false);
+        } else {
+            // Stop all camera tracks so iOS Safari releases the camera indicator
+            const stream = webcamRef.current?.stream;
+            stream?.getTracks().forEach((track) => track.stop());
         }
     }, [open]);
 
@@ -78,6 +82,7 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
                             onUserMedia={handleUserMedia}
                             onUserMediaError={() => setIsCameraReady(false)}
                             className="w-full h-full object-cover"
+                            playsInline
                         />
                     ) : (
                         <img src={image} alt="Capture" className="w-full h-full object-cover" />

@@ -18,8 +18,10 @@ const MobileProfile           = lazy(() => import("../app/mobile/pages/MobilePro
 const MobileResignation       = lazy(() => import("../app/mobile/pages/MobileResignation"))
 const MobileManageTask        = lazy(() => import("../app/mobile/pages/MobileManageTask"))
 const MobilePayslips          = lazy(() => import("../app/mobile/pages/MobilePayslips"))
-const MobileEvaluationList    = lazy(() => import("../app/mobile/pages/MobileEvaluationList"))
-const MobileEvaluationResults = lazy(() => import("../app/mobile/pages/MobileEvaluationResults"))
+const MobileEvaluationList              = lazy(() => import("../app/mobile/pages/MobileEvaluationList"))
+const MobileEvaluationResults           = lazy(() => import("../app/mobile/pages/MobileEvaluationResults"))
+const MobileSubmitEvaluation            = lazy(() => import("../app/mobile/pages/MobileSubmitEvaluation"))
+const MobileViewEvaluationResultDetail  = lazy(() => import("../app/mobile/pages/MobileViewEvaluationResultDetail"))
 
 // Renders mobile page for EMPLOYEE on small screens, desktop page otherwise
 const AdaptivePage = ({ desktop, mobile }: { desktop: JSX.Element; mobile: JSX.Element }) => {
@@ -301,7 +303,7 @@ const privateResourceItem = [
     },
     {
         key: URL.SubmitEvaluation,
-        element: <SubmitEvaluation />,
+        element: <AdaptivePage desktop={<SubmitEvaluation />} mobile={<MobileSubmitEvaluation />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -313,7 +315,7 @@ const privateResourceItem = [
     },
     {
         key: URL.ViewEvaluationResultDetail,
-        element: <ViewEvaluationResultDetail />,
+        element: <AdaptivePage desktop={<ViewEvaluationResultDetail />} mobile={<MobileViewEvaluationResultDetail />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
