@@ -1,13 +1,30 @@
-import Layout, { Content } from "antd/es/layout/layout"
-import Sidebar from "../app/components/sidebar"
-import HeaderBar from "../app/components/header"
+import Layout, { Content } from "antd/es/layout/layout";
+import Sidebar from "../app/components/sidebar";
+import HeaderBar from "../app/components/header";
 import type { JSX } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
+import { useAppSelector } from "../store";
+import { selectInfoLogin } from "../store/authSlide";
+import { EUserRole } from "../interface/app";
+import MobileLayout from "./mobile/MobileLayout";
+import HRManagerMobileLayout from "./mobile/HRManagerMobileLayout";
 
 interface DefaultLayoutProps {
     children: JSX.Element;
 }
 
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
+    const isMobile = useIsMobile();
+    const infoLogin = useAppSelector(selectInfoLogin);
+
+    if (isMobile && infoLogin?.role === EUserRole.EMPLOYEE) {
+        return <MobileLayout>{children}</MobileLayout>;
+    }
+
+    if (isMobile && (infoLogin?.role === EUserRole.HR || infoLogin?.role === EUserRole.MANAGE)) {
+        return <HRManagerMobileLayout>{children}</HRManagerMobileLayout>;
+    }
+
     return (
         <Layout className="app-layout">
             <Sidebar />
@@ -20,6 +37,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
                 </Content>
             </Layout>
         </Layout>
-    )
-}
+    );
+};
+
 export default DefaultLayout;
