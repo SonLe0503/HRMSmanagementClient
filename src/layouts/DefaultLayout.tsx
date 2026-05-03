@@ -7,6 +7,7 @@ import { useAppSelector } from "../store";
 import { selectInfoLogin } from "../store/authSlide";
 import { EUserRole } from "../interface/app";
 import MobileLayout from "./mobile/MobileLayout";
+import HRManagerMobileLayout from "./mobile/HRManagerMobileLayout";
 
 interface DefaultLayoutProps {
     children: JSX.Element;
@@ -18,6 +19,10 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
 
     if (isMobile && infoLogin?.role === EUserRole.EMPLOYEE) {
         return <MobileLayout>{children}</MobileLayout>;
+    }
+
+    if (isMobile && (infoLogin?.role === EUserRole.HR || infoLogin?.role === EUserRole.MANAGE)) {
+        return <HRManagerMobileLayout>{children}</HRManagerMobileLayout>;
     }
 
     return (

@@ -3,7 +3,7 @@ import { Drawer, Select, Button, Tag, Skeleton, message } from "antd";
 import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import {
     CheckCircleOutlined, LogoutOutlined,
-    CalendarOutlined, SearchOutlined,
+    CalendarOutlined, SearchOutlined, ScheduleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -12,6 +12,9 @@ import {
     selectMyToday, selectMyHistory, selectAttendanceLoading,
 } from "../../../../store/attendanceSlide";
 import { fetchLocationSettings, selectLocationSettings, fetchPayrollSettings, selectPayrollSettings } from "../../../../store/systemSettingSlide";
+import {
+    fetchMySchedule, selectMySchedule, selectShiftAssignmentLoading as selectScheduleLoading,
+} from "../../../../store/shiftAssignmentSlide";
 import CameraCaptureModal from "../../../pages/myAttendance/modal/CameraCaptureModal";
 import MobilePageWrapper from "../../components/MobilePageWrapper";
 import MobileCard from "../../components/MobileCard";
@@ -59,10 +62,16 @@ const MobileAttendance = () => {
     const checkInMethod = locationSettings?.checkInMethod ?? "Location";
     const cutOffDay = payrollSettings?.payrollCutOffDay ?? 1;
 
+    const schedule = useAppSelector(selectMySchedule);
+    const scheduleLoading = useAppSelector(selectScheduleLoading);
+
+    const [activeTab, setActiveTab] = useState<"attendance" | "schedule">("attendance");
     const [checkInOpen, setCheckInOpen] = useState(false);
     const [checkOutOpen, setCheckOutOpen] = useState(false);
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedPeriodKey, setSelectedPeriodKey] = useState("");
+    const [scheduleOpen, setScheduleOpen] = useState(false);
+    const [scheduleLabel, setScheduleLabel] = useState("Tuần này");
 
     const payrollPeriods = useMemo(() => generatePayrollPeriods(cutOffDay), [cutOffDay]);
 
@@ -70,6 +79,10 @@ const MobileAttendance = () => {
         dispatch(fetchMyToday());
         dispatch(fetchLocationSettings());
         dispatch(fetchPayrollSettings());
+        dispatch(fetchMySchedule({
+            fromDate: dayjs().startOf("week").format("YYYY-MM-DD"),
+            toDate: dayjs().endOf("month").format("YYYY-MM-DD"),
+        }));
     }, [dispatch]);
 
     // Load current period on first load
@@ -158,6 +171,7 @@ const MobileAttendance = () => {
     useAndroidBack(checkInOpen,   () => setCheckInOpen(false));
     useAndroidBack(checkOutOpen,  () => setCheckOutOpen(false));
     useAndroidBack(historyOpen,   () => setHistoryOpen(false));
+    useAndroidBack(scheduleOpen,  () => setScheduleOpen(false));
 
     const attendance = myToday?.attendance;
     const hasCheckedIn = !!attendance?.checkInTime;
@@ -166,112 +180,247 @@ const MobileAttendance = () => {
 
     return (
         <MobilePageWrapper title="Chấm công của tôi">
-            {/* ── Today card ── */}
-            {loading && !myToday ? (
-                <Skeleton active paragraph={{ rows: 4 }} className="mb-4" />
-            ) : (
-                <MobileCard className="mb-4">
-                    <p className="text-xs text-gray-400 mb-3 capitalize">{todayStr}</p>
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div className="bg-green-50 rounded-xl p-3">
-                            <p className="text-xs text-green-600 font-medium mb-1">Giờ vào</p>
-                            <p className={`text-xl font-bold ${hasCheckedIn ? "text-green-700" : "text-gray-300"}`}>
-                                {attendance?.checkInTime ? dayjs(attendance.checkInTime).format("HH:mm") : "--:--"}
-                            </p>
-                        </div>
-                        <div className="bg-blue-50 rounded-xl p-3">
-                            <p className="text-xs text-blue-600 font-medium mb-1">Giờ ra</p>
-                            <p className={`text-xl font-bold ${hasCheckedOut ? "text-blue-700" : "text-gray-300"}`}>
-                                {attendance?.checkOutTime ? dayjs(attendance.checkOutTime).format("HH:mm") : "--:--"}
-                            </p>
-                        </div>
-                        <div className="bg-purple-50 rounded-xl p-3">
-                            <p className="text-xs text-purple-600 font-medium mb-1">Giờ công</p>
-                            <p className="text-xl font-bold text-purple-700">
-                                {attendance?.workingHours ?? 0}h
-                            </p>
-                        </div>
-                        <div className="bg-gray-50 rounded-xl p-3">
-                            <p className="text-xs text-gray-500 font-medium mb-1">Trạng thái</p>
-                            {attendance?.status ? (
-                                <Tag color={STATUS_MAP[attendance.status]?.color ?? "default"} className="text-xs m-0">
-                                    {STATUS_MAP[attendance.status]?.label ?? attendance.status}
-                                </Tag>
-                            ) : (
-                                <p className="text-sm text-gray-400">Chưa chấm</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <Button
-                            type="primary"
-                            icon={<CheckCircleOutlined />}
-                            size="large"
-                            block
-                            onClick={() => setCheckInOpen(true)}
-                            disabled={loading}
-                            className="bg-green-600 hover:bg-green-700 border-green-600 h-12 rounded-xl font-semibold"
-                        >
-                            Check In
-                        </Button>
-                        <Button
-                            danger
-                            type="primary"
-                            icon={<LogoutOutlined />}
-                            size="large"
-                            block
-                            onClick={() => setCheckOutOpen(true)}
-                            disabled={!hasCheckedIn || loading}
-                            className="h-12 rounded-xl font-semibold"
-                        >
-                            Check Out
-                        </Button>
-                    </div>
-                </MobileCard>
-            )}
-
-            {/* ── History section ── */}
-            <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-gray-700">Lịch sử chấm công</h2>
+            {/* ── Tab switcher ── */}
+            <div className="flex bg-gray-100 rounded-xl p-1 mb-4">
                 <button
-                    className="text-blue-500 text-sm font-medium flex items-center gap-1"
-                    onClick={() => setHistoryOpen(true)}
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                        activeTab === "attendance"
+                            ? "bg-white text-blue-600 shadow-sm"
+                            : "text-gray-500"
+                    }`}
+                    onClick={() => setActiveTab("attendance")}
                 >
-                    <CalendarOutlined /> Chọn kỳ
+                    Chấm công
+                </button>
+                <button
+                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                        activeTab === "schedule"
+                            ? "bg-white text-blue-600 shadow-sm"
+                            : "text-gray-500"
+                    }`}
+                    onClick={() => setActiveTab("schedule")}
+                >
+                    Lịch làm việc
                 </button>
             </div>
 
-            {loading && !history.length ? (
-                [1, 2, 3].map(i => <Skeleton key={i} active paragraph={{ rows: 1 }} className="mb-2" />)
-            ) : history.length === 0 ? (
-                <MobileCard>
-                    <p className="text-center text-gray-400 text-sm py-6">Chưa có dữ liệu chấm công</p>
-                </MobileCard>
-            ) : (
-                <MobileCard className="overflow-hidden p-0">
-                    {history.slice(0, 20).map((r) => (
-                        <div key={r.attendanceId > 0 ? r.attendanceId : `v-${r.attendanceDate}`}
-                            className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-b-0">
-                            <div>
-                                <p className="text-sm font-medium text-gray-800">
-                                    {dayjs(r.attendanceDate).format("DD/MM/YYYY")}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-0.5">
-                                    {r.checkInTime ? dayjs(r.checkInTime).format("HH:mm") : "--:--"}
-                                    {" → "}
-                                    {r.checkOutTime ? dayjs(r.checkOutTime).format("HH:mm") : "--:--"}
-                                    {r.workingHours ? ` · ${r.workingHours}h` : ""}
-                                </p>
+            {activeTab === "attendance" && (
+                <>
+                    {/* ── Today card ── */}
+                    {loading && !myToday ? (
+                        <Skeleton active paragraph={{ rows: 4 }} className="mb-4" />
+                    ) : (
+                        <MobileCard className="mb-4">
+                            <p className="text-xs text-gray-400 mb-3 capitalize">{todayStr}</p>
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                <div className="bg-green-50 rounded-xl p-3">
+                                    <p className="text-xs text-green-600 font-medium mb-1">Giờ vào</p>
+                                    <p className={`text-xl font-bold ${hasCheckedIn ? "text-green-700" : "text-gray-300"}`}>
+                                        {attendance?.checkInTime ? dayjs(attendance.checkInTime).format("HH:mm") : "--:--"}
+                                    </p>
+                                </div>
+                                <div className="bg-blue-50 rounded-xl p-3">
+                                    <p className="text-xs text-blue-600 font-medium mb-1">Giờ ra</p>
+                                    <p className={`text-xl font-bold ${hasCheckedOut ? "text-blue-700" : "text-gray-300"}`}>
+                                        {attendance?.checkOutTime ? dayjs(attendance.checkOutTime).format("HH:mm") : "--:--"}
+                                    </p>
+                                </div>
+                                <div className="bg-purple-50 rounded-xl p-3">
+                                    <p className="text-xs text-purple-600 font-medium mb-1">Giờ công</p>
+                                    <p className="text-xl font-bold text-purple-700">
+                                        {attendance?.workingHours ?? 0}h
+                                    </p>
+                                </div>
+                                <div className="bg-gray-50 rounded-xl p-3">
+                                    <p className="text-xs text-gray-500 font-medium mb-1">Trạng thái</p>
+                                    {attendance?.status ? (
+                                        <Tag color={STATUS_MAP[attendance.status]?.color ?? "default"} className="text-xs m-0">
+                                            {STATUS_MAP[attendance.status]?.label ?? attendance.status}
+                                        </Tag>
+                                    ) : (
+                                        <p className="text-sm text-gray-400">Chưa chấm</p>
+                                    )}
+                                </div>
                             </div>
-                            <Tag color={STATUS_MAP[r.status]?.color ?? "default"} className="text-xs">
-                                {STATUS_MAP[r.status]?.label ?? r.status}
-                            </Tag>
-                        </div>
-                    ))}
-                </MobileCard>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button
+                                    type="primary"
+                                    icon={<CheckCircleOutlined />}
+                                    size="large"
+                                    block
+                                    onClick={() => setCheckInOpen(true)}
+                                    disabled={loading}
+                                    className="bg-green-600 hover:bg-green-700 border-green-600 h-12 rounded-xl font-semibold"
+                                >
+                                    Check In
+                                </Button>
+                                <Button
+                                    danger
+                                    type="primary"
+                                    icon={<LogoutOutlined />}
+                                    size="large"
+                                    block
+                                    onClick={() => setCheckOutOpen(true)}
+                                    disabled={!hasCheckedIn || loading}
+                                    className="h-12 rounded-xl font-semibold"
+                                >
+                                    Check Out
+                                </Button>
+                            </div>
+                        </MobileCard>
+                    )}
+
+                    {/* ── History section ── */}
+                    <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-sm font-semibold text-gray-700">Lịch sử chấm công</h2>
+                        <button
+                            className="text-blue-500 text-sm font-medium flex items-center gap-1"
+                            onClick={() => setHistoryOpen(true)}
+                        >
+                            <CalendarOutlined /> Chọn kỳ
+                        </button>
+                    </div>
+
+                    {loading && !history.length ? (
+                        [1, 2, 3].map(i => <Skeleton key={i} active paragraph={{ rows: 1 }} className="mb-2" />)
+                    ) : history.length === 0 ? (
+                        <MobileCard>
+                            <p className="text-center text-gray-400 text-sm py-6">Chưa có dữ liệu chấm công</p>
+                        </MobileCard>
+                    ) : (
+                        <MobileCard className="overflow-hidden p-0">
+                            {history.slice(0, 20).map((r) => (
+                                <div key={r.attendanceId > 0 ? r.attendanceId : `v-${r.attendanceDate}`}
+                                    className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-b-0">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-800">
+                                            {dayjs(r.attendanceDate).format("DD/MM/YYYY")}
+                                        </p>
+                                        <p className="text-xs text-gray-400 mt-0.5">
+                                            {r.checkInTime ? dayjs(r.checkInTime).format("HH:mm") : "--:--"}
+                                            {" → "}
+                                            {r.checkOutTime ? dayjs(r.checkOutTime).format("HH:mm") : "--:--"}
+                                            {r.workingHours ? ` · ${r.workingHours}h` : ""}
+                                        </p>
+                                    </div>
+                                    <Tag color={STATUS_MAP[r.status]?.color ?? "default"} className="text-xs">
+                                        {STATUS_MAP[r.status]?.label ?? r.status}
+                                    </Tag>
+                                </div>
+                            ))}
+                        </MobileCard>
+                    )}
+                </>
             )}
+
+            {activeTab === "schedule" && (
+                <>
+                    {/* ── Schedule header ── */}
+                    <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-sm font-semibold text-gray-700">Lịch làm việc</h2>
+                        <button
+                            className="text-blue-500 text-sm font-medium flex items-center gap-1"
+                            onClick={() => setScheduleOpen(true)}
+                        >
+                            <ScheduleOutlined /> {scheduleLabel}
+                        </button>
+                    </div>
+
+                    {scheduleLoading && !schedule.length ? (
+                        [1, 2, 3].map(i => <Skeleton key={i} active paragraph={{ rows: 1 }} className="mb-2" />)
+                    ) : schedule.length === 0 ? (
+                        <MobileCard>
+                            <p className="text-center text-gray-400 text-sm py-6">Không có lịch làm việc</p>
+                        </MobileCard>
+                    ) : (
+                        <MobileCard className="overflow-hidden p-0">
+                            {schedule.map((s) => (
+                                <div
+                                    key={s.assignmentId}
+                                    className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-b-0"
+                                >
+                                    <div className="flex-1 min-w-0 mr-2">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <p className="text-sm font-medium text-gray-800">
+                                                {dayjs(s.assignmentDate).format("DD/MM/YYYY")}
+                                            </p>
+                                            <span className="text-xs text-gray-400 capitalize">
+                                                {dayjs(s.assignmentDate).format("dddd")}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            <Tag color="blue" className="text-xs m-0">{s.shiftCode}</Tag>
+                                            <span className="text-xs text-gray-600 truncate">{s.shiftName}</span>
+                                            {s.startTime && s.endTime && (
+                                                <Tag color="orange" className="text-xs m-0">
+                                                    {s.startTime.slice(0, 5)}–{s.endTime.slice(0, 5)}
+                                                </Tag>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <Tag
+                                        color={s.status === "Active" ? "success" : "default"}
+                                        className="text-xs flex-shrink-0"
+                                    >
+                                        {s.status === "Active" ? "Đang áp dụng" : "Đã hủy"}
+                                    </Tag>
+                                </div>
+                            ))}
+                        </MobileCard>
+                    )}
+                </>
+            )}
+
+            {/* ── Schedule period drawer ── */}
+            <Drawer
+                title="Chọn khoảng thời gian"
+                placement="bottom"
+                height="auto"
+                open={scheduleOpen}
+                onClose={() => setScheduleOpen(false)}
+                styles={{ body: { padding: "16px" } }}
+            >
+                <div className="grid grid-cols-2 gap-3">
+                    {([
+                        {
+                            label: "Tuần này",
+                            fromDate: dayjs().startOf("week").format("YYYY-MM-DD"),
+                            toDate: dayjs().endOf("week").format("YYYY-MM-DD"),
+                        },
+                        {
+                            label: "Tuần tới",
+                            fromDate: dayjs().add(1, "week").startOf("week").format("YYYY-MM-DD"),
+                            toDate: dayjs().add(1, "week").endOf("week").format("YYYY-MM-DD"),
+                        },
+                        {
+                            label: "Tháng này",
+                            fromDate: dayjs().startOf("month").format("YYYY-MM-DD"),
+                            toDate: dayjs().endOf("month").format("YYYY-MM-DD"),
+                        },
+                        {
+                            label: "Tháng tới",
+                            fromDate: dayjs().add(1, "month").startOf("month").format("YYYY-MM-DD"),
+                            toDate: dayjs().add(1, "month").endOf("month").format("YYYY-MM-DD"),
+                        },
+                    ] as { label: string; fromDate: string; toDate: string }[]).map((preset) => (
+                        <Button
+                            key={preset.label}
+                            type={scheduleLabel === preset.label ? "primary" : "default"}
+                            block
+                            size="large"
+                            className="rounded-xl h-12"
+                            onClick={() => {
+                                setScheduleLabel(preset.label);
+                                dispatch(fetchMySchedule({ fromDate: preset.fromDate, toDate: preset.toDate }));
+                                setScheduleOpen(false);
+                            }}
+                        >
+                            {preset.label}
+                        </Button>
+                    ))}
+                </div>
+            </Drawer>
 
             {/* ── Period selector drawer ── */}
             <Drawer

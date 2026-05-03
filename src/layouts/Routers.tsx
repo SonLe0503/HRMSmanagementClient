@@ -23,11 +23,13 @@ const MobileEvaluationResults           = lazy(() => import("../app/mobile/pages
 const MobileSubmitEvaluation            = lazy(() => import("../app/mobile/pages/MobileSubmitEvaluation"))
 const MobileViewEvaluationResultDetail  = lazy(() => import("../app/mobile/pages/MobileViewEvaluationResultDetail"))
 
-// Renders mobile page for EMPLOYEE on small screens, desktop page otherwise
+const MOBILE_ROLES = [EUserRole.EMPLOYEE, EUserRole.HR, EUserRole.MANAGE]
+
+// Renders mobile page for EMPLOYEE / HR / MANAGE on small screens, desktop otherwise
 const AdaptivePage = ({ desktop, mobile }: { desktop: JSX.Element; mobile: JSX.Element }) => {
     const isMobile = useIsMobile()
     const infoLogin = useAppSelector(selectInfoLogin)
-    if (isMobile && infoLogin?.role === EUserRole.EMPLOYEE) return mobile
+    if (isMobile && infoLogin?.role && MOBILE_ROLES.includes(infoLogin.role as any)) return mobile
     return desktop
 }
 
