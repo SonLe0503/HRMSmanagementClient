@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchEmployeeById, selectSelectedEmployee, selectEmployeeLoading } from "../../../../store/employeeSlide";
 import { selectInfoLogin } from "../../../../store/authSlide";
 import { stringToColor, getInitial } from "../../../../utils/common";
-import ChangePasswordModal from "../../../pages/auth/ChangePasswordModal";
+import ChangePasswordModal from "../../../desktop/pages/auth/ChangePasswordModal";
 import MobileCard from "../../components/MobileCard";
 
 const STATUS_COLOR: Record<string, string> = {

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import URL from "../../constants/url";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import ChangePasswordModal from "../../app/pages/auth/ChangePasswordModal";
+import ChangePasswordModal from "../../app/desktop/pages/auth/ChangePasswordModal";
 import { stringToColor, getInitial } from "../../utils/common";
 import { request } from "../../utils/request";
 

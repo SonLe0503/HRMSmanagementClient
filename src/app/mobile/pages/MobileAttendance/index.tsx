@@ -15,7 +15,7 @@ import { fetchLocationSettings, selectLocationSettings, fetchPayrollSettings, se
 import {
     fetchMySchedule, selectMySchedule, selectShiftAssignmentLoading as selectScheduleLoading,
 } from "../../../../store/shiftAssignmentSlide";
-import CameraCaptureModal from "../../../pages/myAttendance/modal/CameraCaptureModal";
+import CameraCaptureModal from "../../../desktop/pages/myAttendance/modal/CameraCaptureModal";
 import MobilePageWrapper from "../../components/MobilePageWrapper";
 import MobileCard from "../../components/MobileCard";
 

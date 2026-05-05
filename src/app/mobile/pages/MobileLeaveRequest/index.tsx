@@ -14,7 +14,7 @@ import MobilePageWrapper from "../../components/MobilePageWrapper";
 import MobileCard from "../../components/MobileCard";
 import MobileStatCard from "../../components/MobileStatCard";
 import MobileStatusBadge from "../../components/MobileStatusBadge";
-import LeaveRequestForm from "../../../pages/myLeaveRequest/components/LeaveRequestForm";
+import LeaveRequestForm from "../../../desktop/pages/myLeaveRequest/components/LeaveRequestForm";
 
 const STATUS_VI: Record<string, string> = {
     Approved: "approved", Pending: "pending",

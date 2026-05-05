@@ -1,6 +1,6 @@
 import Layout, { Content } from "antd/es/layout/layout";
-import Sidebar from "../app/components/sidebar";
-import HeaderBar from "../app/components/header";
+import Sidebar from "../app/desktop/components/sidebar";
+import HeaderBar from "../app/desktop/components/header";
 import type { JSX } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useAppSelector } from "../store";

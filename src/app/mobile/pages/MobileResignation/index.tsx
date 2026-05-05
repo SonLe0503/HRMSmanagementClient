@@ -10,7 +10,7 @@ import {
 } from "../../../../store/resignationRequestSlide";
 import MobilePageWrapper from "../../components/MobilePageWrapper";
 import MobileCard from "../../components/MobileCard";
-import ResignationRequestForm from "../../../pages/myResignationRequest/components/ResignationRequestForm";
+import ResignationRequestForm from "../../../desktop/pages/myResignationRequest/components/ResignationRequestForm";
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
     Pending:   { label: "Chờ duyệt", color: "orange"  },
