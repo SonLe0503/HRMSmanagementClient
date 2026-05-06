@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { LaptopOutlined } from "@ant-design/icons";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { CalendarOutlined, CameraOutlined } from "@ant-design/icons";
 import MobileHeader from "./MobileHeader";
 import URL from "../../constants/url";
 
@@ -8,10 +8,16 @@ interface HRManagerMobileLayoutProps {
     children: ReactNode;
 }
 
-const ALLOWED_PATHS = [URL.MyAttendance];
+const ALLOWED_PATHS = [URL.MyAttendance, URL.ManageFaceRegistration];
+
+const NAV_TABS = [
+    { path: URL.MyAttendance, icon: CalendarOutlined, label: "Chấm công" },
+    { path: URL.ManageFaceRegistration, icon: CameraOutlined, label: "Khuôn mặt" },
+];
 
 const HRManagerMobileLayout = ({ children }: HRManagerMobileLayoutProps) => {
     const location = useLocation();
+    const navigate = useNavigate();
 
     const isAllowed = ALLOWED_PATHS.some(
         (p) => location.pathname === p || location.pathname.startsWith(p + "/")
@@ -27,12 +33,25 @@ const HRManagerMobileLayout = ({ children }: HRManagerMobileLayoutProps) => {
             <main className="mobile-content">
                 {children}
             </main>
-            <div className="flex items-center justify-center gap-2 py-3 bg-white border-t border-gray-100"
-                style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom, 0px))" }}>
-                <LaptopOutlined className="text-gray-400 text-sm" />
-                <span className="text-xs text-gray-400">
-                    Dùng máy tính để truy cập đầy đủ tính năng
-                </span>
+            <div
+                className="flex bg-white border-t border-gray-100"
+                style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+            >
+                {NAV_TABS.map(({ path, icon: Icon, label }) => {
+                    const active = location.pathname === path || location.pathname.startsWith(path + "/");
+                    return (
+                        <button
+                            key={path}
+                            onClick={() => navigate(path)}
+                            className={`flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
+                                active ? "text-indigo-600" : "text-gray-400"
+                            }`}
+                        >
+                            <Icon className="text-xl" />
+                            <span className="text-[10px] font-medium">{label}</span>
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );

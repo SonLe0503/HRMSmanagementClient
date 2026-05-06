@@ -22,6 +22,7 @@ const MobileEvaluationList              = lazy(() => import("../app/mobile/pages
 const MobileEvaluationResults           = lazy(() => import("../app/mobile/pages/MobileEvaluationResults"))
 const MobileSubmitEvaluation            = lazy(() => import("../app/mobile/pages/MobileSubmitEvaluation"))
 const MobileViewEvaluationResultDetail  = lazy(() => import("../app/mobile/pages/MobileViewEvaluationResultDetail"))
+const MobileFaceRegistration            = lazy(() => import("../app/mobile/pages/MobileFaceRegistration"))
 
 const MOBILE_ROLES = [EUserRole.EMPLOYEE, EUserRole.HR, EUserRole.MANAGE]
 
@@ -335,7 +336,7 @@ const privateResourceItem = [
     },
     {
         key: URL.ManageFaceRegistration,
-        element: <ManageFaceRegistration />,
+        element: <AdaptivePage desktop={<ManageFaceRegistration />} mobile={<MobileFaceRegistration />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
