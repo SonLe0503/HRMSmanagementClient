@@ -1,11 +1,11 @@
-import { Avatar, Dropdown, Tag } from "antd";
-import { UserOutlined, LogoutOutlined, KeyOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { Avatar, Dropdown } from "antd";
+import { UserOutlined, LogoutOutlined, KeyOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { logout, selectInfoLogin } from "../../store/authSlide";
 import { useNavigate } from "react-router-dom";
 import URL from "../../constants/url";
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+
 import ChangePasswordModal from "../../app/desktop/pages/auth/ChangePasswordModal";
 import { stringToColor, getInitial } from "../../utils/common";
 import { request } from "../../utils/request";
@@ -14,7 +14,6 @@ const MobileHeader = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
-    const [timeLeft, setTimeLeft] = useState<string>("--:--");
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
     const handleLogout = () => {
@@ -22,25 +21,7 @@ const MobileHeader = () => {
         navigate(URL.Login);
     };
 
-    useEffect(() => {
-        const expiresTime = infoLogin?.expiresTime;
-        if (!expiresTime) return;
 
-        const timer = setInterval(() => {
-            const now = dayjs().unix();
-            const diff = expiresTime - now;
-            if (diff <= 0) {
-                clearInterval(timer);
-                handleLogout();
-            } else {
-                const minutes = Math.floor(diff / 60);
-                const seconds = diff % 60;
-                setTimeLeft(`${minutes}:${seconds < 10 ? "0" : ""}${seconds}`);
-            }
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [infoLogin?.expiresTime]);
 
     useEffect(() => {
         if (!infoLogin?.accessToken) return;
@@ -62,21 +43,12 @@ const MobileHeader = () => {
 
     const userInitial = getInitial(infoLogin?.userName);
     const avatarColor = infoLogin?.userName ? stringToColor(infoLogin.userName) : "#bfbfbf";
-    const isNearExpiry = parseInt(timeLeft.split(":")[0]) < 5;
 
     return (
         <>
             <header className="mobile-header flex items-center justify-between px-4">
                 <div className="flex items-center gap-2">
-                    <span className="text-blue-600 font-bold text-lg leading-none">PeopleCore</span>
-                    <Tag
-                        icon={<ClockCircleOutlined />}
-                        color={isNearExpiry ? "error" : "processing"}
-                        className="m-0 text-xs"
-                        style={{ lineHeight: "18px", padding: "0 6px" }}
-                    >
-                        {timeLeft}
-                    </Tag>
+                    <span className="text-blue-600 font-bold text-lg leading-none">HRMS Management</span>
                 </div>
 
                 <Dropdown
