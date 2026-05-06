@@ -5,7 +5,7 @@ import { logout, selectInfoLogin } from "../../store/authSlide";
 import { useNavigate } from "react-router-dom";
 import URL from "../../constants/url";
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+
 import ChangePasswordModal from "../../app/desktop/pages/auth/ChangePasswordModal";
 import { stringToColor, getInitial } from "../../utils/common";
 import { request } from "../../utils/request";
@@ -14,7 +14,6 @@ const MobileHeader = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
-    const [timeLeft, setTimeLeft] = useState<string>("--:--");
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
     const handleLogout = () => {
@@ -22,25 +21,7 @@ const MobileHeader = () => {
         navigate(URL.Login);
     };
 
-    useEffect(() => {
-        const expiresTime = infoLogin?.expiresTime;
-        if (!expiresTime) return;
 
-        const timer = setInterval(() => {
-            const now = dayjs().unix();
-            const diff = expiresTime - now;
-            if (diff <= 0) {
-                clearInterval(timer);
-                handleLogout();
-            } else {
-                const minutes = Math.floor(diff / 60);
-                const seconds = diff % 60;
-                setTimeLeft(`${minutes}:${seconds < 10 ? "0" : ""}${seconds}`);
-            }
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [infoLogin?.expiresTime]);
 
     useEffect(() => {
         if (!infoLogin?.accessToken) return;
