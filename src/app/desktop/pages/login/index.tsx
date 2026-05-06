@@ -62,25 +62,23 @@ const LoginPage = () => {
                     },
                     Button: {
                         controlHeightLG: 54,
-                        fontWeight: 700,
+                        fontWeight: 600,
                     }
                 }
             }}
         >
             <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0c10]">
-                {/* Immersive Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
                         src={imghrm}
                         className="w-full h-full object-cover opacity-40 scale-105"
-                        alt="HR Background"
+                        alt=""
                     />
                     <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/90 via-slate-950/80 to-transparent"></div>
                 </div>
 
-                {/* Animated Decorative Blur */}
-                <div className="absolute top-1/4 -left-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
-                <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
+                <div className="absolute top-1/4 -left-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse motion-reduce:animate-none"></div>
+                <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-[120px] animate-pulse delay-700 motion-reduce:animate-none"></div>
 
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -88,8 +86,7 @@ const LoginPage = () => {
                     transition={{ duration: 0.7, ease: "easeOut" }}
                     className="relative z-10 w-full max-w-[460px] mx-4"
                 >
-                    <div className="bg-white rounded-[40px] p-10 sm:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10">
-                        {/* Header Area */}
+                    <div className="bg-white rounded-[40px] p-10 sm:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-slate-100">
                         <div className="text-center mb-12">
                             <motion.div
                                 initial={{ y: -20, opacity: 0 }}
@@ -102,7 +99,7 @@ const LoginPage = () => {
                             <Title level={2} className="!m-0 !text-3xl font-black tracking-tight text-slate-900">
                                 HRMS <span className="text-indigo-600">Portal</span>
                             </Title>
-                            <Text className="text-slate-400 mt-2 block font-medium text-gray-100">
+                            <Text className="text-slate-500 mt-2 block font-medium">
                                 Hệ thống quản trị nhân sự tập trung
                             </Text>
                         </div>
@@ -115,39 +112,39 @@ const LoginPage = () => {
                             requiredMark={false}
                         >
                             <Form.Item
-                                label={<span className="text-slate-500 font-bold text-[11px] tracking-[0.15em] uppercase px-1">Tên đăng nhập</span>}
+                                label={<span className="text-slate-500 font-semibold text-sm px-1">Tên đăng nhập</span>}
                                 name="username"
                                 rules={[{ required: true, message: "Vui lòng nhập tài khoản" }]}
                                 className="mb-6"
                             >
                                 <Input
                                     size="large"
-                                    prefix={<UserOutlined className="text-slate-300 mr-2" />}
-                                    placeholder="tên_đăng_nhập"
-                                    className="!rounded-2xl border-slate-100 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
+                                    prefix={<UserOutlined className="text-slate-400 mr-2" />}
+                                    placeholder="Nhập tên đăng nhập"
+                                    className="!rounded-2xl border-slate-200 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
                                 />
                             </Form.Item>
 
                             <Form.Item
-                                label={<span className="text-slate-500 font-bold text-[11px] tracking-[0.15em] uppercase px-1">Mật khẩu</span>}
+                                label={<span className="text-slate-500 font-semibold text-sm px-1">Mật khẩu</span>}
                                 name="password"
                                 rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
                                 className="mb-2"
                             >
                                 <Input.Password
                                     size="large"
-                                    prefix={<LockOutlined className="text-slate-300 mr-2" />}
-                                    placeholder="••••••••"
-                                    className="!rounded-2xl border-slate-100 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
+                                    prefix={<LockOutlined className="text-slate-400 mr-2" />}
+                                    placeholder="Nhập mật khẩu"
+                                    className="!rounded-2xl border-slate-200 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
                                 />
                             </Form.Item>
 
                             <div className="flex justify-end mb-10">
-                                <Text 
-                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors px-1"
+                                <Text
+                                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors py-2 px-3 -mr-3 inline-flex items-center min-h-[44px]"
                                     onClick={() => setIsForgotPasswordOpen(true)}
                                 >
-                                    QUÊN MẬT KHẨU?
+                                    Quên mật khẩu?
                                 </Text>
                             </div>
 
@@ -159,23 +156,23 @@ const LoginPage = () => {
                                     block
                                     loading={loading}
                                     icon={<ArrowRightOutlined />}
-                                    className="h-14 !bg-indigo-600 hover:!bg-indigo-700 !border-none !rounded-2xl text-base font-bold shadow-xl shadow-indigo-100 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                    iconPosition="end"
+                                    className="h-14 !bg-indigo-600 hover:!bg-indigo-700 !border-none !rounded-2xl text-base font-semibold shadow-xl shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
                                 >
-                                    BẮT ĐẦU LÀM VIỆC
+                                    Bắt đầu làm việc
                                 </Button>
                             </Form.Item>
                         </Form>
                     </div>
 
-                    {/* Bottom Link */}
                     <div className="mt-8 text-center">
-                        <Text className="text-white/40 text-xs font-bold tracking-widest uppercase">
-                            © 2026 HRMS Platform • Bảo mật được chứng nhận
+                        <Text className="!text-white/50 text-xs">
+                            © 2026 HRMS Platform · Bảo mật được chứng nhận
                         </Text>
                     </div>
                 </motion.div>
 
-                <ForgotPasswordModal 
+                <ForgotPasswordModal
                     open={isForgotPasswordOpen}
                     onCancel={() => setIsForgotPasswordOpen(false)}
                 />
