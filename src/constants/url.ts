@@ -59,6 +59,8 @@ const URL = {
 
     // Payroll — Employee
     MyPayslips:           "/payroll/my-payslips",
+    MyPayrollDraftList:   "/payroll/my-draft",
+    MyPayrollDraft:       "/payroll/my-draft/:periodId",
 
     // Payroll — Reference
     PayrollMethodology:   "/payroll/methodology",

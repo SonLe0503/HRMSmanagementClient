@@ -80,7 +80,6 @@ const Sidebar = () => {
                 key: "admin-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
-                    { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
                     { key: URL.PayrollMethodology, label: "Quy tắc tính lương" },
                 ]
             },
@@ -131,6 +130,7 @@ const Sidebar = () => {
                 key: "manage-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
+                    { key: URL.MyPayrollDraftList, label: "Phiếu lương tạm" },
                     { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
                 ]
             },
@@ -151,7 +151,13 @@ const Sidebar = () => {
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
             { key: URL.EvaluationList, icon: <SolutionOutlined />, label: "Phiếu đánh giá của tôi" },
             { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
-            { key: URL.MyPayslips, icon: <WalletOutlined />, label: "Phiếu lương của tôi" },
+            {
+                key: "employee-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
+                children: [
+                    { key: URL.MyPayrollDraftList, label: "Phiếu lương tạm" },
+                    { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
+                ]
+            },
         ],
         [EUserRole.HR]: [
             { key: URL.DashboardHR, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -202,6 +208,7 @@ const Sidebar = () => {
                 key: "hr-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
+                    { key: URL.MyPayrollDraftList, label: "Phiếu lương tạm" },
                     { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
                     { key: URL.PayrollReport, label: "Báo cáo quỹ lương" },
                     { key: URL.PayrollMethodology, label: "Quy tắc tính lương" },

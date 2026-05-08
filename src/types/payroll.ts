@@ -6,7 +6,7 @@ export interface IPayrollPeriod {
   year: number
   startDate: string
   endDate: string
-  status: 'Open' | 'Aggregated' | 'Calculated' | 'Approved' | 'Closed'
+  status: 'Open' | 'Aggregated' | 'Calculated' | 'UnderReview' | 'Approved' | 'Closed'
   totalEmployees: number
   totalGrossPay: number
   totalNetPay: number
@@ -17,6 +17,10 @@ export interface IPayrollPeriod {
   approvedDate?: string
   approvedByName?: string
   workingDays?: number
+  reviewDeadline?: string
+  reviewDeadlineExpired?: boolean
+  allAgreed?: boolean
+  agreedCount?: number
 }
 
 export interface ICreatePayrollPeriod {
@@ -34,6 +38,7 @@ export interface IPayrollRecord {
   departmentName: string
   positionName: string
   periodId: number
+  periodStatus?: string
   baseSalary: number
   workingDays: number
   actualWorkingDays: number
@@ -102,6 +107,71 @@ export interface IPayrollSummary {
   totalDeductions: number
   totalNetPay: number
   byDepartment: { departmentName: string; employeeCount: number; totalNetPay: number }[]
+}
+
+export interface IPayrollFeedback {
+  feedbackId: number
+  payrollRecordId: number
+  employeeId: number
+  employeeName: string
+  employeeCode: string
+  departmentName: string
+  content?: string
+  isAgreed: boolean
+  submittedAt: string
+  status: 'Pending' | 'Resolved' | 'Dismissed'
+  hrResponse?: string
+  resolvedAt?: string
+  resolvedByName?: string
+  netPay: number
+  periodLabel: string
+}
+
+export interface ICreatePayrollFeedback {
+  isAgreed: boolean
+  content?: string
+}
+
+export interface IAttendanceItem {
+  date: string
+  status: string
+  workingHours: number
+  isExplanationApproved: boolean
+}
+
+export interface ILeaveItem {
+  startDate: string
+  endDate: string
+  leaveTypeName: string
+  isPaid: boolean
+  days: number
+}
+
+export interface IOvertimeItem {
+  date: string
+  hours: number
+}
+
+export interface IAttendanceTotals {
+  presentDays: number
+  lateDays: number
+  absentDays: number
+  explanationApprovedDays: number
+  paidLeaveDays: number
+  overtimeHours: number
+  totalActualDays: number
+}
+
+export interface IAttendanceSummary {
+  records: IAttendanceItem[]
+  approvedLeaves: ILeaveItem[]
+  approvedOvertime: IOvertimeItem[]
+  totals: IAttendanceTotals
+}
+
+export interface IResolveFeedback {
+  status: 'Resolved' | 'Dismissed'
+  hrResponse: string
 }
 
 export interface ITaxCalculationResult {

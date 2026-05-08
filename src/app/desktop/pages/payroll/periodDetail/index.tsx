@@ -1,13 +1,22 @@
-import { useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { Table, Card, Button, Space, Typography, Tag, message, Breadcrumb, Divider } from "antd"
+import {
+  Table, Card, Button, Space, Typography, Tag, message,
+  Breadcrumb, Divider, Input, Select, Row, Col, Tooltip, Badge, Modal, InputNumber, Progress,
+} from "antd"
 import {
   CalculatorOutlined,
   ArrowLeftOutlined,
   FileExcelOutlined,
   CheckCircleOutlined,
   LoadingOutlined,
-  EyeOutlined
+  EyeOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  CloseCircleOutlined,
+  SendOutlined,
+  ClockCircleOutlined,
+  TeamOutlined,
 } from "@ant-design/icons"
 import type { ColumnsType } from "antd/es/table"
 import { useAppDispatch, useAppSelector } from "../../../../../store"
@@ -18,35 +27,46 @@ import {
   approvePayrollPeriod,
   generatePayslipsForPeriod,
   exportPayrollExcel,
+  publishForReview,
+  fetchPeriodFeedbacks,
   selectCurrentPeriod,
   selectPayrollRecords,
   selectPayrollLoading,
-  selectPayrollCalculating
+  selectPayrollCalculating,
 } from "../../../../../store/payrollSlide"
 import { selectInfoLogin } from "../../../../../store/authSlide"
 import { EUserRole } from "../../../../../interface/app"
 import type { IPayrollRecord } from "../../../../../types/payroll"
 import URL from "../../../../../constants/url"
 import SummaryCards from "./SummaryCards"
+import FeedbackPanel from "./FeedbackPanel"
 
 const { Title, Text } = Typography
 
 const PayrollPeriodDetail = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const dispatch = useAppDispatch()
+  const { id }    = useParams()
+  const navigate  = useNavigate()
+  const dispatch  = useAppDispatch()
 
-  const period = useAppSelector(selectCurrentPeriod)
-  const records = useAppSelector(selectPayrollRecords)
-  const loading = useAppSelector(selectPayrollLoading)
+  const period      = useAppSelector(selectCurrentPeriod)
+  const records     = useAppSelector(selectPayrollRecords)
+  const loading     = useAppSelector(selectPayrollLoading)
   const calculating = useAppSelector(selectPayrollCalculating)
-  const infoLogin = useAppSelector(selectInfoLogin)
+  const infoLogin   = useAppSelector(selectInfoLogin)
 
-  const periodId = Number(id)
-  const isHR = infoLogin?.role === EUserRole.HR
-  const isAdmin = infoLogin?.role === EUserRole.ADMIN
-  const isApproved = period?.status === "Approved"
-  const isCalculated = period?.status === "Calculated"
+  const periodId   = Number(id)
+  const isHR       = infoLogin?.role === EUserRole.HR
+  const isAdmin    = infoLogin?.role === EUserRole.ADMIN
+  const isApproved    = period?.status === "Approved"
+  const isCalculated  = period?.status === "Calculated"
+  const isUnderReview = period?.status === "UnderReview"
+
+  // ── Bộ lọc ──────────────────────────────────────────
+  const [search, setSearch]               = useState("")
+  const [deptFilter, setDeptFilter]       = useState<string | null>(null)
+  const [positionFilter, setPositionFilter] = useState<string | null>(null)
+  const [publishModal, setPublishModal]   = useState(false)
+  const [reviewDays, setReviewDays]       = useState(3)
 
   useEffect(() => {
     if (periodId) {
@@ -55,10 +75,62 @@ const PayrollPeriodDetail = () => {
     }
   }, [dispatch, periodId])
 
+  useEffect(() => {
+    if (periodId && isUnderReview) {
+      dispatch(fetchPeriodFeedbacks(periodId))
+    }
+  }, [dispatch, periodId, isUnderReview])
+
+  // Reset position filter khi đổi phòng ban
+  useEffect(() => {
+    setPositionFilter(null)
+  }, [deptFilter])
+
+  // ── Danh sách phòng ban / chức vụ ────────────────────
+  const deptOptions = useMemo(() => {
+    const names = [...new Set(records.map(r => r.departmentName))].filter(Boolean).sort()
+    return names.map(d => ({ label: d, value: d }))
+  }, [records])
+
+  const positionOptions = useMemo(() => {
+    const source = deptFilter ? records.filter(r => r.departmentName === deptFilter) : records
+    const names  = [...new Set(source.map(r => r.positionName))].filter(Boolean).sort()
+    return names.map(p => ({ label: p, value: p }))
+  }, [records, deptFilter])
+
+  // ── Lọc + sắp xếp theo phòng ban → chức vụ ──────────
+  const filteredRecords = useMemo(() => {
+    return [...records]
+      .filter(r => {
+        const q           = search.toLowerCase()
+        const matchSearch = !search ||
+          r.employeeName.toLowerCase().includes(q) ||
+          r.employeeCode.toLowerCase().includes(q)
+        const matchDept   = !deptFilter || r.departmentName === deptFilter
+        const matchPos    = !positionFilter || r.positionName === positionFilter
+        return matchSearch && matchDept && matchPos
+      })
+      .sort((a, b) => {
+        const byDept = (a.departmentName || "").localeCompare(b.departmentName || "", "vi")
+        if (byDept !== 0) return byDept
+        const byPos = (a.positionName || "").localeCompare(b.positionName || "", "vi")
+        if (byPos !== 0) return byPos
+        return a.employeeName.localeCompare(b.employeeName, "vi")
+      })
+  }, [records, search, deptFilter, positionFilter])
+
+  const hasActiveFilter = !!(search || deptFilter || positionFilter)
+
+  const clearFilters = () => {
+    setSearch("")
+    setDeptFilter(null)
+    setPositionFilter(null)
+  }
+
+  // ── Handlers ─────────────────────────────────────────
   const handleCalculateAll = async () => {
     try {
       await dispatch(calculateAllEmployees(periodId)).unwrap()
-      // Re-fetch period để cập nhật status → "Calculated" (hiện nút Duyệt cho Admin)
       await dispatch(fetchPayrollPeriodById(periodId))
       message.success("Đã hoàn tất tính lương cho toàn bộ nhân viên!")
     } catch (err: any) {
@@ -84,12 +156,23 @@ const PayrollPeriodDetail = () => {
     }
   }
 
+  const handlePublishForReview = async () => {
+    try {
+      await dispatch(publishForReview({ periodId, reviewDays })).unwrap()
+      message.success(`Đã gửi phiếu lương tạm cho nhân viên xem! Hạn phản hồi: ${reviewDays} ngày.`)
+      setPublishModal(false)
+      await dispatch(fetchPayrollPeriodById(periodId))
+    } catch (err: any) {
+      message.error(err.message || "Lỗi khi gửi NV xem")
+    }
+  }
+
   const handleExport = async () => {
     try {
       const blob = await dispatch(exportPayrollExcel(periodId)).unwrap()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
+      const url  = window.URL.createObjectURL(blob)
+      const a    = document.createElement("a")
+      a.href     = url
       a.download = `Payroll_Thang${period?.month}_${period?.year}.xlsx`
       a.click()
       window.URL.revokeObjectURL(url)
@@ -98,90 +181,133 @@ const PayrollPeriodDetail = () => {
     }
   }
 
+  // ── Cột bảng ─────────────────────────────────────────
   const columns: ColumnsType<IPayrollRecord> = [
     {
       title: "Nhân viên",
       key: "employee",
       fixed: "left",
-      width: 200,
+      width: 180,
+      sorter: (a, b) => a.employeeName.localeCompare(b.employeeName, "vi"),
       render: (_, r) => (
         <Space direction="vertical" size={0}>
-          <Text strong>{r.employeeName}</Text>
+          <Text strong className="text-sm">{r.employeeName}</Text>
           <Text type="secondary" className="text-xs">{r.employeeCode}</Text>
         </Space>
       ),
     },
     {
+      title: "Phòng ban",
+      dataIndex: "departmentName",
+      width: 150,
+      sorter: (a, b) => (a.departmentName || "").localeCompare(b.departmentName || "", "vi"),
+      render: (v: string) => v
+        ? <Tag color="cyan" className="text-xs">{v}</Tag>
+        : <span className="text-gray-300">—</span>,
+    },
+    {
+      title: "Chức vụ",
+      dataIndex: "positionName",
+      width: 140,
+      sorter: (a, b) => (a.positionName || "").localeCompare(b.positionName || "", "vi"),
+      render: (v: string) => v
+        ? <span className="text-xs text-gray-600">{v}</span>
+        : <span className="text-gray-300">—</span>,
+    },
+    {
       title: "Công TT",
-      dataIndex: "actualWorkingDays",
+      key: "workdays",
       align: "center",
-      render: (v, r) => (
-        <Tag color="blue">
-          {Number(v).toFixed(2)} / {r.workingDays || period?.workingDays || "--"}
+      width: 100,
+      sorter: (a, b) => a.actualWorkingDays - b.actualWorkingDays,
+      render: (_, r) => (
+        <Tag color={r.actualWorkingDays < (r.workingDays ?? 0) ? "orange" : "blue"}>
+          {Number(r.actualWorkingDays).toFixed(1)} / {r.workingDays ?? period?.workingDays ?? "—"}
         </Tag>
-      )
+      ),
     },
     {
       title: "Lương ngày công",
       dataIndex: "salariedAmount",
       align: "right",
-      render: (v) => v?.toLocaleString() ?? "—"
+      width: 140,
+      sorter: (a, b) => (a.salariedAmount ?? 0) - (b.salariedAmount ?? 0),
+      render: (v: number) => (v > 0 ? v.toLocaleString("vi-VN") : "—"),
     },
     {
       title: "Phụ cấp",
       dataIndex: "totalAllowances",
       align: "right",
-      render: (v) => v > 0 ? v.toLocaleString() : "—"
+      width: 110,
+      sorter: (a, b) => (a.totalAllowances ?? 0) - (b.totalAllowances ?? 0),
+      render: (v: number) => (v > 0 ? v.toLocaleString("vi-VN") : "—"),
     },
     {
       title: "OT",
       dataIndex: "overtimePay",
       align: "right",
-      render: (v) => <Text type="success">{v > 0 ? v.toLocaleString() : "—"}</Text>
+      width: 100,
+      sorter: (a, b) => (a.overtimePay ?? 0) - (b.overtimePay ?? 0),
+      render: (v: number) => (
+        <Text type={v > 0 ? "success" : undefined}>
+          {v > 0 ? v.toLocaleString("vi-VN") : "—"}
+        </Text>
+      ),
     },
     {
       title: "Bảo hiểm",
-      key: "insurance",
+      dataIndex: "insuranceAmount",
       align: "right",
-      render: (_, r) => {
-        const gross = r.salariedAmount + r.totalAllowances + r.overtimePay + r.bonusAmount
-        const insurance = Math.round(Math.min(gross, 46_800_000) * 0.105)
-        return <Text type="danger">-{insurance.toLocaleString()}</Text>
-      }
+      width: 110,
+      sorter: (a, b) => (a.insuranceAmount ?? 0) - (b.insuranceAmount ?? 0),
+      render: (v: number) => (
+        <Text type="danger">-{(v ?? 0).toLocaleString("vi-VN")}</Text>
+      ),
     },
     {
       title: "Thuế",
       dataIndex: "taxAmount",
       align: "right",
-      render: (v) => <Text type="danger">-{v.toLocaleString()}</Text>
+      width: 110,
+      sorter: (a, b) => (a.taxAmount ?? 0) - (b.taxAmount ?? 0),
+      render: (v: number) => (
+        <Text type="danger">-{(v ?? 0).toLocaleString("vi-VN")}</Text>
+      ),
     },
     {
       title: "THỰC LĨNH",
       key: "netPay",
       align: "right",
       fixed: "right",
-      width: 130,
+      width: 140,
+      sorter: (a, b) => {
+        const netA = a.salariedAmount + a.totalAllowances + a.overtimePay + a.bonusAmount - a.insuranceAmount - a.taxAmount - a.deductions.filter(d => d.deductionType === "Manual").reduce((s, d) => s + d.amount, 0)
+        const netB = b.salariedAmount + b.totalAllowances + b.overtimePay + b.bonusAmount - b.insuranceAmount - b.taxAmount - b.deductions.filter(d => d.deductionType === "Manual").reduce((s, d) => s + d.amount, 0)
+        return netA - netB
+      },
       render: (_, r) => {
         const gross = r.salariedAmount + r.totalAllowances + r.overtimePay + r.bonusAmount
-        const manualDeductions = r.deductions
-          .filter(d => d.deductionType === "Manual")
-          .reduce((s, d) => s + d.amount, 0)
+        const manualDeductions = r.deductions.filter(d => d.deductionType === "Manual").reduce((s, d) => s + d.amount, 0)
         const computedNet = gross - r.insuranceAmount - r.taxAmount - manualDeductions
-        return <span className="font-bold text-green-600">{computedNet.toLocaleString()} đ</span>
-      }
+        return <span className="font-bold text-green-600">{computedNet.toLocaleString("vi-VN")} đ</span>
+      },
     },
     {
-      title: "Thao tác",
+      title: "",
       key: "action",
       fixed: "right",
       align: "center",
-      width: 100,
+      width: 80,
       render: (_, r) => (
-        <Button 
-          type="primary" 
-          icon={<EyeOutlined />} 
+        <Button
+          type="primary"
+          ghost
+          icon={<EyeOutlined />}
           size="small"
-          onClick={() => navigate(URL.PayrollRecordDetail.replace(":id", String(r.payrollRecordId)))}
+          onClick={(e) => {
+            e.stopPropagation()
+            navigate(URL.PayrollRecordDetail.replace(":id", String(r.payrollRecordId)))
+          }}
         >
           Chi tiết
         </Button>
@@ -200,27 +326,51 @@ const PayrollPeriodDetail = () => {
         ]}
       />
 
-      <div className="flex justify-between items-start mb-6">
+      {/* Header + Actions */}
+      <div className="flex justify-between items-start !mb-5">
         <Space direction="vertical" size={0}>
-          <Title level={3}>Chi tiết Kỳ lương Tháng {period?.month}/{period?.year}</Title>
-          <Space>
+          <Title level={3} className="!mb-0">
+            Chi tiết Kỳ lương Tháng {period?.month}/{period?.year}
+          </Title>
+          <Space className="mt-1">
             <Tag color="cyan">Từ: {period?.startDate}</Tag>
             <Tag color="cyan">Đến: {period?.endDate}</Tag>
-            {period?.status === "Approved" && <Tag color="green" icon={<CheckCircleOutlined />}>ĐÃ DUYỆT</Tag>}
+            {period?.status === "Approved" && (
+              <Tag color="green" icon={<CheckCircleOutlined />}>ĐÃ DUYỆT</Tag>
+            )}
+            {isUnderReview && (
+              <Tag color="purple">ĐANG CHỜ XEM XÉT</Tag>
+            )}
           </Space>
         </Space>
 
-        <Space>
+        <Space wrap>
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>Quay lại</Button>
+
           {isHR && !isApproved && (
-            <Button
-              icon={calculating ? <LoadingOutlined /> : <CalculatorOutlined />}
-              onClick={handleCalculateAll}
-              loading={calculating}
-            >
-              Tính lương toàn bộ
-            </Button>
+            <Tooltip title="Tính lại lương cho toàn bộ nhân viên trong kỳ">
+              <Button
+                icon={calculating ? <LoadingOutlined /> : <CalculatorOutlined />}
+                onClick={handleCalculateAll}
+                loading={calculating}
+              >
+                Tính lương toàn bộ
+              </Button>
+            </Tooltip>
           )}
+
+          {isHR && isCalculated && (
+            <Tooltip title="Gửi phiếu lương tạm cho nhân viên xem và phản hồi">
+              <Button
+                icon={<SendOutlined />}
+                onClick={() => setPublishModal(true)}
+                className="border-purple-500 text-purple-600"
+              >
+                Gửi NV xem
+              </Button>
+            </Tooltip>
+          )}
+
           {isHR && isApproved && (
             <>
               <Button
@@ -239,26 +389,194 @@ const PayrollPeriodDetail = () => {
               </Button>
             </>
           )}
-          {isAdmin && isCalculated && (
-            <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleApprove}>Duyệt & Khóa</Button>
+
+          {isAdmin && isUnderReview && (period?.allAgreed || period?.reviewDeadlineExpired) && (
+            <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleApprove}>
+              Duyệt & Khóa
+            </Button>
           )}
         </Space>
       </div>
 
+      {/* UnderReview: deadline + progress */}
+      {isUnderReview && (
+        <Card className="shadow-sm rounded-xl !mb-4 border-purple-200 bg-purple-50">
+          <Row gutter={[24, 8]} align="middle">
+            <Col xs={24} sm={12}>
+              <Space>
+                <ClockCircleOutlined className="text-purple-600" />
+                <span className="font-semibold text-purple-700">Hạn phản hồi:</span>
+                {period?.reviewDeadline
+                  ? <span className={period.reviewDeadlineExpired ? "text-red-600 font-bold" : "text-gray-800"}>
+                      {new Date(period.reviewDeadline).toLocaleString("vi-VN")}
+                      {period.reviewDeadlineExpired && " — ĐÃ HẾT HẠN"}
+                    </span>
+                  : <span className="text-gray-400">Chưa đặt</span>
+                }
+              </Space>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Space direction="vertical" size={2} className="w-full">
+                <Space>
+                  <TeamOutlined className="text-purple-600" />
+                  <span className="text-sm font-semibold text-purple-700">
+                    {period?.allAgreed
+                      ? "Tất cả nhân viên đã đồng ý ✓"
+                      : `${period?.agreedCount ?? 0} / ${period?.totalEmployees ?? 0} nhân viên đã đồng ý`}
+                  </span>
+                </Space>
+                <Progress
+                  percent={period?.totalEmployees
+                    ? Math.round(((period.agreedCount ?? 0) / period.totalEmployees) * 100)
+                    : 0}
+                  size="small"
+                  status={period?.allAgreed ? "success" : "active"}
+                  strokeColor={period?.allAgreed ? "#52c41a" : "#9b59b6"}
+                />
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+      )}
+
+      {/* Summary */}
       <SummaryCards />
+
+      {/* Feedback Panel — HR xem phản hồi NV khi kỳ đang UnderReview */}
+      {isUnderReview && (isHR || isAdmin) && (
+        <>
+          <Divider />
+          <FeedbackPanel periodId={periodId} />
+        </>
+      )}
 
       <Divider />
 
-      <Card title="Danh sách nhân viên" className="shadow-sm rounded-xl">
+      {/* Bảng nhân viên */}
+      <Card
+        title={
+          <Space>
+            <span>Danh sách nhân viên</span>
+            <Badge
+              count={filteredRecords.length}
+              showZero
+              color={hasActiveFilter ? "orange" : "blue"}
+              overflowCount={999}
+            />
+          </Space>
+        }
+        className="shadow-sm rounded-xl"
+        extra={
+          hasActiveFilter && (
+            <Button
+              size="small"
+              icon={<CloseCircleOutlined />}
+              onClick={clearFilters}
+              type="text"
+              className="text-orange-500"
+            >
+              Xóa bộ lọc
+            </Button>
+          )
+        }
+      >
+        {/* Thanh lọc */}
+        <Row gutter={[12, 12]} className="mb-4">
+          <Col xs={24} sm={10} md={8}>
+            <Input
+              prefix={<SearchOutlined className="text-gray-400" />}
+              placeholder="Tìm theo tên hoặc mã nhân viên..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              allowClear
+            />
+          </Col>
+          <Col xs={12} sm={7} md={6}>
+            <Select
+              placeholder={<><FilterOutlined /> Phòng ban</>}
+              options={deptOptions}
+              value={deptFilter}
+              onChange={setDeptFilter}
+              allowClear
+              style={{ width: "100%" }}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
+              }
+            />
+          </Col>
+          <Col xs={12} sm={7} md={6}>
+            <Select
+              placeholder={<><FilterOutlined /> Chức vụ</>}
+              options={positionOptions}
+              value={positionFilter}
+              onChange={setPositionFilter}
+              allowClear
+              disabled={positionOptions.length === 0}
+              style={{ width: "100%" }}
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label as string ?? "").toLowerCase().includes(input.toLowerCase())
+              }
+            />
+          </Col>
+          <Col xs={24} md={4} className="flex items-center">
+            <Text type="secondary" className="text-sm">
+              {hasActiveFilter
+                ? `${filteredRecords.length} / ${records.length} nhân viên`
+                : `${records.length} nhân viên`}
+            </Text>
+          </Col>
+        </Row>
+
+        {/* Bảng */}
         <Table
           columns={columns}
-          dataSource={records}
+          dataSource={filteredRecords}
           rowKey="payrollRecordId"
           loading={loading || calculating}
-          scroll={{ x: 1200 }}
-          pagination={{ pageSize: 20 }}
+          scroll={{ x: 1380 }}
+          pagination={{
+            pageSize: 20,
+            showTotal: (total) => `${total} nhân viên`,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "20", "50"],
+          }}
+          onRow={r => ({
+            style: { cursor: "pointer" },
+            onClick: () => navigate(URL.PayrollRecordDetail.replace(":id", String(r.payrollRecordId))),
+          })}
+          rowClassName={(_, index) => index % 2 === 0 ? "" : "bg-gray-50"}
         />
       </Card>
+      {/* Modal gửi NV xem */}
+      <Modal
+        title={<Space><SendOutlined className="text-purple-500" /><span>Gửi phiếu lương tạm cho nhân viên</span></Space>}
+        open={publishModal}
+        onCancel={() => setPublishModal(false)}
+        onOk={handlePublishForReview}
+        okText="Gửi ngay"
+        cancelText="Hủy"
+        okButtonProps={{ className: "bg-purple-600 border-purple-600" }}
+      >
+        <p className="text-gray-600 mb-4">
+          Nhân viên sẽ nhận được thông báo và có thể xem phiếu lương tạm, sau đó xác nhận Đồng ý hoặc Không đồng ý.
+        </p>
+        <div className="flex items-center gap-3">
+          <span className="font-medium whitespace-nowrap">Thời hạn phản hồi:</span>
+          <InputNumber
+            min={1}
+            max={30}
+            value={reviewDays}
+            onChange={v => setReviewDays(v ?? 3)}
+            addonAfter="ngày"
+            style={{ width: 140 }}
+          />
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          Sau khi hết hạn, Admin có thể duyệt kỳ lương ngay cả khi chưa có đủ phản hồi.
+        </p>
+      </Modal>
     </div>
   )
 }
