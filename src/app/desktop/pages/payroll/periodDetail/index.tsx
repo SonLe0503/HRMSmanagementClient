@@ -220,11 +220,15 @@ const PayrollPeriodDetail = () => {
       align: "center",
       width: 100,
       sorter: (a, b) => a.actualWorkingDays - b.actualWorkingDays,
-      render: (_, r) => (
-        <Tag color={r.actualWorkingDays < (r.workingDays ?? 0) ? "orange" : "blue"}>
-          {Number(r.actualWorkingDays).toFixed(1)} / {r.workingDays ?? period?.workingDays ?? "—"}
-        </Tag>
-      ),
+      render: (_, r) => {
+        if (!r.workingDays || r.workingDays === 0)
+          return <Tag color="default">Chưa phân ca</Tag>
+        return (
+          <Tag color={r.actualWorkingDays < r.workingDays ? "orange" : "blue"}>
+            {Number(r.actualWorkingDays).toFixed(1)} / {r.workingDays}
+          </Tag>
+        )
+      },
     },
     {
       title: "Lương ngày công",
