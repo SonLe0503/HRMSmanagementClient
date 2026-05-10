@@ -86,7 +86,7 @@ const Sidebar = () => {
             {
                 key: "admin-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
                 children: [
-                    { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
+
                     { key: URL.CompetencyReport, label: "Báo cáo Năng lực" },
                 ]
             },
@@ -134,7 +134,7 @@ const Sidebar = () => {
             {
                 key: "manage-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
                 children: [
-                    { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
+
                     { key: URL.CompetencyReport, label: "Báo cáo Năng lực" },
                 ]
             },
