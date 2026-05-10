@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   Table, Card, Button, Tag, Space, Typography,
-  Tooltip, Select, Input, Row, Col, Radio,
+  Tooltip, Select, Row, Col, Radio,
 } from "antd"
-import { PlusOutlined, PlayCircleOutlined, SearchOutlined } from "@ant-design/icons"
+import { PlusOutlined, PlayCircleOutlined } from "@ant-design/icons"
 import type { ColumnsType } from "antd/es/table"
 import { useAppDispatch, useAppSelector } from "../../../../store"
 import {
@@ -51,36 +51,25 @@ const PayrollPeriodList = () => {
 
   const [showCreate, setShowCreate]     = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [yearFilter, setYearFilter]     = useState<number | null>(null)
-  const [searchText, setSearchText]     = useState("")
+  const [periodFilter, setPeriodFilter] = useState<string | null>(null)
 
   useEffect(() => {
     dispatch(fetchPayrollPeriods())
   }, [dispatch])
 
-  // Tự động set year mặc định là năm có kỳ lương gần nhất
-  useEffect(() => {
-    if (periods.length > 0 && yearFilter === null) {
-      const latestYear = Math.max(...periods.map(p => p.year))
-      setYearFilter(latestYear)
-    }
-  }, [periods, yearFilter])
-
-  const yearOptions = useMemo(() => {
-    const years = [...new Set(periods.map(p => p.year))].sort((a, b) => b - a)
-    return years.map(y => ({ label: `Năm ${y}`, value: y }))
+  const periodOptions = useMemo(() => {
+    return [...periods]
+      .sort((a, b) => b.year !== a.year ? b.year - a.year : b.month - a.month)
+      .map(p => ({ label: `Tháng ${p.month}/${p.year}`, value: `${p.month}-${p.year}` }))
   }, [periods])
 
   const filteredPeriods = useMemo(() => {
     return periods.filter(p => {
       const matchStatus = statusFilter === "all" || p.status === statusFilter
-      const matchYear   = !yearFilter || p.year === yearFilter
-      const matchSearch = !searchText ||
-        `${p.month}/${p.year}`.includes(searchText) ||
-        String(p.month).includes(searchText)
-      return matchStatus && matchYear && matchSearch
+      const matchPeriod = !periodFilter || `${p.month}-${p.year}` === periodFilter
+      return matchStatus && matchPeriod
     })
-  }, [periods, statusFilter, yearFilter, searchText])
+  }, [periods, statusFilter, periodFilter])
 
   const columns: ColumnsType<IPayrollPeriod> = [
     {
@@ -205,21 +194,12 @@ const PayrollPeriodList = () => {
       {/* Bộ lọc */}
       <Card className="!mb-4 shadow-sm rounded-xl">
         <Row gutter={[16, 12]} align="middle">
-          <Col xs={24} sm={8} md={6}>
-            <Input
-              prefix={<SearchOutlined className="text-gray-400" />}
-              placeholder="Tìm theo tháng..."
-              value={searchText}
-              onChange={e => setSearchText(e.target.value)}
-              allowClear
-            />
-          </Col>
-          <Col xs={24} sm={8} md={5}>
+          <Col xs={24} sm={8} md={7}>
             <Select
-              placeholder="Chọn năm"
-              options={yearOptions}
-              value={yearFilter}
-              onChange={setYearFilter}
+              placeholder="Chọn kỳ lương"
+              options={periodOptions}
+              value={periodFilter}
+              onChange={setPeriodFilter}
               allowClear
               style={{ width: "100%" }}
             />

@@ -1,6 +1,5 @@
-import { Card, Form, InputNumber, Button, Space, Radio, Alert, Divider, Row, Col, Tooltip } from "antd"
+import { Card, Form, InputNumber, Button, Space, Alert, Divider, Row, Col, Tooltip } from "antd"
 import { CalculatorOutlined, ReloadOutlined, SaveOutlined, QuestionCircleOutlined } from "@ant-design/icons"
-import { useState } from "react"
 
 interface Props {
     form: any
@@ -10,14 +9,6 @@ interface Props {
 }
 
 const PayrollCalculationSettingsCard = ({ form, loading, onFinish, onRefresh }: Props) => {
-    const [baseMode, setBaseMode] = useState<string>(form.getFieldValue("insuranceBaseMode") || "Gross")
-
-    const handleValuesChange = (changed: any) => {
-        if (changed.insuranceBaseMode !== undefined) {
-            setBaseMode(changed.insuranceBaseMode)
-        }
-    }
-
     const totalInsuranceRate = () => {
         const bhxh = form.getFieldValue("bhxhRate") ?? 8
         const bhyt = form.getFieldValue("bhytRate") ?? 1.5
@@ -47,7 +38,7 @@ const PayrollCalculationSettingsCard = ({ form, loading, onFinish, onRefresh }: 
                 message="Các tỷ lệ được lưu vào SystemSettings và dùng ngay trong lần tính lương tiếp theo. Không cần sửa code khi nhà nước thay đổi quy định."
             />
 
-            <Form form={form} layout="vertical" onFinish={onFinish} onValuesChange={handleValuesChange}>
+            <Form form={form} layout="vertical" onFinish={onFinish}>
 
                 {/* ── Bảo hiểm NLĐ ── */}
                 <Divider className="text-sm font-semibold text-slate-600">
@@ -110,75 +101,37 @@ const PayrollCalculationSettingsCard = ({ form, loading, onFinish, onRefresh }: 
                     &emsp;|&emsp;Theo luật: <span className="text-gray-500">8% + 1.5% + 1% = 10.5%</span>
                 </div>
 
-                {/* ── Căn cứ tính BH ── */}
+                {/* ── Trần BH ── */}
                 <Divider className="text-sm font-semibold text-slate-600">
-                    Mức lương làm căn cứ đóng Bảo hiểm
+                    Mức trần đóng Bảo hiểm
                 </Divider>
 
+                <Alert
+                    type="info"
+                    showIcon
+                    className="mb-4"
+                    message="Căn cứ tính BH lấy theo mức lương đóng bảo hiểm đã đăng ký của từng nhân viên (khai báo trong hồ sơ nhân viên). Mức trần dưới đây được áp dụng làm giới hạn tối đa."
+                />
+
                 <Form.Item
-                    name="insuranceBaseMode"
-                    label="Chế độ tính căn cứ"
+                    name="insuranceCap"
+                    label={
+                        <Space>
+                            Mức trần đóng BH (đồng)
+                            <Tooltip title="Mặc định: 46,800,000 = 20 × LTT vùng I. Cập nhật khi Nghị định điều chỉnh lương tối thiểu vùng.">
+                                <QuestionCircleOutlined className="text-gray-400" />
+                            </Tooltip>
+                        </Space>
+                    }
+                    rules={[{ required: true }, { type: "number", min: 0 }]}
                 >
-                    <Radio.Group>
-                        <Radio value="Gross">
-                            <strong>Theo lương gộp thực tế</strong>
-                            <div className="text-xs text-gray-400 mt-0.5">
-                                BH = min(GrossPay, InsuranceCap) × TỷLệ — đúng quy định nhà nước
-                            </div>
-                        </Radio>
-                        <Radio value="Fixed" className="mt-3">
-                            <strong>Mức cố định (khai báo)</strong>
-                            <div className="text-xs text-gray-400 mt-0.5">
-                                BH = InsuranceFixedBase × TỷLệ — bất kể lương thực tế
-                                (áp dụng khi công ty khai báo mức đóng BH riêng)
-                            </div>
-                        </Radio>
-                    </Radio.Group>
+                    <InputNumber
+                        min={0} step={100000}
+                        formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        parser={(v) => Number(v!.replace(/,/g, "")) as any}
+                        addonAfter="đ" style={{ width: "100%" }}
+                    />
                 </Form.Item>
-
-                {baseMode === "Gross" && (
-                    <Form.Item
-                        name="insuranceCap"
-                        label={
-                            <Space>
-                                Mức trần đóng BH (đồng)
-                                <Tooltip title="Mặc định: 46,800,000 = 20 × LTT vùng I. Cập nhật khi Nghị định điều chỉnh lương tối thiểu vùng.">
-                                    <QuestionCircleOutlined className="text-gray-400" />
-                                </Tooltip>
-                            </Space>
-                        }
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                    >
-                        <InputNumber
-                            min={0} step={100000}
-                            formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                            parser={(v) => Number(v!.replace(/,/g, "")) as any}
-                            addonAfter="đ" style={{ width: "100%" }}
-                        />
-                    </Form.Item>
-                )}
-
-                {baseMode === "Fixed" && (
-                    <Form.Item
-                        name="insuranceFixedBase"
-                        label={
-                            <Space>
-                                Mức lương khai báo cố định (đồng)
-                                <Tooltip title="Ví dụ: 7,500,000 (LTT vùng I) hoặc mức công ty tự khai báo với cơ quan BHXH.">
-                                    <QuestionCircleOutlined className="text-gray-400" />
-                                </Tooltip>
-                            </Space>
-                        }
-                        rules={[{ required: true }, { type: "number", min: 0 }]}
-                    >
-                        <InputNumber
-                            min={0} step={100000}
-                            formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                            parser={(v) => Number(v!.replace(/,/g, "")) as any}
-                            addonAfter="đ" style={{ width: "100%" }}
-                        />
-                    </Form.Item>
-                )}
 
                 {/* ── Giảm trừ Thuế TNCN ── */}
                 <Divider className="text-sm font-semibold text-slate-600">

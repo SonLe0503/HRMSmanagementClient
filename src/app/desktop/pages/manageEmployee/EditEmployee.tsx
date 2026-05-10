@@ -76,6 +76,8 @@ const EditEmployee = () => {
                 employmentStatus: editingEmployee.employmentStatus,
                 employmentType: editingEmployee.employmentType,
                 baseSalary: editingEmployee.baseSalary,
+                insuranceSalary: editingEmployee.insuranceSalary,
+                numberOfDependents: editingEmployee.numberOfDependents ?? 0,
                 dateOfBirth: editingEmployee.dateOfBirth ? dayjs(editingEmployee.dateOfBirth) : null,
                 joinDate: editingEmployee.joinDate ? dayjs(editingEmployee.joinDate) : null,
                 resignationDate: editingEmployee.resignationDate ? dayjs(editingEmployee.resignationDate) : null,
@@ -132,6 +134,8 @@ const EditEmployee = () => {
             employmentStatus: values.employmentStatus,
             employmentType: values.employmentType,
             baseSalary: values.baseSalary ?? null,
+            insuranceSalary: values.insuranceSalary ?? null,
+            numberOfDependents: values.numberOfDependents ?? 0,
         };
 
         dispatch(updateEmployee({ id: Number(id), data: payload }))
@@ -317,6 +321,36 @@ const EditEmployee = () => {
                         <Col span={12}>
                             <Form.Item name="employmentType" label="Loại hình" rules={[{ required: true, message: "Vui lòng chọn loại hình" }]}>
                                 <Select options={TYPE_OPTIONS} placeholder="Chọn loại hình" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="numberOfDependents"
+                                label="Số người phụ thuộc (NPT)"
+                                rules={[{ type: "number", min: 0, max: 20, message: "NPT từ 0 đến 20" }]}
+                            >
+                                <InputNumber style={{ width: "100%" }} min={0} max={20} />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="insuranceSalary"
+                                label="Mức lương đóng bảo hiểm"
+                                rules={[
+                                    { type: "number", min: 1000000, message: "Mức lương BH phải ít nhất 1.000.000 VND" },
+                                    { type: "number", max: 100000000, message: "Mức lương BH không được vượt quá 100.000.000 VND" }
+                                ]}
+                                tooltip="Mức lương đóng BHXH/BHYT/BHTN đã đăng ký, cố định không thay đổi theo lương thực nhận hàng tháng. Nếu để trống sẽ dùng lương cơ bản."
+                            >
+                                <InputNumber
+                                    style={{ width: "100%" }}
+                                    formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    min={1000000}
+                                    max={100000000}
+                                    placeholder="VND (để trống = dùng lương cơ bản)"
+                                />
                             </Form.Item>
                         </Col>
                     </Row>
