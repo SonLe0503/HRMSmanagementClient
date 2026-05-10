@@ -85,6 +85,8 @@ const PayrollPeriods = lazy(() => import("../app/desktop/pages/payroll/index"));
 const PayrollPeriodDetail = lazy(() => import("../app/desktop/pages/payroll/periodDetail/index"));
 const PayrollRecordDetail = lazy(() => import("../app/desktop/pages/payroll/recordDetail/index"));
 const MyPayslips = lazy(() => import("../app/desktop/pages/payroll/myPayslips/index"));
+const MyPayrollDraft = lazy(() => import("../app/desktop/pages/payroll/myPayrollDraft/index"));
+const MyPayrollDraftList = lazy(() => import("../app/desktop/pages/payroll/myPayrollDraft/List"));
 const PayrollReport = lazy(() => import("../app/desktop/pages/payroll/PayrollReport"));
 const PayrollMethodology = lazy(() => import("../app/desktop/pages/payroll/PayrollMethodology"));
 const MyResignationRequest = lazy(() => import("../app/desktop/pages/myResignationRequest/index"));
@@ -367,6 +369,18 @@ const privateResourceItem = [
     {
         key: URL.MyPayslips,
         element: <AdaptivePage desktop={<MyPayslips />} mobile={<MobilePayslips />} />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyPayrollDraftList,
+        element: <MyPayrollDraftList />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.MyPayrollDraft,
+        element: <MyPayrollDraft />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

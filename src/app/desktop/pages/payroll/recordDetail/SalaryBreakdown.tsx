@@ -21,17 +21,17 @@ const SalaryBreakdown = ({ record, isEditable }: Props) => {
   const [savingBonus, setSavingBonus] = useState(false)
 
   // ── Tính toán nội bộ để hiển thị ──────────────────────────────
-  // salariedAmount được tính chính xác từ backend (baseSalary / workingDays × actualWorkingDays)
   const attendancePay = record.salariedAmount
-
-  // Tính Gross từ các thành phần → luôn nhất quán với breakdown
-  // KHÔNG dùng record.grossPay từ DB vì có thể lỗi thời (tính từ lần cũ)
   const displayGross = attendancePay + record.totalAllowances + record.overtimePay + record.bonusAmount
 
-  const insuranceBase = Math.min(displayGross, 46_800_000)
-  const bhxh = Math.round(insuranceBase * 0.08)
-  const bhyt = Math.round(insuranceBase * 0.015)
-  const bhtn = Math.round(insuranceBase * 0.01)
+  // BH: dùng giá trị backend đã tính (cố định theo mức lương đóng BH đã đăng ký của NV)
+  // KHÔNG tính lại từ displayGross — insurance base là cố định, không phụ thuộc bonus/OT
+  const computedInsuranceTotal = record.insuranceAmount
+  const bhxh = Math.round(computedInsuranceTotal * 8 / 10.5)
+  const bhyt = Math.round(computedInsuranceTotal * 1.5 / 10.5)
+  const bhtn = computedInsuranceTotal - bhxh - bhyt
+  // Base BH reverse-engineer để hiển thị (chỉ informational)
+  const insuranceBase = Math.round(computedInsuranceTotal / 0.105)
 
   const personalDeduction = 11_000_000
   const taxableIncome = Math.max(0, displayGross - record.insuranceAmount - personalDeduction)
@@ -126,7 +126,7 @@ const SalaryBreakdown = ({ record, isEditable }: Props) => {
       key: "bhxh",
       step: "5a",
       label: "BHXH (8%)",
-      formula: `min(Gross, 46.8tr) × 8% = ${fmt(insuranceBase)} × 8%`,
+      formula: `Lương đóng BH đã đăng ký ${fmt(insuranceBase)} × 8%`,
       amount: bhxh,
       type: "deduction",
     },
@@ -134,7 +134,7 @@ const SalaryBreakdown = ({ record, isEditable }: Props) => {
       key: "bhyt",
       step: "5b",
       label: "BHYT (1.5%)",
-      formula: `min(Gross, 46.8tr) × 1.5% = ${fmt(insuranceBase)} × 1.5%`,
+      formula: `Lương đóng BH đã đăng ký ${fmt(insuranceBase)} × 1.5%`,
       amount: bhyt,
       type: "deduction",
     },
@@ -142,7 +142,7 @@ const SalaryBreakdown = ({ record, isEditable }: Props) => {
       key: "bhtn",
       step: "5c",
       label: "BHTN (1%)",
-      formula: `min(Gross, 46.8tr) × 1% = ${fmt(insuranceBase)} × 1%`,
+      formula: `Lương đóng BH đã đăng ký ${fmt(insuranceBase)} × 1%`,
       amount: bhtn,
       type: "deduction",
     },
@@ -159,8 +159,7 @@ const SalaryBreakdown = ({ record, isEditable }: Props) => {
   const manualDeductions = record.deductions.filter(d => d.deductionType === "Manual")
   const manualDeductionTotal = manualDeductions.reduce((s, d) => s + d.amount, 0)
 
-  // Tổng khấu trừ tính từ displayGross (không dùng record.totalDeductions từ DB cũ)
-  const computedInsurance = bhxh + bhyt + bhtn
+  const computedInsurance = bhxh + bhyt + bhtn  // = record.insuranceAmount
   const computedTotalDeductions = computedInsurance + record.taxAmount + manualDeductionTotal
   const computedNetPay = displayGross - computedTotalDeductions
 
@@ -235,10 +234,8 @@ const SalaryBreakdown = ({ record, isEditable }: Props) => {
       {/* ── PHẦN KHẤU TRỪ BẮT BUỘC ──────────────── */}
       <Text type="secondary" className="text-xs uppercase font-semibold tracking-wide">Khấu trừ bắt buộc</Text>
       <div className="text-xs text-gray-400 mb-1">
-        Mức đóng BH tính trên: <strong>{fmt(insuranceBase)} đ</strong>
-        {insuranceBase < displayGross && (
-          <span className="ml-1 text-orange-500">(đã giới hạn trần 46.8tr = 20 × lương tối thiểu vùng)</span>
-        )}
+        Mức lương đóng BH đã đăng ký: <strong>{fmt(insuranceBase)} đ</strong>
+        <span className="ml-1 text-blue-500">(cố định theo đăng ký, không đổi theo OT/thưởng)</span>
       </div>
       <Table
         size="small"

@@ -97,6 +97,8 @@ const EmployeeDetail = () => {
                                 <Descriptions.Item label="Chức vụ">{employee.positionName ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Quản lý trực tiếp">{employee.managerName ?? "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Lương cơ bản">{formatCurrency(employee.baseSalary)}</Descriptions.Item>
+                                <Descriptions.Item label="Mức lương đóng BH">{employee.insuranceSalary ? formatCurrency(employee.insuranceSalary) : "— (dùng lương cơ bản)"}</Descriptions.Item>
+                                <Descriptions.Item label="Số người phụ thuộc (NPT)">{employee.numberOfDependents ?? 0}</Descriptions.Item>
                                 <Descriptions.Item label="Ngày vào làm">{formatDate(employee.joinDate)}</Descriptions.Item>
                                 <Descriptions.Item label="Ngày nghỉ việc">{formatDate(employee.resignationDate)}</Descriptions.Item>
                                 <Descriptions.Item label="Loại hình">{employee.employmentType}</Descriptions.Item>

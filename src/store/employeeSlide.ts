@@ -44,6 +44,8 @@ export interface IEmployeeDetail {
     employmentStatus: string;
     employmentType: string;
     baseSalary: number | null;
+    insuranceSalary: number | null;
+    numberOfDependents: number;
 }
 
 export interface IEmployeeApprovalAnalysis {

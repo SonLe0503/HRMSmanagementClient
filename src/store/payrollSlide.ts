@@ -6,7 +6,9 @@ import type {
   IPayrollPeriod, ICreatePayrollPeriod,
   IPayrollRecord, IPayrollSummary,
   IPayslip,
-  IPayrollAllowance, IPayrollDeduction
+  IPayrollAllowance, IPayrollDeduction,
+  IPayrollFeedback, ICreatePayrollFeedback, IResolveFeedback,
+  IAttendanceSummary,
 } from "../types/payroll"
 
 // ─────────────────────────────────────────────────────────
@@ -19,6 +21,11 @@ interface IPayrollState {
   records: IPayrollRecord[]
   currentRecord: IPayrollRecord | null
   myPayslips: IPayslip[]
+  myDraftRecord: IPayrollRecord | null
+  myPeriods: IPayrollPeriod[]
+  periodFeedbacks: IPayrollFeedback[]
+  myFeedbacks: IPayrollFeedback[]
+  myAttendanceSummary: IAttendanceSummary | null
   loading: boolean
   calculating: boolean
   error: string | null
@@ -32,6 +39,11 @@ const initialState: IPayrollState = {
   records: [],
   currentRecord: null,
   myPayslips: [],
+  myDraftRecord: null,
+  myPeriods: [],
+  periodFeedbacks: [],
+  myFeedbacks: [],
+  myAttendanceSummary: null,
   loading: false,
   calculating: false,
   error: null,
@@ -364,6 +376,139 @@ export const exportPayrollExcel = createAsyncThunk(
   }
 )
 
+// ── UnderReview thunks ────────────────────────────────────
+
+export const publishForReview = createAsyncThunk(
+  "payroll/publishForReview",
+  async ({ periodId, reviewDays }: { periodId: number; reviewDays: number }, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/periods/${periodId}/publish`,
+        method: "PUT",
+        data: { reviewDays },
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollPeriod
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi gửi NV xem")
+    }
+  }
+)
+
+export const fetchMyAttendanceSummary = createAsyncThunk(
+  "payroll/fetchMyAttendanceSummary",
+  async (periodId: number, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/records/my/${periodId}/attendance`,
+        method: "GET",
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IAttendanceSummary
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi tải dữ liệu chấm công")
+    }
+  }
+)
+
+export const fetchMyDraftRecord = createAsyncThunk(
+  "payroll/fetchMyDraftRecord",
+  async (periodId: number, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/records/my/${periodId}`,
+        method: "GET",
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollRecord
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi tải phiếu lương tạm")
+    }
+  }
+)
+
+export const fetchMyPeriods = createAsyncThunk(
+  "payroll/fetchMyPeriods",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: "/payroll/periods/my",
+        method: "GET",
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollPeriod[]
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi tải danh sách kỳ lương")
+    }
+  }
+)
+
+export const submitFeedback = createAsyncThunk(
+  "payroll/submitFeedback",
+  async ({ recordId, data }: { recordId: number; data: ICreatePayrollFeedback }, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/records/${recordId}/feedback`,
+        method: "POST",
+        data,
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollFeedback
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi gửi phản hồi")
+    }
+  }
+)
+
+export const fetchPeriodFeedbacks = createAsyncThunk(
+  "payroll/fetchPeriodFeedbacks",
+  async (periodId: number, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/periods/${periodId}/feedbacks`,
+        method: "GET",
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollFeedback[]
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi tải danh sách phản hồi")
+    }
+  }
+)
+
+export const resolveFeedback = createAsyncThunk(
+  "payroll/resolveFeedback",
+  async ({ feedbackId, data }: { feedbackId: number; data: IResolveFeedback }, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/feedbacks/${feedbackId}/resolve`,
+        method: "PUT",
+        data,
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollFeedback
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi xử lý phản hồi")
+    }
+  }
+)
+
+export const fetchMyFeedbacks = createAsyncThunk(
+  "payroll/fetchMyFeedbacks",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: "/payroll/feedbacks/my",
+        method: "GET",
+        headers: getAuthHeader(getState()),
+      })
+      return res.data as IPayrollFeedback[]
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi tải phản hồi của tôi")
+    }
+  }
+)
+
 // ─────────────────────────────────────────────────────────
 // SLICE
 // ─────────────────────────────────────────────────────────
@@ -506,6 +651,66 @@ const payrollSlice = createSlice({
         state.myPayslips = action.payload
       })
       .addCase(fetchMyPayslips.rejected, setError)
+
+      // UnderReview
+      .addCase(publishForReview.pending, setLoading)
+      .addCase(publishForReview.fulfilled, (state, action) => {
+        state.loading = false
+        state.currentPeriod = action.payload
+        const idx = state.periods.findIndex(p => p.periodId === action.payload.periodId)
+        if (idx !== -1) state.periods[idx] = action.payload
+      })
+      .addCase(publishForReview.rejected, setError)
+
+      .addCase(fetchMyDraftRecord.pending, setLoading)
+      .addCase(fetchMyDraftRecord.fulfilled, (state, action) => {
+        state.loading = false
+        state.myDraftRecord = action.payload
+      })
+      .addCase(fetchMyDraftRecord.rejected, setError)
+
+      .addCase(fetchMyPeriods.pending, setLoading)
+      .addCase(fetchMyPeriods.fulfilled, (state, action) => {
+        state.loading = false
+        state.myPeriods = action.payload
+      })
+      .addCase(fetchMyPeriods.rejected, setError)
+
+      .addCase(submitFeedback.pending, setLoading)
+      .addCase(submitFeedback.fulfilled, (state, action) => {
+        state.loading = false
+        state.myFeedbacks.unshift(action.payload)
+      })
+      .addCase(submitFeedback.rejected, setError)
+
+      .addCase(fetchPeriodFeedbacks.pending, setLoading)
+      .addCase(fetchPeriodFeedbacks.fulfilled, (state, action) => {
+        state.loading = false
+        state.periodFeedbacks = action.payload
+      })
+      .addCase(fetchPeriodFeedbacks.rejected, setError)
+
+      .addCase(resolveFeedback.pending, setLoading)
+      .addCase(resolveFeedback.fulfilled, (state, action) => {
+        state.loading = false
+        const idx = state.periodFeedbacks.findIndex(f => f.feedbackId === action.payload.feedbackId)
+        if (idx !== -1) state.periodFeedbacks[idx] = action.payload
+      })
+      .addCase(resolveFeedback.rejected, setError)
+
+      .addCase(fetchMyFeedbacks.pending, setLoading)
+      .addCase(fetchMyFeedbacks.fulfilled, (state, action) => {
+        state.loading = false
+        state.myFeedbacks = action.payload
+      })
+      .addCase(fetchMyFeedbacks.rejected, setError)
+
+      .addCase(fetchMyAttendanceSummary.pending, setLoading)
+      .addCase(fetchMyAttendanceSummary.fulfilled, (state, action) => {
+        state.loading = false
+        state.myAttendanceSummary = action.payload
+      })
+      .addCase(fetchMyAttendanceSummary.rejected, setError)
   },
 })
 
@@ -517,6 +722,11 @@ export const selectPeriodSummary     = (state: RootState) => state.payroll.perio
 export const selectPayrollRecords    = (state: RootState) => state.payroll.records
 export const selectCurrentRecord     = (state: RootState) => state.payroll.currentRecord
 export const selectMyPayslips        = (state: RootState) => state.payroll.myPayslips
+export const selectMyDraftRecord     = (state: RootState) => state.payroll.myDraftRecord
+export const selectMyPeriods         = (state: RootState) => state.payroll.myPeriods
+export const selectPeriodFeedbacks   = (state: RootState) => state.payroll.periodFeedbacks
+export const selectMyFeedbacks       = (state: RootState) => state.payroll.myFeedbacks
+export const selectMyAttendanceSummary = (state: RootState) => state.payroll.myAttendanceSummary
 export const selectPayrollLoading    = (state: RootState) => state.payroll.loading
 export const selectPayrollCalculating = (state: RootState) => state.payroll.calculating
 export const selectPayrollError      = (state: RootState) => state.payroll.error

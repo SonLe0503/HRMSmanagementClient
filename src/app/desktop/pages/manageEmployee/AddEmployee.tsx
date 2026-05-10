@@ -81,6 +81,8 @@ const AddEmployee = () => {
             employmentStatus: values.employmentStatus,
             employmentType: values.employmentType,
             baseSalary: values.baseSalary ?? null,
+            insuranceSalary: values.insuranceSalary ?? null,
+            numberOfDependents: values.numberOfDependents ?? 0,
             createdBy: infoLogin?.userId || null,
         };
         dispatch(createEmployee(payload))
@@ -224,6 +226,37 @@ const AddEmployee = () => {
                                     max={100000000}
                                     placeholder="VND"
                                 />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="insuranceSalary"
+                                label="Mức lương đóng bảo hiểm"
+                                rules={[
+                                    { type: "number", min: 1000000, message: "Mức lương BH phải ít nhất 1.000.000 VND" },
+                                    { type: "number", max: 100000000, message: "Mức lương BH không được vượt quá 100.000.000 VND" }
+                                ]}
+                                tooltip="Mức lương đóng BHXH/BHYT/BHTN đã đăng ký, cố định không thay đổi theo lương thực nhận hàng tháng. Nếu để trống sẽ dùng lương cơ bản."
+                            >
+                                <InputNumber
+                                    style={{ width: "100%" }}
+                                    formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    min={1000000}
+                                    max={100000000}
+                                    placeholder="VND (để trống = dùng lương cơ bản)"
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="numberOfDependents"
+                                label="Số người phụ thuộc (NPT)"
+                                rules={[{ type: "number", min: 0, max: 20, message: "NPT từ 0 đến 20" }]}
+                                initialValue={0}
+                            >
+                                <InputNumber style={{ width: "100%" }} min={0} max={20} />
                             </Form.Item>
                         </Col>
                     </Row>
