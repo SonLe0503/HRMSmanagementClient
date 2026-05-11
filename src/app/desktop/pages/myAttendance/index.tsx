@@ -53,7 +53,7 @@ const MyAttendance = () => {
     ];
 
     return (
-        <div className="p-6 bg-gray-50/50 min-h-screen">
+        <div className="p-4 bg-gray-50/50 min-h-screen">
             <div className="mb-6">
                 <Title level={2} className="m-0 font-bold text-gray-800">Chấm công của tôi</Title>
                 <div className="flex items-center gap-2 text-gray-500 mt-2">
