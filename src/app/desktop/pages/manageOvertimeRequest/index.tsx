@@ -1,4 +1,4 @@
-import { Layout, Typography, Table, Tag, Button, Row, Col, Card, Statistic, Breadcrumb } from "antd";
+import { Layout, Typography, Table, Tag, Button, Row, Col, Card, Statistic } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchPendingOvertimeRequests, selectPendingOvertimeRequests, selectOvertimeLoading } from "../../../../store/overtimeSlide";
@@ -113,16 +113,9 @@ const ManageOvertimeRequest = () => {
     ];
 
     return (
-        <Layout className="bg-slate-50/30 p-8 min-h-screen">
+        <Layout className="bg-slate-50/30 p-4 min-h-screen">
             <Content>
                 <div className="mb-10">
-                    <Breadcrumb 
-                        className="mb-4"
-                        items={[
-                            { title: 'Quản lý' },
-                            { title: 'Duyệt tăng ca' }
-                        ]}
-                    />
                     <Title level={2} className="m-0 text-slate-900 font-extrabold tracking-tight">Duyệt yêu cầu làm thêm giờ</Title>
                     <p className="text-slate-500 mt-2 text-lg font-medium opacity-80">Xem và phê duyệt các yêu cầu tăng ca từ nhân viên trong bộ phận.</p>
                 </div>

@@ -1,11 +1,10 @@
-import { Layout, Avatar, Dropdown, Tag } from 'antd';
-import { UserOutlined, LogoutOutlined, ClockCircleOutlined, KeyOutlined } from '@ant-design/icons';
+import { Layout, Avatar, Dropdown } from 'antd';
+import { UserOutlined, LogoutOutlined, KeyOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '../../../../store';
 import { logout, selectInfoLogin } from '../../../../store/authSlide';
 import { useNavigate } from 'react-router-dom';
 import URL from '../../../../constants/url';
 import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import ChangePasswordModal from '../../pages/auth/ChangePasswordModal';
 
 import { stringToColor, getInitial } from '../../../../utils/common';
@@ -17,35 +16,12 @@ const HeaderBar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
-    const [timeLeft, setTimeLeft] = useState<string>("--:--");
-
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
     const handleLogout = () => {
         dispatch(logout());
         navigate(URL.Login);
     };
-
-    useEffect(() => {
-        const expiresTime = infoLogin?.expiresTime;
-        if (!expiresTime) return;
-
-        const timer = setInterval(() => {
-            const now = dayjs().unix();
-            const diff = expiresTime - now;
-
-            if (diff <= 0) {
-                clearInterval(timer);
-                handleLogout();
-            } else {
-                const minutes = Math.floor(diff / 60);
-                const seconds = diff % 60;
-                setTimeLeft(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
-            }
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [infoLogin?.expiresTime]);
 
     useEffect(() => {
         if (!infoLogin?.accessToken) return;
@@ -71,17 +47,10 @@ const HeaderBar = () => {
 
     return (
         <Header
-            className="flex items-center justify-between shadow-sm border-b border-gray-100 h-16 sticky top-0 z-10"
-            style={{ background: '#fff', padding: '0 24px' }}
+            className="flex items-center justify-end h-16 sticky top-0 z-10"
+            style={{ background: '#fff', padding: '0 24px', boxShadow: '0 4px 8px rgba(0,0,0,0.04)', clipPath: 'inset(0 0 -20px 0)' }}
         >
-            <Tag 
-                icon={<ClockCircleOutlined />} 
-                color={parseInt(timeLeft.split(':')[0]) < 5 ? "error" : "processing"}
-                className="m-0 text-sm py-1 px-3"
-            >
-                Phiên: {timeLeft}
-            </Tag>
-            
+
             <Dropdown
                 menu={{
                     items: [
@@ -127,7 +96,7 @@ const HeaderBar = () => {
                 </div>
             </Dropdown>
 
-            <ChangePasswordModal 
+            <ChangePasswordModal
                 open={isChangePasswordOpen}
                 onCancel={() => setIsChangePasswordOpen(false)}
             />

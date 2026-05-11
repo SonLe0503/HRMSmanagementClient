@@ -492,8 +492,8 @@ const LeaveConfiguration = () => {
     ];
 
     return (
-        <Layout className="bg-[#f8fafc] p-8 lg:p-12 min-h-screen">
-            <Content className="max-w-7xl mx-auto w-full">
+        <Layout className="bg-[#f8fafc] p-4 min-h-screen">
+            <Content className="w-full">
                 <div className="mb-10">
                     <Title level={2} style={{ marginBottom: 4, fontWeight: 700, color: '#1e293b' }}>
                         <SolutionOutlined className="mr-3 text-indigo-600" />Cấu hình Nghỉ Phép

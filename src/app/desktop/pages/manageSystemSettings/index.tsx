@@ -49,7 +49,7 @@ const SystemSettingPage: React.FC = () => {
     const approvalAnalysis = useAppSelector(selectApprovalAnalysis);
     const users = useAppSelector(selectUsers);
     const loading = useAppSelector(selectSystemSettingLoading);
-    
+
     const [detecting, setDetecting] = useState(false);
     const [detectingIp, setDetectingIp] = useState(false);
 
@@ -201,14 +201,14 @@ const SystemSettingPage: React.FC = () => {
                     <Row gutter={[32, 32]}>
                         <Col xs={24} lg={16}>
                             <Space orientation="vertical" style={{ width: '100%' }}>
-                                <TopLevelApprovalCard 
+                                <TopLevelApprovalCard
                                     form={topLevelForm}
                                     users={users}
                                     loading={loading}
                                     onFinish={onApprovalFinish}
                                     onRefresh={() => dispatch(fetchApprovalSettings())}
                                 />
-                                <DefaultFallbackApprovalCard 
+                                <DefaultFallbackApprovalCard
                                     form={defaultFallbackForm}
                                     users={users}
                                     loading={loading}
@@ -337,39 +337,37 @@ const SystemSettingPage: React.FC = () => {
     ];
 
     return (
-        <div className="p-8 lg:p-12 bg-[#f8fafc] min-h-screen">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-10 flex justify-between items-end">
-                    <div>
-                        <Title level={2} style={{ marginBottom: 4, fontWeight: 700, color: '#1e293b' }}>
-                            <SettingOutlined className="mr-3 text-indigo-600" />Thiết lập Hệ thống
-                        </Title>
-                        <Paragraph type="secondary" className="text-lg">
-                            Cấu hình tham số lõi và quản lý quy tắc phê duyệt tự động.
-                        </Paragraph>
-                    </div>
-                    <div className="hidden md:block">
-                        <Badge count="Admin Control Center" style={{ backgroundColor: '#4f46e5', padding: '0 12px' }} />
-                    </div>
+        <div className="p-4 bg-[#f8fafc] min-h-screen">
+            <div className="mb-10 flex justify-between items-end">
+                <div>
+                    <Title level={2} style={{ marginBottom: 4, fontWeight: 700, color: '#1e293b' }}>
+                        <SettingOutlined className="mr-3 text-indigo-600" />Thiết lập Hệ thống
+                    </Title>
+                    <Paragraph type="secondary" className="text-lg">
+                        Cấu hình tham số lõi và quản lý quy tắc phê duyệt tự động.
+                    </Paragraph>
                 </div>
-
-                <Tabs 
-                    defaultActiveKey="1" 
-                    items={tabItems} 
-                    className="custom-minimal-tabs"
-                    tabBarStyle={{ 
-                        marginBottom: 32,
-                        borderBottom: '1px solid #e2e8f0'
-                    }}
-                    size="large"
-                />
-
-                <div className="mt-16 text-center opacity-40">
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        <QuestionCircleOutlined className="mr-1" />
-                        Mọi thay đổi sẽ có hiệu lực ngay lập tức. Liên hệ hỗ trợ nếu cần hướng dẫn nâng cao.
-                    </Text>
+                <div className="hidden md:block">
+                    <Badge count="Admin Control Center" style={{ backgroundColor: '#4f46e5', padding: '0 12px' }} />
                 </div>
+            </div>
+
+            <Tabs
+                defaultActiveKey="1"
+                items={tabItems}
+                className="custom-minimal-tabs"
+                tabBarStyle={{
+                    marginBottom: 32,
+                    borderBottom: '1px solid #e2e8f0'
+                }}
+                size="large"
+            />
+
+            <div className="mt-16 text-center opacity-40">
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                    <QuestionCircleOutlined className="mr-1" />
+                    Mọi thay đổi sẽ có hiệu lực ngay lập tức. Liên hệ hỗ trợ nếu cần hướng dẫn nâng cao.
+                </Text>
             </div>
         </div>
     );
