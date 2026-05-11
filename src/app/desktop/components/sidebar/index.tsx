@@ -230,7 +230,7 @@ const Sidebar = () => {
             width={collapsed ? 80 : 240}
             collapsedWidth={80}
             trigger={null}
-            className="bg-white border-r border-gray-200"
+            className="bg-white"
             collapsed={collapsed}
         >
             <motion.div

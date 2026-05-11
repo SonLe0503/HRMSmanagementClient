@@ -17,7 +17,7 @@ const MyLeaveRequest = () => {
     }, [dispatch]);
 
     return (
-        <Layout className="bg-transparent p-6 min-h-screen">
+        <Layout className="bg-transparent p-4 min-h-screen">
             <Content>
                 <div className="mb-8">
                     <Title level={2} className="m-0 text-slate-800">Nghỉ phép của tôi</Title>

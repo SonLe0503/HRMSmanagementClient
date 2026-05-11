@@ -1,5 +1,5 @@
-import { Form, Input, Button, Typography, ConfigProvider } from 'antd';
-import { UserOutlined, LockOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { Form, Input, Button, ConfigProvider } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import imghrm from '../../../../assets/images/hrm.jpg';
 import { actionLogin, selectInfoLogin } from '../../../../store/authSlide';
 import { useAppDispatch, useAppSelector } from '../../../../store';
@@ -8,10 +8,39 @@ import { useEffect, useState } from 'react';
 import { EUserRole } from '../../../../interface/app';
 import URL from '../../../../constants/url';
 import { handleError } from '../../../../utils/common';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import ForgotPasswordModal from '../auth/ForgotPasswordModal';
 
-const { Title, Text } = Typography;
+const staggerContainer: Variants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+};
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+
+const fadeRight: Variants = {
+    hidden: { opacity: 0, x: -40 },
+    show: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
+const fadeLeft: Variants = {
+    hidden: { opacity: 0, x: 40 },
+    show: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
+const dots = [
+    { top: '8%',  left: '12%', size: 10, opacity: 0.5 },
+    { top: '15%', left: '72%', size: 6,  opacity: 0.35 },
+    { top: '28%', left: '88%', size: 8,  opacity: 0.4 },
+    { top: '55%', left: '6%',  size: 7,  opacity: 0.3 },
+    { top: '68%', left: '80%', size: 5,  opacity: 0.45 },
+    { top: '78%', left: '20%', size: 9,  opacity: 0.3 },
+    { top: '88%', left: '60%', size: 6,  opacity: 0.4 },
+    { top: '40%', left: '92%', size: 5,  opacity: 0.25 },
+];
 
 const LoginPage = () => {
     const dispatch = useAppDispatch();
@@ -25,7 +54,7 @@ const LoginPage = () => {
         try {
             const res: any = await dispatch(actionLogin(values));
             if (!actionLogin.fulfilled.match(res)) {
-                handleError(res.payload || "Tài khoản hoặc mật khẩu không đúng");
+                handleError(res.payload || 'Tài khoản hoặc mật khẩu không đúng');
             }
         } catch (error) {
             handleError(error);
@@ -51,132 +80,200 @@ const LoginPage = () => {
         <ConfigProvider
             theme={{
                 token: {
-                    colorPrimary: '#6366f1',
-                    borderRadius: 16,
+                    colorPrimary: '#4F46E5',
+                    borderRadius: 10,
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                 },
                 components: {
                     Input: {
-                        controlHeightLG: 54,
-                        colorBorder: '#e2e8f0',
+                        controlHeightLG: 50,
+                        colorBorder: '#E2E8F0',
+                        colorBgContainer: '#F8FAFC',
+                        hoverBorderColor: '#4F46E5',
+                        activeBorderColor: '#4F46E5',
                     },
                     Button: {
-                        controlHeightLG: 54,
+                        controlHeightLG: 50,
                         fontWeight: 600,
-                    }
-                }
+                    },
+                },
             }}
         >
-            <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0c10]">
-                <div className="absolute inset-0 z-0">
+            <div className="min-h-screen flex overflow-hidden">
+
+                {/* ── LEFT PANEL ── */}
+                <motion.div
+                    variants={fadeRight}
+                    initial="hidden"
+                    animate="show"
+                    className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden"
+                >
+                    {/* Background image */}
                     <img
                         src={imghrm}
-                        className="w-full h-full object-cover opacity-40 scale-105"
                         alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/90 via-slate-950/80 to-transparent"></div>
-                </div>
 
-                <div className="absolute top-1/4 -left-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-[120px] animate-pulse motion-reduce:animate-none"></div>
-                <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-blue-600/20 rounded-full blur-[120px] animate-pulse delay-700 motion-reduce:animate-none"></div>
+                    {/* Dark overlay */}
+                    <div className="absolute inset-0"
+                        style={{ background: 'linear-gradient(135deg, rgba(15,23,42,0.82) 0%, rgba(30,27,75,0.78) 50%, rgba(49,46,129,0.72) 100%)' }}
+                    />
 
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                    className="relative z-10 w-full max-w-[460px] mx-4"
-                >
-                    <div className="bg-white rounded-[40px] p-10 sm:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-slate-100">
-                        <div className="text-center mb-12">
-                            <motion.div
-                                initial={{ y: -20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ delay: 0.3 }}
-                                className="inline-flex items-center justify-center mb-6"
-                            >
-                                <img src="/logo.png" alt="PeopleCore Logo" className="w-24 h-24 object-contain" />
-                            </motion.div>
-                            <Title level={2} className="!m-0 !text-3xl font-black tracking-tight text-slate-900">
-                                HRMS <span className="text-indigo-600">Portal</span>
-                            </Title>
-                            <Text className="text-slate-500 mt-2 block font-medium">
-                                Hệ thống quản trị nhân sự tập trung
-                            </Text>
-                        </div>
+                    {/* Decorative floating dots */}
+                    {dots.map((d, i) => (
+                        <div
+                            key={i}
+                            className="absolute rounded-full bg-white"
+                            style={{
+                                top: d.top,
+                                left: d.left,
+                                width: d.size,
+                                height: d.size,
+                                opacity: d.opacity,
+                            }}
+                        />
+                    ))}
 
-                        <Form
-                            name="login"
-                            layout="vertical"
-                            autoComplete="off"
-                            onFinish={onFinish}
-                            requiredMark={false}
+                    {/* Concentric rings behind logo */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        {[320, 240, 160].map((size, i) => (
+                            <div
+                                key={i}
+                                className="absolute rounded-full border border-white/[0.07]"
+                                style={{ width: size, height: size }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Logo card — centered */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
+                            className="bg-white rounded-3xl shadow-2xl shadow-black/50 overflow-hidden"
+                            style={{ width: 'clamp(220px, 32%, 300px)', aspectRatio: '1 / 1' }}
                         >
-                            <Form.Item
-                                label={<span className="text-slate-500 font-semibold text-sm px-1">Tên đăng nhập</span>}
-                                name="username"
-                                rules={[{ required: true, message: "Vui lòng nhập tài khoản" }]}
-                                className="mb-6"
-                            >
-                                <Input
-                                    size="large"
-                                    prefix={<UserOutlined className="text-slate-400 mr-2" />}
-                                    placeholder="Nhập tên đăng nhập"
-                                    className="!rounded-2xl border-slate-200 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                label={<span className="text-slate-500 font-semibold text-sm px-1">Mật khẩu</span>}
-                                name="password"
-                                rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
-                                className="mb-2"
-                            >
-                                <Input.Password
-                                    size="large"
-                                    prefix={<LockOutlined className="text-slate-400 mr-2" />}
-                                    placeholder="Nhập mật khẩu"
-                                    className="!rounded-2xl border-slate-200 hover:border-indigo-400 focus:border-indigo-400 bg-slate-50/50"
-                                />
-                            </Form.Item>
-
-                            <div className="flex justify-end mb-10">
-                                <Text
-                                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors py-2 px-3 -mr-3 inline-flex items-center min-h-[44px]"
-                                    onClick={() => setIsForgotPasswordOpen(true)}
-                                >
-                                    Quên mật khẩu?
-                                </Text>
-                            </div>
-
-                            <Form.Item className="mb-0">
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    size="large"
-                                    block
-                                    loading={loading}
-                                    icon={<ArrowRightOutlined />}
-                                    iconPosition="end"
-                                    className="h-14 !bg-indigo-600 hover:!bg-indigo-700 !border-none !rounded-2xl text-base font-semibold shadow-xl shadow-indigo-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                >
-                                    Bắt đầu làm việc
-                                </Button>
-                            </Form.Item>
-                        </Form>
+                            <img src="/logo.png" alt="PeopleCore" className="w-full h-full object-contain p-6" />
+                        </motion.div>
                     </div>
 
-                    <div className="mt-8 text-center">
-                        <Text className="!text-white/50 text-xs">
-                            © 2026 HRMS Platform · Bảo mật được chứng nhận
-                        </Text>
-                    </div>
+                    {/* Bottom tagline */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        className="absolute bottom-10 left-0 right-0 text-center px-8"
+                    >
+                        <p className="text-white font-black text-xl xl:text-2xl tracking-widest uppercase drop-shadow-lg">
+                            Hệ thống quản trị nhân sự
+                        </p>
+                        <p className="text-white/50 text-sm mt-1 tracking-wider uppercase">HR Management System</p>
+                    </motion.div>
                 </motion.div>
 
-                <ForgotPasswordModal
-                    open={isForgotPasswordOpen}
-                    onCancel={() => setIsForgotPasswordOpen(false)}
-                />
+                {/* ── RIGHT FORM PANEL ── */}
+                <motion.div
+                    variants={fadeLeft}
+                    initial="hidden"
+                    animate="show"
+                    className="flex-1 flex flex-col items-center justify-center bg-white px-8 sm:px-14 lg:px-16 xl:px-24 py-12"
+                >
+                    <div className="w-full max-w-[400px]">
+                        {/* Logo + brand */}
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="hidden"
+                            animate="show"
+                        >
+                            <motion.div variants={fadeUp} className="flex items-center gap-3 mb-10">
+                                <img src="/logo.png" alt="PeopleCore" className="w-10 h-10 object-contain" />
+                                <span className="text-slate-900 font-black text-xl tracking-tight">PeopleCore</span>
+                            </motion.div>
+
+                            <motion.div variants={fadeUp} className="mb-8">
+                                <h2 className="text-slate-900 font-black text-[2rem] leading-tight tracking-tight">
+                                    Đăng nhập tài khoản
+                                </h2>
+                                <p className="text-slate-500 mt-2 text-sm">Nhập thông tin để tiếp tục</p>
+                            </motion.div>
+
+                            <motion.div variants={fadeUp}>
+                                <Form
+                                    name="login"
+                                    layout="vertical"
+                                    autoComplete="off"
+                                    onFinish={onFinish}
+                                    requiredMark={false}
+                                    size="large"
+                                >
+                                    <Form.Item
+                                        label={<span className="text-slate-600 font-semibold text-sm">Tên đăng nhập</span>}
+                                        name="username"
+                                        rules={[{ required: true, message: 'Vui lòng nhập tài khoản' }]}
+                                        className="mb-5"
+                                    >
+                                        <Input
+                                            prefix={<UserOutlined className="text-slate-400 mr-1" />}
+                                            placeholder="Nhập tên đăng nhập"
+                                            className="!rounded-xl"
+                                        />
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label={<span className="text-slate-600 font-semibold text-sm">Mật khẩu</span>}
+                                        name="password"
+                                        rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+                                        className="mb-7"
+                                    >
+                                        <Input.Password
+                                            prefix={<LockOutlined className="text-slate-400 mr-1" />}
+                                            placeholder="Nhập mật khẩu"
+                                            className="!rounded-xl"
+                                        />
+                                    </Form.Item>
+
+                                    <Form.Item className="mb-5">
+                                        <Button
+                                            type="primary"
+                                            htmlType="submit"
+                                            block
+                                            loading={loading}
+                                            className="!h-[50px] !rounded-xl !text-base !font-semibold !border-none"
+                                            style={{
+                                                background: loading ? undefined : 'linear-gradient(135deg, #4F46E5, #6366F1)',
+                                                boxShadow: '0 8px 20px -4px rgba(79,70,229,0.45)',
+                                            }}
+                                        >
+                                            Đăng nhập
+                                        </Button>
+                                    </Form.Item>
+
+                                    <div className="text-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsForgotPasswordOpen(true)}
+                                            className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold underline underline-offset-4 transition-colors duration-150 cursor-pointer"
+                                        >
+                                            Quên mật khẩu?
+                                        </button>
+                                    </div>
+                                </Form>
+                            </motion.div>
+                        </motion.div>
+
+                        <p className="text-center text-slate-400 text-xs mt-12">
+                            © 2026 HRMS Platform · Bảo mật được chứng nhận
+                        </p>
+                    </div>
+                </motion.div>
             </div>
+
+            <ForgotPasswordModal
+                open={isForgotPasswordOpen}
+                onCancel={() => setIsForgotPasswordOpen(false)}
+            />
         </ConfigProvider>
     );
 };
