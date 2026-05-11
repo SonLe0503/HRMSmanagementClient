@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Space, DatePicker, Select, Tag, Card, Tooltip, message } from "antd";
-import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined, ExclamationCircleOutlined, ReloadOutlined, TeamOutlined } from "@ant-design/icons";
+import { Table, Button, Space, DatePicker, Select, Tag, Card, Tooltip, message, Typography } from "antd";
+import { SearchOutlined, EditOutlined, EyeOutlined, PlusOutlined, LockOutlined, UnlockOutlined, HistoryOutlined, ExclamationCircleOutlined, ReloadOutlined, TeamOutlined, CalendarOutlined } from "@ant-design/icons";
+
+const { Text } = Typography;
 import { useAppDispatch, useAppSelector } from "../../../../../store";
 import { searchAttendance, selectAdminAttendance, selectAttendanceLoading, lockAttendance, unlockAttendance } from "../../../../../store/attendanceSlide";
 import { fetchAllEmployees, selectEmployees } from "../../../../../store/employeeSlide";
@@ -231,21 +233,37 @@ const AttendanceTable = () => {
         }
     ];
 
+    const displayRecords = allowedEmployeeIds
+        ? records.filter(r => allowedEmployeeIds.has(r.employeeId))
+        : records;
+
     return (
-        <Card className="shadow-sm" style={{ overflow: 'hidden' }}>
+        <Card
+            title={
+                <Space>
+                    <CalendarOutlined className="text-blue-500" />
+                    <span>Quản lý chấm công</span>
+                    {displayRecords.length > 0 && (
+                        <Text type="secondary" style={{ fontSize: 13, fontWeight: 400 }}>
+                            — {displayRecords.length} bản ghi
+                        </Text>
+                    )}
+                </Space>
+            }
+            className="shadow-sm rounded-xl"
+            style={{ overflow: 'hidden' }}
+        >
             {managerProfile && (
-                <div style={{ marginBottom: 16, padding: '10px 14px', background: '#f0f5ff', borderRadius: 6, border: '1px solid #d6e4ff', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                    <TeamOutlined style={{ color: '#1677ff', fontSize: 16 }} />
-                    <span style={{ fontWeight: 600, color: '#1677ff' }}>Phòng ban của bạn:</span>
+                <div className="mb-4 flex items-center gap-3 flex-wrap px-3 py-2.5 bg-blue-50 rounded-lg border border-blue-100">
+                    <TeamOutlined className="text-blue-500 text-base" />
+                    <span className="font-semibold text-blue-600">Phòng ban của bạn:</span>
                     <Tag color="blue" style={{ margin: 0, fontSize: 13 }}>
                         {managerProfile.departmentName || "Chưa phân công"}
                     </Tag>
-                    <span style={{ color: '#555' }}>
-                        Đang quản lý <strong>{employees.length}</strong> nhân viên
-                    </span>
+                    <Text type="secondary">Đang quản lý <strong>{employees.length}</strong> nhân viên</Text>
                 </div>
             )}
-            <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
+            <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
                 <Space wrap style={{ rowGap: 8 }}>
                     <RangePicker
                         value={dateRange}
@@ -294,10 +312,10 @@ const AttendanceTable = () => {
 
             <Table
                 columns={columns}
-                dataSource={allowedEmployeeIds ? records.filter(r => allowedEmployeeIds.has(r.employeeId)) : records}
+                dataSource={displayRecords}
                 loading={loading}
                 rowKey={(record) => record.attendanceId > 0 ? record.attendanceId : `virtual-${record.attendanceDate}-${record.employeeId}`}
-                pagination={{ pageSize: 15 }}
+                pagination={{ pageSize: 15, showTotal: (total) => `Tổng ${total} bản ghi` }}
                 scroll={{ x: 1150 }}
                 bordered
             />
