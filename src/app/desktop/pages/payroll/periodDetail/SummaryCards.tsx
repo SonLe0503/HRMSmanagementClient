@@ -1,4 +1,4 @@
-import { Row, Col, Card, Statistic, Tag } from "antd"
+import { Row, Col, Card, Statistic } from "antd"
 import { useAppSelector } from "../../../../../store"
 import { selectCurrentPeriod, selectPayrollRecords } from "../../../../../store/payrollSlide"
 import { selectInfoLogin } from "../../../../../store/authSlide"
