@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Tag, Space, Card, Switch, message, Typography } from "antd";
+import { Table, Button, Tag, Space, Card, message, Typography } from "antd";
 import { PlusOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
 import { useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -45,7 +45,16 @@ const ManageAccount = () => {
         setIsEditModalOpen(true);
     };
 
+    const isProtectedAdmin = (record: any) => {
+        return record.username?.toLowerCase() === "admin";
+    };
+
     const handleToggleStatus = (record: any) => {
+        if (record.isActive && isProtectedAdmin(record)) {
+            message.warning("Khong cho phep vo hieu hoa tai khoan admin");
+            return;
+        }
+
         const action = record.isActive ? deactivateUser(record.userId) : activateUser(record.userId);
         const successMsg = record.isActive ? "Đã vô hiệu hóa tài khoản" : "Đã kích hoạt tài khoản";
 
@@ -136,12 +145,15 @@ const ManageAccount = () => {
                         icon={<EditOutlined />}
                         onClick={() => handleEdit(record)}
                     />
-                    <Switch
-                        size="small"
+                    <Button
+                        type={record.isActive ? "primary" : "default"}
+                        danger={record.isActive}
                         loading={togglingUserId === record.userId}
-                        checked={record.isActive}
-                        onChange={() => handleToggleStatus(record)}
-                    />
+                        disabled={record.isActive && isProtectedAdmin(record)}
+                        onClick={() => handleToggleStatus(record)}
+                    >
+                        {record.isActive ? "Deactivate" : "Activate"}
+                    </Button>
                 </Space>
             ),
         },

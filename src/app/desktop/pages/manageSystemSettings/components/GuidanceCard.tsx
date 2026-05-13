@@ -17,12 +17,6 @@ const GuidanceCard: React.FC = () => {
                 <li><Text style={{ color: '#1890ff' }}>Global Default:</Text> Dành cho người chưa được gán sếp.</li>
                 <li><Text style={{ color: '#52c41a' }}>System Admin:</Text> Cứu cánh cuối cùng nếu không cấu hình gì.</li>
             </ul>
-            <Divider />
-            <Text strong>Làm sao để lấy tọa độ?</Text>
-            <ul className="mt-2 text-gray-600">
-                <li>Cách 1: Nhấn nút "Lấy toạ độ tại đây" nếu bạn đang ngồi tại văn phòng (yêu cầu bật định vị trình duyệt).</li>
-                <li>Cách 2: Truy cập Google Maps, chuột phải vào vị trí văn phòng và copy tọa độ.</li>
-            </ul>
         </Card>
     );
 };

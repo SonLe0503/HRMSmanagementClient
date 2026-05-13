@@ -249,6 +249,13 @@ const SystemSettingPage: React.FC = () => {
                                     Hệ thống sử dụng tọa độ vệ tinh để xác minh tính trung thực khi điểm danh.
                                 </Paragraph>
                                 <Badge status="processing" text="Bán kính ổn định nhất: 50m" />
+                                <Paragraph className="text-slate-500 mt-4">
+                                                <Text strong>Làm sao để lấy tọa độ?</Text>
+                                                <ul className="mt-2 text-gray-600">
+                                                    <li>Cách 1: Nhấn nút "Lấy toạ độ tại đây" nếu bạn đang ngồi tại văn phòng (yêu cầu bật định vị trình duyệt).</li>
+                                                    <li>Cách 2: Truy cập Google Maps, chuột phải vào vị trí văn phòng và copy tọa độ.</li>
+                                                </ul>
+                                </Paragraph>
                             </div>
                         </Col>
                     </Row>
