@@ -49,6 +49,18 @@ export interface AttendanceResponseDto {
     explanationMessage?: string;
     explanationStatus?: string;
     explanationResponse?: string;
+    explanationType?: string;
+    explanationLeaveTypeId?: number;
+    explanationLeaveTypeName?: string;
+    explanationRequestedCheckInTime?: string;
+    explanationRequestedCheckOutTime?: string;
+    shiftStartTime?: string;
+    shiftEndTime?: string;
+    shiftIsOvernight?: boolean;
+    allowedCheckInFrom?: string;
+    allowedCheckInTo?: string;
+    allowedCheckOutFrom?: string;
+    allowedCheckOutTo?: string;
 }
 
 export interface AttendanceLogResponseDto {
@@ -247,14 +259,31 @@ export const addLocationReason = createAsyncThunk(
 
 export const submitExplanation = createAsyncThunk(
     "attendance/submitExplanation",
-    async ({ attendanceId, message }: { attendanceId: number; message: string }, { rejectWithValue, getState }) => {
+    async (
+        {
+            attendanceId,
+            message,
+            explanationType,
+            leaveTypeId,
+            requestedCheckInTime,
+            requestedCheckOutTime,
+        }: {
+            attendanceId: number;
+            message: string;
+            explanationType?: "Regularization" | "LeaveRequest";
+            leaveTypeId?: number;
+            requestedCheckInTime?: string;
+            requestedCheckOutTime?: string;
+        },
+        { rejectWithValue, getState }
+    ) => {
         try {
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: `/Attendance/${attendanceId}/submit-explanation`,
                 method: "POST",
-                data: { message },
+                data: { message, explanationType, leaveTypeId, requestedCheckInTime, requestedCheckOutTime },
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;
@@ -266,14 +295,31 @@ export const submitExplanation = createAsyncThunk(
 
 export const submitAbsentExplanation = createAsyncThunk(
     "attendance/submitAbsentExplanation",
-    async ({ attendanceDate, message }: { attendanceDate: string; message: string }, { rejectWithValue, getState }) => {
+    async (
+        {
+            attendanceDate,
+            message,
+            explanationType,
+            leaveTypeId,
+            requestedCheckInTime,
+            requestedCheckOutTime,
+        }: {
+            attendanceDate: string;
+            message: string;
+            explanationType?: "Regularization" | "LeaveRequest";
+            leaveTypeId?: number;
+            requestedCheckInTime?: string;
+            requestedCheckOutTime?: string;
+        },
+        { rejectWithValue, getState }
+    ) => {
         try {
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
             const response = await request({
                 url: `/Attendance/submit-absent-explanation`,
                 method: "POST",
-                data: { date: attendanceDate, message },
+                data: { date: attendanceDate, message, explanationType, leaveTypeId, requestedCheckInTime, requestedCheckOutTime },
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;
