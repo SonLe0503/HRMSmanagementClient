@@ -17,6 +17,8 @@ import {
   SendOutlined,
   ClockCircleOutlined,
   TeamOutlined,
+  StopOutlined,
+  WarningOutlined,
 } from "@ant-design/icons"
 import type { ColumnsType } from "antd/es/table"
 import { useAppDispatch, useAppSelector } from "../../../../../store"
@@ -25,6 +27,7 @@ import {
   fetchRecordsByPeriod,
   calculateAllEmployees,
   approvePayrollPeriod,
+  rejectPayrollPeriod,
   generatePayslipsForPeriod,
   exportPayrollExcel,
   publishForReview,
@@ -60,6 +63,7 @@ const PayrollPeriodDetail = () => {
   const isApproved    = period?.status === "Approved"
   const isCalculated  = period?.status === "Calculated"
   const isUnderReview = period?.status === "UnderReview"
+  const isRejected    = period?.status === "Rejected"
 
   // ── Bộ lọc ──────────────────────────────────────────
   const [search, setSearch]               = useState("")
@@ -67,6 +71,8 @@ const PayrollPeriodDetail = () => {
   const [positionFilter, setPositionFilter] = useState<string | null>(null)
   const [publishModal, setPublishModal]   = useState(false)
   const [reviewDays, setReviewDays]       = useState(3)
+  const [rejectModal, setRejectModal]     = useState(false)
+  const [rejectReason, setRejectReason]   = useState("")
 
   useEffect(() => {
     if (periodId) {
@@ -153,6 +159,21 @@ const PayrollPeriodDetail = () => {
       message.success("Kỳ lương đã được duyệt và khóa dữ liệu.")
     } catch (err: any) {
       message.error(err.message || "Lỗi khi duyệt kỳ lương")
+    }
+  }
+
+  const handleReject = async () => {
+    if (!rejectReason.trim()) {
+      message.warning("Vui lòng nhập lý do từ chối.")
+      return
+    }
+    try {
+      await dispatch(rejectPayrollPeriod({ periodId, data: { reason: rejectReason.trim() } })).unwrap()
+      message.success("Đã từ chối kỳ lương. HR cần tính toán lại.")
+      setRejectModal(false)
+      setRejectReason("")
+    } catch (err: any) {
+      message.error(err.message || "Lỗi khi từ chối kỳ lương")
     }
   }
 
@@ -345,6 +366,9 @@ const PayrollPeriodDetail = () => {
             {isUnderReview && (
               <Tag color="purple">ĐANG CHỜ XEM XÉT</Tag>
             )}
+            {isRejected && (
+              <Tag color="red" icon={<StopOutlined />}>ĐÃ TỪ CHỐI</Tag>
+            )}
           </Space>
         </Space>
 
@@ -399,6 +423,15 @@ const PayrollPeriodDetail = () => {
               Duyệt & Khóa
             </Button>
           )}
+          {isAdmin && isUnderReview && (
+            <Button
+              danger
+              icon={<StopOutlined />}
+              onClick={() => setRejectModal(true)}
+            >
+              Từ chối
+            </Button>
+          )}
         </Space>
       </div>
 
@@ -440,6 +473,30 @@ const PayrollPeriodDetail = () => {
               </Space>
             </Col>
           </Row>
+        </Card>
+      )}
+
+      {/* Banner Rejected */}
+      {isRejected && (
+        <Card className="shadow-sm rounded-xl !mb-4 border-red-200 bg-red-50">
+          <Space>
+            <WarningOutlined className="text-red-500 text-lg" />
+            <div>
+              <span className="font-semibold text-red-700">Kỳ lương đã bị từ chối</span>
+              {period?.rejectedByName && (
+                <span className="text-gray-600 ml-2">bởi <strong>{period.rejectedByName}</strong></span>
+              )}
+              {period?.rejectedDate && (
+                <span className="text-gray-500 ml-2">— {new Date(period.rejectedDate).toLocaleString("vi-VN")}</span>
+              )}
+              {period?.rejectionReason && (
+                <div className="text-red-600 mt-1">Lý do: {period.rejectionReason}</div>
+              )}
+              {isHR && (
+                <div className="text-gray-500 text-sm mt-1">HR cần tính toán lại và gửi cho nhân viên xem trước khi Admin duyệt lại.</div>
+              )}
+            </div>
+          </Space>
         </Card>
       )}
 
@@ -554,6 +611,32 @@ const PayrollPeriodDetail = () => {
         />
       </Card>
       {/* Modal gửi NV xem */}
+      {/* Modal từ chối kỳ lương */}
+      <Modal
+        title={<Space><StopOutlined className="text-red-500" /><span>Từ chối kỳ lương</span></Space>}
+        open={rejectModal}
+        onCancel={() => { setRejectModal(false); setRejectReason("") }}
+        onOk={handleReject}
+        okText="Xác nhận từ chối"
+        cancelText="Hủy"
+        okButtonProps={{ danger: true, disabled: !rejectReason.trim() }}
+      >
+        <p className="text-gray-600 mb-3">
+          Kỳ lương sẽ chuyển sang trạng thái <strong>Từ chối</strong>. HR sẽ cần tính toán lại và gửi cho nhân viên xem trước khi trình duyệt lại.
+        </p>
+        <div>
+          <span className="font-medium block mb-1">Lý do từ chối <span className="text-red-500">*</span></span>
+          <Input.TextArea
+            rows={3}
+            placeholder="Nhập lý do từ chối..."
+            value={rejectReason}
+            onChange={e => setRejectReason(e.target.value)}
+            maxLength={500}
+            showCount
+          />
+        </div>
+      </Modal>
+
       <Modal
         title={<Space><SendOutlined className="text-purple-500" /><span>Gửi phiếu lương tạm cho nhân viên</span></Space>}
         open={publishModal}

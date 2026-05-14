@@ -21,35 +21,34 @@ import CreatePeriodModal from "./CreatePeriodModal"
 const { Title } = Typography
 
 const STATUS_COLORS: Record<string, string> = {
-  Open:        "blue",
-  Aggregated:  "orange",
-  Calculated:  "gold",
+  Open: "blue",
+  Aggregated: "orange",
+  Calculated: "gold",
   UnderReview: "purple",
-  Approved:    "green",
-  Closed:      "default",
+  Approved: "green",
+  Closed: "default",
 }
 
 const STATUS_LABELS_VI: Record<string, string> = {
-  Open:        "Đang mở",
-  Aggregated:  "Đã tổng hợp",
-  Calculated:  "Đã tính lương",
+  Open: "Đang mở",
+  Calculated: "Đã tính lương",
   UnderReview: "Chờ xem xét",
-  Approved:    "Đã duyệt",
-  Closed:      "Đã đóng",
+  Approved: "Đã duyệt",
+  Rejected: "Đã từ chối",
 }
 
 const ALL_STATUSES = Object.keys(STATUS_LABELS_VI)
 
 const PayrollPeriodList = () => {
-  const dispatch   = useAppDispatch()
-  const navigate   = useNavigate()
-  const periods    = useAppSelector(selectPayrollPeriods)
-  const loading    = useAppSelector(selectPayrollLoading)
-  const infoLogin  = useAppSelector(selectInfoLogin)
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const periods = useAppSelector(selectPayrollPeriods)
+  const loading = useAppSelector(selectPayrollLoading)
+  const infoLogin = useAppSelector(selectInfoLogin)
 
   const isHR = infoLogin?.role === EUserRole.HR
 
-  const [showCreate, setShowCreate]     = useState(false)
+  const [showCreate, setShowCreate] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [periodFilter, setPeriodFilter] = useState<string | null>(null)
 

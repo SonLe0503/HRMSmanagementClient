@@ -8,7 +8,7 @@ import type {
   IPayslip,
   IPayrollAllowance, IPayrollDeduction,
   IPayrollFeedback, ICreatePayrollFeedback, IResolveFeedback,
-  IAttendanceSummary,
+  IAttendanceSummary, IRejectPayrollPeriod,
 } from "../types/payroll"
 
 // ─────────────────────────────────────────────────────────
@@ -137,6 +137,23 @@ export const approvePayrollPeriod = createAsyncThunk(
       return res.data
     } catch (err: any) {
       return rejectWithValue(err.response?.data || "Lỗi duyệt kỳ lương")
+    }
+  }
+)
+
+export const rejectPayrollPeriod = createAsyncThunk(
+  "payroll/rejectPeriod",
+  async ({ periodId, data }: { periodId: number; data: IRejectPayrollPeriod }, { rejectWithValue, getState }) => {
+    try {
+      const res = await request({
+        url: `/payroll/periods/${periodId}/reject`,
+        method: "PUT",
+        data,
+        headers: getAuthHeader(getState()),
+      })
+      return res.data
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Lỗi từ chối kỳ lương")
     }
   }
 )
@@ -568,6 +585,15 @@ const payrollSlice = createSlice({
         if (idx !== -1) state.periods[idx] = action.payload
       })
       .addCase(approvePayrollPeriod.rejected, setError)
+
+      .addCase(rejectPayrollPeriod.pending, setLoading)
+      .addCase(rejectPayrollPeriod.fulfilled, (state, action) => {
+        state.loading = false
+        state.currentPeriod = action.payload
+        const idx = state.periods.findIndex(p => p.periodId === action.payload.periodId)
+        if (idx !== -1) state.periods[idx] = action.payload
+      })
+      .addCase(rejectPayrollPeriod.rejected, setError)
 
       // Calculate
       .addCase(calculateAllEmployees.pending, (state) => { state.calculating = true; state.error = null })
