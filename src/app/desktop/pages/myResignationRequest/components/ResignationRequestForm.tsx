@@ -116,7 +116,7 @@ const ResignationRequestForm = () => {
                         >
                             {(employees || []).map((emp: any) => (
                                 <Option key={emp.employeeId} value={emp.employeeId}>
-                                    {emp.firstName} {emp.lastName} — {emp.employeeCode}
+                                    {emp.fullName} — {emp.employeeCode}
                                 </Option>
                             ))}
                         </Select>

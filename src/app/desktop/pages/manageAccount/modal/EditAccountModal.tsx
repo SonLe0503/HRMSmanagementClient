@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Modal, Form, Input, Select, Switch, message } from "antd";
+import { Modal, Form, Input, Select, Button, message } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../../store";
 import { updateUser, selectUserLoading } from "../../../../../store/userSlide";
 import { selectRoles } from "../../../../../store/roleSlide";
@@ -18,6 +18,9 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
     const roles = useAppSelector(selectRoles);
     const employees = useAppSelector(selectEmployees);
     const loading = useAppSelector(selectUserLoading);
+    const isActive = Form.useWatch("isActive", form);
+    const isProtectedAdmin = editingUser?.username?.toLowerCase() === "admin";
+    const currentIsActive = typeof isActive === "boolean" ? isActive : !!editingUser?.isActive;
 
     useEffect(() => {
         if (open && employees.length === 0) {
@@ -39,6 +42,11 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
     }, [open, editingUser, roles, form]);
 
     const onFinish = (values: any) => {
+        if (isProtectedAdmin && values.isActive === false) {
+            message.warning("Khong cho phep vo hieu hoa tai khoan admin");
+            return;
+        }
+
         dispatch(updateUser({ id: editingUser.userId, data: values })).then((res: any) => {
             if (!res.error) {
                 message.success("User updated successfully");
@@ -124,8 +132,21 @@ const EditAccountModal = ({ open, onCancel, onSuccess, editingUser }: EditAccoun
                     </Select>
                 </Form.Item>
 
-                <Form.Item name="isActive" label="Active Status" valuePropName="checked">
-                    <Switch />
+                <Form.Item name="isActive" hidden>
+                    <Input />
+                </Form.Item>
+
+                <Form.Item label="Active Status">
+                    <Button
+                        type={currentIsActive ? "primary" : "default"}
+                        danger={currentIsActive}
+                        disabled={isProtectedAdmin && currentIsActive}
+                        onClick={() => {
+                            form.setFieldValue("isActive", !currentIsActive);
+                        }}
+                    >
+                        {currentIsActive ? "Deactivate" : "Activate"}
+                    </Button>
                 </Form.Item>
             </Form>
         </Modal>
