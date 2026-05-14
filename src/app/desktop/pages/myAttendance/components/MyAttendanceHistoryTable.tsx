@@ -135,10 +135,28 @@ const MyAttendanceHistoryTable = () => {
             const values = await form.validateFields();
             if (!selectedRecord) return;
 
+            const payload = {
+                message: values.message,
+                explanationType: values.explanationType,
+                leaveTypeId: values.explanationType === "LeaveRequest" ? values.leaveTypeId : undefined,
+                requestedCheckInTime: values.requestedCheckInTime
+                    ? values.requestedCheckInTime.format("HH:mm:ss")
+                    : undefined,
+                requestedCheckOutTime: values.requestedCheckOutTime
+                    ? values.requestedCheckOutTime.format("HH:mm:ss")
+                    : undefined,
+            };
+
             if (selectedRecord.attendanceId === 0) {
-                await dispatch(submitAbsentExplanation({ attendanceDate: selectedRecord.attendanceDate, message: values.message })).unwrap();
+                await dispatch(submitAbsentExplanation({
+                    attendanceDate: selectedRecord.attendanceDate,
+                    ...payload,
+                })).unwrap();
             } else {
-                await dispatch(submitExplanation({ attendanceId: selectedRecord.attendanceId, message: values.message })).unwrap();
+                await dispatch(submitExplanation({
+                    attendanceId: selectedRecord.attendanceId,
+                    ...payload,
+                })).unwrap();
             }
 
             message.success("Phiếu giải trình đã được gửi. Đang chờ Quản lý duyệt.");

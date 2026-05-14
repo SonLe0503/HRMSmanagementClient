@@ -1,16 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
-import { Drawer, Select, Button, Tag, Skeleton, message } from "antd";
+import { Drawer, Select, Button, Tag, Skeleton, message, Form } from "antd";
 import { useAndroidBack } from "../../../../hooks/useAndroidBack";
 import {
     CheckCircleOutlined, LogoutOutlined,
     CalendarOutlined, SearchOutlined, ScheduleOutlined,
+    ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
     checkIn, checkOut, fetchMyToday, fetchMyHistory,
     selectMyToday, selectMyHistory, selectAttendanceLoading,
+    submitExplanation, submitAbsentExplanation, type AttendanceResponseDto
 } from "../../../../store/attendanceSlide";
+import ExplanationModal from "../../../desktop/pages/myAttendance/modal/ExplanationModal";
 import { fetchLocationSettings, selectLocationSettings, fetchPayrollSettings, selectPayrollSettings } from "../../../../store/systemSettingSlide";
 import {
     fetchMySchedule, selectMySchedule, selectShiftAssignmentLoading as selectScheduleLoading,
@@ -72,6 +75,54 @@ const MobileAttendance = () => {
     const [selectedPeriodKey, setSelectedPeriodKey] = useState("");
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const [scheduleLabel, setScheduleLabel] = useState("Tuần này");
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState<AttendanceResponseDto | null>(null);
+    const [form] = Form.useForm();
+
+    const handleOpenExplanation = (record: AttendanceResponseDto) => {
+        setSelectedRecord(record);
+        form.resetFields();
+        if (record.explanationMessage) form.setFieldValue("message", record.explanationMessage);
+        setModalOpen(true);
+    };
+
+    const handleSubmitExplanation = async () => {
+        try {
+            const values = await form.validateFields();
+            if (!selectedRecord) return;
+
+            const payload = {
+                message: values.message,
+                explanationType: values.explanationType,
+                leaveTypeId: values.explanationType === "LeaveRequest" ? values.leaveTypeId : undefined,
+                requestedCheckInTime: values.requestedCheckInTime
+                    ? values.requestedCheckInTime.format("HH:mm:ss")
+                    : undefined,
+                requestedCheckOutTime: values.requestedCheckOutTime
+                    ? values.requestedCheckOutTime.format("HH:mm:ss")
+                    : undefined,
+            };
+
+            if (selectedRecord.attendanceId === 0) {
+                await dispatch(submitAbsentExplanation({
+                    attendanceDate: selectedRecord.attendanceDate,
+                    ...payload,
+                })).unwrap();
+            } else {
+                await dispatch(submitExplanation({
+                    attendanceId: selectedRecord.attendanceId,
+                    ...payload,
+                })).unwrap();
+            }
+
+            message.success("Phiếu giải trình đã được gửi. Đang chờ Quản lý duyệt.");
+            setModalOpen(false);
+            handleFetchHistory();
+        } catch (error: any) {
+            if (error?.errorFields) return;
+            message.error(error?.message || "Gửi giải trình thất bại.");
+        }
+    };
 
     const payrollPeriods = useMemo(() => generatePayrollPeriods(cutOffDay), [cutOffDay]);
 
@@ -290,25 +341,53 @@ const MobileAttendance = () => {
                         </MobileCard>
                     ) : (
                         <MobileCard className="overflow-hidden p-0">
-                            {history.slice(0, 20).map((r) => (
-                                <div key={r.attendanceId > 0 ? r.attendanceId : `v-${r.attendanceDate}`}
-                                    className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-b-0">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-800">
-                                            {dayjs(r.attendanceDate).format("DD/MM/YYYY")}
-                                        </p>
-                                        <p className="text-xs text-gray-400 mt-0.5">
-                                            {r.checkInTime ? dayjs(r.checkInTime).format("HH:mm") : "--:--"}
-                                            {" → "}
-                                            {r.checkOutTime ? dayjs(r.checkOutTime).format("HH:mm") : "--:--"}
-                                            {r.workingHours ? ` · ${r.workingHours}h` : ""}
-                                        </p>
+                            {history.slice(0, 20).map((r) => {
+                                let expStatus = r.explanationStatus;
+                                if (!expStatus && (
+                                    r.location?.includes("[INVALID]") ||
+                                    r.status === "Absent" ||
+                                    r.status === "Incomplete"
+                                )) expStatus = "Required";
+
+                                const canExplain = expStatus === "Required" || expStatus === "Rejected";
+
+                                return (
+                                    <div key={r.attendanceId > 0 ? r.attendanceId : `v-${r.attendanceDate}`}
+                                        className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-b-0"
+                                        onClick={() => canExplain && handleOpenExplanation(r)}
+                                    >
+                                        <div className="flex-1 min-w-0 mr-2">
+                                            <div className="flex items-center gap-2">
+                                                <p className="text-sm font-medium text-gray-800">
+                                                    {dayjs(r.attendanceDate).format("DD/MM/YYYY")}
+                                                </p>
+                                                {canExplain && (
+                                                    <ExclamationCircleOutlined className="text-red-500 text-xs" />
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-gray-400 mt-0.5">
+                                                {r.checkInTime ? dayjs(r.checkInTime).format("HH:mm") : "--:--"}
+                                                {" → "}
+                                                {r.checkOutTime ? dayjs(r.checkOutTime).format("HH:mm") : "--:--"}
+                                                {r.workingHours ? ` · ${r.workingHours}h` : ""}
+                                            </p>
+                                            {expStatus === "Pending" && (
+                                                <p className="text-[10px] text-yellow-600 mt-0.5">Đang chờ duyệt giải trình</p>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col items-end gap-1">
+                                            <Tag color={STATUS_MAP[r.status]?.color ?? "default"} className="text-xs m-0">
+                                                {STATUS_MAP[r.status]?.label ?? r.status}
+                                            </Tag>
+                                            {canExplain && (
+                                                <Button size="small" type="primary" danger ghost className="text-[10px] px-2 h-5 mt-1" onClick={(e) => { e.stopPropagation(); handleOpenExplanation(r); }}>
+                                                    Giải trình
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
-                                    <Tag color={STATUS_MAP[r.status]?.color ?? "default"} className="text-xs">
-                                        {STATUS_MAP[r.status]?.label ?? r.status}
-                                    </Tag>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </MobileCard>
                     )}
                 </>
@@ -466,6 +545,14 @@ const MobileAttendance = () => {
                 onCancel={() => setCheckOutOpen(false)}
                 onCapture={handleCheckOut}
                 loading={loading}
+            />
+            <ExplanationModal
+                open={modalOpen}
+                loading={loading}
+                selectedRecord={selectedRecord}
+                form={form}
+                onOk={handleSubmitExplanation}
+                onCancel={() => setModalOpen(false)}
             />
         </MobilePageWrapper>
     );
