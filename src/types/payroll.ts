@@ -6,7 +6,7 @@ export interface IPayrollPeriod {
   year: number
   startDate: string
   endDate: string
-  status: 'Open' | 'Aggregated' | 'Calculated' | 'UnderReview' | 'Approved' | 'Closed'
+  status: 'Open' | 'Aggregated' | 'Calculated' | 'UnderReview' | 'Approved' | 'Rejected'
   totalEmployees: number
   totalGrossPay: number
   totalNetPay: number
@@ -21,6 +21,9 @@ export interface IPayrollPeriod {
   reviewDeadlineExpired?: boolean
   allAgreed?: boolean
   agreedCount?: number
+  rejectionReason?: string
+  rejectedByName?: string
+  rejectedDate?: string
 }
 
 export interface ICreatePayrollPeriod {
@@ -172,6 +175,10 @@ export interface IAttendanceSummary {
 export interface IResolveFeedback {
   status: 'Resolved' | 'Dismissed'
   hrResponse: string
+}
+
+export interface IRejectPayrollPeriod {
+  reason: string
 }
 
 export interface ITaxCalculationResult {
