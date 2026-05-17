@@ -180,7 +180,7 @@ const LeaveRequestForm = () => {
                 </Form.Item>
 
                 <Form.Item name="numberOfDays" label="Số ngày nghỉ" rules={[{ required: true, message: 'Vui lòng nhập số ngày' }]}>
-                    <InputNumber min={0.5} step={0.5} className="w-full !h-12 flex items-center rounded-lg" size="large" />
+                    <InputNumber min={0.5} step={0.5} className="w-full !h-12 flex items-center rounded-lg" size="large" disabled />
                 </Form.Item>
 
                 <Form.Item name="reason" label="Lý do" rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}>

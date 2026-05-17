@@ -4,6 +4,7 @@ import { InboxOutlined, FileTextOutlined, FilePdfOutlined, FileImageOutlined, Fi
 import type { UploadFile, UploadProps } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../../../store";
 import { uploadEmployeeDocument, fetchDocumentsByEmployee, selectDocumentUploading } from "../../../../../store/employeeDocumentSlide";
+import { selectInfoLogin } from "../../../../../store/authSlide";
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -39,6 +40,7 @@ const UploadDocumentModal = ({ open, employeeId, onCancel, onSuccess }: UploadDo
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const uploading = useAppSelector(selectDocumentUploading);
+    const infoLogin = useAppSelector(selectInfoLogin);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [fileError, setFileError] = useState<string | null>(null);
 
@@ -94,6 +96,7 @@ const UploadDocumentModal = ({ open, employeeId, onCancel, onSuccess }: UploadDo
         formData.append("DocumentTitle", values.documentTitle);
         formData.append("DocumentCategory", values.documentCategory);
         formData.append("IsConfidential", String(values.isConfidential ?? false));
+        formData.append("UploadedBy", String(infoLogin?.userId ?? ""));
 
         dispatch(uploadEmployeeDocument({ formData }))
             .unwrap()
