@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
     Table, Button, Tag, Space, Tooltip, Popconfirm, Empty,
-    Typography, Select, Row, Col, Badge, message,
+    Typography, Select, Row, Col, Badge, message, Input, DatePicker,
 } from "antd";
 import {
     UploadOutlined, EditOutlined, DeleteOutlined, DownloadOutlined,
     LockOutlined, FileTextOutlined, FilePdfOutlined, FileImageOutlined, FileWordOutlined,
-    FilterOutlined,
+    FilterOutlined, SearchOutlined,
 } from "@ant-design/icons";
+import type { Dayjs } from "dayjs";
 import { useAppDispatch, useAppSelector } from "../../../../../store";
 import {
     fetchDocumentsByEmployee,
@@ -64,14 +65,32 @@ const DocumentsTab = ({ employeeId }: DocumentsTabProps) => {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingDoc, setEditingDoc] = useState<IEmployeeDocumentList | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+    const [searchText, setSearchText] = useState("");
+    const [uploaderFilter, setUploaderFilter] = useState<string | null>(null);
+    const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
 
     useEffect(() => {
         dispatch(fetchDocumentsByEmployee(employeeId));
     }, [employeeId, dispatch]);
 
-    const filteredDocs = categoryFilter
-        ? documents.filter(d => d.documentCategory === categoryFilter)
-        : documents;
+    const uploaderOptions = useMemo(() => {
+        const names = Array.from(new Set(documents.map(d => d.uploadedByName).filter(Boolean)));
+        return names.map(n => ({ label: n, value: n }));
+    }, [documents]);
+
+    const filteredDocs = documents.filter(d => {
+        const matchCategory = !categoryFilter || d.documentCategory === categoryFilter;
+        const matchSearch = !searchText.trim() ||
+            d.documentTitle.toLowerCase().includes(searchText.toLowerCase()) ||
+            d.fileName.toLowerCase().includes(searchText.toLowerCase());
+        const matchUploader = !uploaderFilter || d.uploadedByName === uploaderFilter;
+        const uploadDay = new Date(d.uploadDate);
+        const matchDate = !dateRange || !dateRange[0] || !dateRange[1] || (
+            uploadDay >= dateRange[0].startOf("day").toDate() &&
+            uploadDay <= dateRange[1].endOf("day").toDate()
+        );
+        return matchCategory && matchSearch && matchUploader && matchDate;
+    });
 
 
     const handleDownload = async (id: number, fileName: string) => {
@@ -203,15 +222,38 @@ const DocumentsTab = ({ employeeId }: DocumentsTabProps) => {
             {/* Toolbar */}
             <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
-                    <Space>
+                    <Space wrap>
+                        <Input
+                            placeholder="Tìm tiêu đề hoặc tên file..."
+                            prefix={<SearchOutlined style={{ color: "#8c8c8c" }} />}
+                            allowClear
+                            style={{ width: 220 }}
+                            value={searchText}
+                            onChange={e => setSearchText(e.target.value)}
+                        />
                         <FilterOutlined style={{ color: "#8c8c8c" }} />
                         <Select
-                            style={{ width: 220 }}
-                            placeholder="Lọc theo danh mục"
+                            style={{ width: 180 }}
+                            placeholder="Danh mục"
                             allowClear
                             value={categoryFilter}
                             onChange={v => setCategoryFilter(v)}
                             options={CATEGORY_OPTIONS.slice(1)}
+                        />
+                        <Select
+                            style={{ width: 160 }}
+                            placeholder="Người tải"
+                            allowClear
+                            value={uploaderFilter}
+                            onChange={v => setUploaderFilter(v)}
+                            options={uploaderOptions}
+                        />
+                        <DatePicker.RangePicker
+                            style={{ width: 240 }}
+                            placeholder={["Từ ngày", "Đến ngày"]}
+                            format="DD/MM/YYYY"
+                            value={dateRange}
+                            onChange={v => setDateRange(v as [Dayjs | null, Dayjs | null] | null)}
                         />
                         {filteredDocs.length > 0 && (
                             <Badge count={filteredDocs.length} color="#1890ff" showZero>
