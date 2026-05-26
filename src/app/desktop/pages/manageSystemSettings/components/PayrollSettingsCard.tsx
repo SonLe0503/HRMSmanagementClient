@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Form, InputNumber, Button, Typography, Alert } from "antd";
-import { SaveOutlined, ReloadOutlined, CalendarOutlined } from "@ant-design/icons";
+import { SaveOutlined, ReloadOutlined, CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -61,6 +61,25 @@ const PayrollSettingsCard: React.FC<Props> = ({ form, loading, onFinish, onRefre
                         size="large"
                         addonBefore={<CalendarOutlined />}
                         addonAfter="hàng tháng"
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="defaultReviewWindowDays"
+                    label="Số ngày nhân viên được review chấm công (mặc định)"
+                    rules={[
+                        { required: true, message: "Vui lòng nhập số ngày review" },
+                        { type: "number", min: 1, max: 30, message: "Phải từ 1 đến 30 ngày" }
+                    ]}
+                    extra="Số ngày này sẽ được tự động điền khi tạo kỳ lương mới"
+                >
+                    <InputNumber
+                        min={1}
+                        max={30}
+                        style={{ width: 180 }}
+                        size="large"
+                        addonBefore={<ClockCircleOutlined />}
+                        addonAfter="ngày"
                     />
                 </Form.Item>
 

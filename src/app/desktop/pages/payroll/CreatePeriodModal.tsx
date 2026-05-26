@@ -25,7 +25,6 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
     }
   }, [visible, dispatch])
 
-  // Reset khi đóng modal
   useEffect(() => {
     if (!visible) {
       form.resetFields()
@@ -36,11 +35,17 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
 
   const cutOffDay = payrollSettings?.payrollCutOffDay ?? 1
 
-  // Tính startDate / endDate từ tháng, năm, ngày chốt
+  // startDate / endDate của kỳ lương
   const computeDates = (m: number, y: number) => {
     const start = dayjs(`${y}-${String(m).padStart(2, "0")}-${String(cutOffDay).padStart(2, "0")}`)
     const end = start.add(1, "month").subtract(1, "day")
-    return { startDate: start.format("YYYY-MM-DD"), endDate: end.format("YYYY-MM-DD") }
+    // AttendanceCutoffDate = ngày đầu tiên của tháng kế tiếp (= EndDate + 1)
+    const cutoff = end.add(1, "day")
+    return {
+      startDate: start.format("YYYY-MM-DD"),
+      endDate: end.format("YYYY-MM-DD"),
+      attendanceCutoffDate: cutoff.format("YYYY-MM-DD"),
+    }
   }
 
   const dates = month && year ? computeDates(month, year) : null
@@ -58,6 +63,8 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
         year: values.year,
         startDate: dates.startDate,
         endDate: dates.endDate,
+        attendanceCutoffDate: dates.attendanceCutoffDate,
+        reviewWindowDays: payrollSettings?.defaultReviewWindowDays ?? 5,
       })).unwrap()
 
       message.success("Tạo kỳ lương thành công!")
@@ -75,15 +82,12 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
       onCancel={onCancel}
       okText="Xác nhận"
       cancelText="Hủy bỏ"
-      width={460}
+      width={480}
     >
       <Form form={form} layout="vertical" className="mt-4">
         <div className="flex gap-3">
           <Form.Item name="month" label="Tháng" rules={[{ required: true, message: "Chọn tháng" }]} className="flex-1">
-            <Select
-              placeholder="Chọn tháng"
-              onChange={(v) => setMonth(v)}
-            >
+            <Select placeholder="Chọn tháng" onChange={(v) => setMonth(v)}>
               {Array.from({ length: 12 }, (_, i) => (
                 <Select.Option key={i + 1} value={i + 1}>Tháng {i + 1}</Select.Option>
               ))}
@@ -91,10 +95,7 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
           </Form.Item>
 
           <Form.Item name="year" label="Năm" rules={[{ required: true, message: "Chọn năm" }]} className="flex-1">
-            <Select
-              placeholder="Chọn năm"
-              onChange={(v) => setYear(v)}
-            >
+            <Select placeholder="Chọn năm" onChange={(v) => setYear(v)}>
               {[2024, 2025, 2026, 2027].map(y => (
                 <Select.Option key={y} value={y}>{y}</Select.Option>
               ))}
@@ -108,11 +109,14 @@ const CreatePeriodModal = ({ visible, onCancel, onSuccess }: Props) => {
             showIcon
             message={
               <span>
-                Thời gian chốt công:{" "}
-                <strong>{dates.startDate}</strong> → <strong>{dates.endDate}</strong>
+                Thời gian chốt công: <strong>{dates.startDate}</strong> → <strong>{dates.endDate}</strong>
               </span>
             }
-            description={`Dựa theo ngày chốt lương = ${cutOffDay} (cấu hình trong Cài đặt hệ thống)`}
+            description={
+              <span>
+                Ngày chốt công: <strong>{dates.attendanceCutoffDate}</strong> — hệ thống tự động gửi thông báo review chấm công cho nhân viên vào ngày này.
+              </span>
+            }
             className="mt-1"
           />
         ) : (

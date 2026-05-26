@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
   Table, Card, Button, Space, Typography, Tag, message,
-  Breadcrumb, Divider, Input, Select, Row, Col, Tooltip, Badge, Modal, InputNumber, Progress,
+  Breadcrumb, Divider, Input, Select, Row, Col, Tooltip, Badge, Modal,
 } from "antd"
 import {
   CalculatorOutlined,
@@ -28,10 +28,9 @@ import {
   calculateAllEmployees,
   approvePayrollPeriod,
   rejectPayrollPeriod,
+  triggerAttendanceReview,
   generatePayslipsForPeriod,
   exportPayrollExcel,
-  publishForReview,
-  fetchPeriodFeedbacks,
   selectCurrentPeriod,
   selectPayrollRecords,
   selectPayrollLoading,
@@ -42,7 +41,6 @@ import { EUserRole } from "../../../../../interface/app"
 import type { IPayrollRecord } from "../../../../../types/payroll"
 import URL from "../../../../../constants/url"
 import SummaryCards from "./SummaryCards"
-import FeedbackPanel from "./FeedbackPanel"
 
 const { Title, Text } = Typography
 
@@ -60,17 +58,16 @@ const PayrollPeriodDetail = () => {
   const periodId   = Number(id)
   const isHR       = infoLogin?.role === EUserRole.HR
   const isAdmin    = infoLogin?.role === EUserRole.ADMIN
-  const isApproved    = period?.status === "Approved"
-  const isCalculated  = period?.status === "Calculated"
-  const isUnderReview = period?.status === "UnderReview"
-  const isRejected    = period?.status === "Rejected"
+  const isApproved         = period?.status === "Approved"
+  const isCalculated       = period?.status === "Calculated"
+  const isAttendanceReview = period?.status === "AttendanceReview"
+  const isRejected         = period?.status === "Rejected"
+  const isOpen             = period?.status === "Open"
 
   // ── Bộ lọc ──────────────────────────────────────────
   const [search, setSearch]               = useState("")
   const [deptFilter, setDeptFilter]       = useState<string | null>(null)
   const [positionFilter, setPositionFilter] = useState<string | null>(null)
-  const [publishModal, setPublishModal]   = useState(false)
-  const [reviewDays, setReviewDays]       = useState(3)
   const [rejectModal, setRejectModal]     = useState(false)
   const [rejectReason, setRejectReason]   = useState("")
 
@@ -80,12 +77,6 @@ const PayrollPeriodDetail = () => {
       dispatch(fetchRecordsByPeriod(periodId))
     }
   }, [dispatch, periodId])
-
-  useEffect(() => {
-    if (periodId && isUnderReview) {
-      dispatch(fetchPeriodFeedbacks(periodId))
-    }
-  }, [dispatch, periodId, isUnderReview])
 
   // Reset position filter khi đổi phòng ban
   useEffect(() => {
@@ -177,14 +168,13 @@ const PayrollPeriodDetail = () => {
     }
   }
 
-  const handlePublishForReview = async () => {
+  const handleTriggerReview = async () => {
     try {
-      await dispatch(publishForReview({ periodId, reviewDays })).unwrap()
-      message.success(`Đã gửi phiếu lương tạm cho nhân viên xem! Hạn phản hồi: ${reviewDays} ngày.`)
-      setPublishModal(false)
+      await dispatch(triggerAttendanceReview(periodId)).unwrap()
+      message.success("Đã kích hoạt giai đoạn review chấm công. Email đã được gửi cho nhân viên.")
       await dispatch(fetchPayrollPeriodById(periodId))
     } catch (err: any) {
-      message.error(err.message || "Lỗi khi gửi NV xem")
+      message.error(err.message || "Lỗi khi kích hoạt review")
     }
   }
 
@@ -360,41 +350,42 @@ const PayrollPeriodDetail = () => {
           <Space className="mt-1">
             <Tag color="cyan">Từ: {period?.startDate}</Tag>
             <Tag color="cyan">Đến: {period?.endDate}</Tag>
-            {period?.status === "Approved" && (
-              <Tag color="green" icon={<CheckCircleOutlined />}>ĐÃ DUYỆT</Tag>
-            )}
-            {isUnderReview && (
-              <Tag color="purple">ĐANG CHỜ XEM XÉT</Tag>
-            )}
-            {isRejected && (
-              <Tag color="red" icon={<StopOutlined />}>ĐÃ TỪ CHỐI</Tag>
-            )}
+            {isApproved         && <Tag color="green"  icon={<CheckCircleOutlined />}>ĐÃ DUYỆT</Tag>}
+            {isAttendanceReview && <Tag color="orange">REVIEW CHẤM CÔNG</Tag>}
+            {isCalculated       && <Tag color="blue">ĐÃ TÍNH LƯƠNG</Tag>}
+            {isRejected         && <Tag color="red" icon={<StopOutlined />}>ĐÃ TỪ CHỐI</Tag>}
+            {isOpen             && <Tag color="default">CHƯA XỬ LÝ</Tag>}
           </Space>
         </Space>
 
         <Space wrap>
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>Quay lại</Button>
 
-          {isHR && !isApproved && (
-            <Tooltip title="Tính lại lương cho toàn bộ nhân viên trong kỳ">
+          {/* HR: kích hoạt review thủ công nếu background service chưa chạy */}
+          {isHR && isOpen && (
+            <Tooltip title="Gửi thông báo review chấm công cho nhân viên và bắt đầu giai đoạn review">
               <Button
-                icon={calculating ? <LoadingOutlined /> : <CalculatorOutlined />}
-                onClick={handleCalculateAll}
-                loading={calculating}
+                icon={<SendOutlined />}
+                onClick={handleTriggerReview}
+                className="border-orange-500 text-orange-600"
               >
-                Tính lương toàn bộ
+                Kích hoạt Review chấm công
               </Button>
             </Tooltip>
           )}
 
-          {isHR && isCalculated && (
-            <Tooltip title="Gửi phiếu lương tạm cho nhân viên xem và phản hồi">
+          {/* HR: tính lương sau khi review deadline đã qua */}
+          {isHR && !isApproved && !isOpen && (
+            <Tooltip title={isAttendanceReview && !period?.reviewDeadlineExpired
+              ? "Chờ hết hạn review chấm công mới có thể tính lương"
+              : "Tính lại lương cho toàn bộ nhân viên trong kỳ"}>
               <Button
-                icon={<SendOutlined />}
-                onClick={() => setPublishModal(true)}
-                className="border-purple-500 text-purple-600"
+                icon={calculating ? <LoadingOutlined /> : <CalculatorOutlined />}
+                onClick={handleCalculateAll}
+                loading={calculating}
+                disabled={isAttendanceReview && !period?.reviewDeadlineExpired}
               >
-                Gửi NV xem
+                Tính lương toàn bộ
               </Button>
             </Tooltip>
           )}
@@ -418,58 +409,42 @@ const PayrollPeriodDetail = () => {
             </>
           )}
 
-          {isAdmin && isUnderReview && (period?.allAgreed || period?.reviewDeadlineExpired) && (
+          {isAdmin && isCalculated && (
             <Button type="primary" icon={<CheckCircleOutlined />} onClick={handleApprove}>
               Duyệt & Khóa
             </Button>
           )}
-          {isAdmin && isUnderReview && (
-            <Button
-              danger
-              icon={<StopOutlined />}
-              onClick={() => setRejectModal(true)}
-            >
+          {isAdmin && isCalculated && (
+            <Button danger icon={<StopOutlined />} onClick={() => setRejectModal(true)}>
               Từ chối
             </Button>
           )}
         </Space>
       </div>
 
-      {/* UnderReview: deadline + progress */}
-      {isUnderReview && (
-        <Card className="shadow-sm rounded-xl !mb-4 border-purple-200 bg-purple-50">
+      {/* AttendanceReview: hiển thị thông tin hạn review chấm công */}
+      {isAttendanceReview && (
+        <Card className="shadow-sm rounded-xl !mb-4 border-orange-200 bg-orange-50">
           <Row gutter={[24, 8]} align="middle">
-            <Col xs={24} sm={12}>
+            <Col xs={24} sm={14}>
               <Space>
-                <ClockCircleOutlined className="text-purple-600" />
-                <span className="font-semibold text-purple-700">Hạn phản hồi:</span>
+                <ClockCircleOutlined className="text-orange-600" />
+                <span className="font-semibold text-orange-700">Hạn nhân viên review chấm công:</span>
                 {period?.reviewDeadline
                   ? <span className={period.reviewDeadlineExpired ? "text-red-600 font-bold" : "text-gray-800"}>
                       {new Date(period.reviewDeadline).toLocaleString("vi-VN")}
-                      {period.reviewDeadlineExpired && " — ĐÃ HẾT HẠN"}
+                      {period.reviewDeadlineExpired && " — ĐÃ HẾT HẠN — HR có thể tính lương"}
                     </span>
                   : <span className="text-gray-400">Chưa đặt</span>
                 }
               </Space>
             </Col>
-            <Col xs={24} sm={12}>
-              <Space direction="vertical" size={2} className="w-full">
-                <Space>
-                  <TeamOutlined className="text-purple-600" />
-                  <span className="text-sm font-semibold text-purple-700">
-                    {period?.allAgreed
-                      ? "Tất cả nhân viên đã đồng ý ✓"
-                      : `${period?.agreedCount ?? 0} / ${period?.totalEmployees ?? 0} nhân viên đã đồng ý`}
-                  </span>
-                </Space>
-                <Progress
-                  percent={period?.totalEmployees
-                    ? Math.round(((period.agreedCount ?? 0) / period.totalEmployees) * 100)
-                    : 0}
-                  size="small"
-                  status={period?.allAgreed ? "success" : "active"}
-                  strokeColor={period?.allAgreed ? "#52c41a" : "#9b59b6"}
-                />
+            <Col xs={24} sm={10}>
+              <Space>
+                <TeamOutlined className="text-orange-600" />
+                <span className="text-sm text-orange-700">
+                  Nhân viên đang xem xét và gửi yêu cầu giải trình chấm công nếu có sai sót.
+                </span>
               </Space>
             </Col>
           </Row>
@@ -493,7 +468,7 @@ const PayrollPeriodDetail = () => {
                 <div className="text-red-600 mt-1">Lý do: {period.rejectionReason}</div>
               )}
               {isHR && (
-                <div className="text-gray-500 text-sm mt-1">HR cần tính toán lại và gửi cho nhân viên xem trước khi Admin duyệt lại.</div>
+                <div className="text-gray-500 text-sm mt-1">HR cần tính toán lại để Admin duyệt lại.</div>
               )}
             </div>
           </Space>
@@ -502,14 +477,6 @@ const PayrollPeriodDetail = () => {
 
       {/* Summary */}
       <SummaryCards />
-
-      {/* Feedback Panel — HR xem phản hồi NV khi kỳ đang UnderReview */}
-      {isUnderReview && (isHR || isAdmin) && (
-        <>
-          <Divider />
-          <FeedbackPanel periodId={periodId} />
-        </>
-      )}
 
       <Divider />
 
@@ -622,7 +589,7 @@ const PayrollPeriodDetail = () => {
         okButtonProps={{ danger: true, disabled: !rejectReason.trim() }}
       >
         <p className="text-gray-600 mb-3">
-          Kỳ lương sẽ chuyển sang trạng thái <strong>Từ chối</strong>. HR sẽ cần tính toán lại và gửi cho nhân viên xem trước khi trình duyệt lại.
+          Kỳ lương sẽ chuyển sang trạng thái <strong>Từ chối</strong>. HR sẽ cần tính toán lại trước khi Admin duyệt lại.
         </p>
         <div>
           <span className="font-medium block mb-1">Lý do từ chối <span className="text-red-500">*</span></span>
@@ -637,33 +604,6 @@ const PayrollPeriodDetail = () => {
         </div>
       </Modal>
 
-      <Modal
-        title={<Space><SendOutlined className="text-purple-500" /><span>Gửi phiếu lương tạm cho nhân viên</span></Space>}
-        open={publishModal}
-        onCancel={() => setPublishModal(false)}
-        onOk={handlePublishForReview}
-        okText="Gửi ngay"
-        cancelText="Hủy"
-        okButtonProps={{ className: "bg-purple-600 border-purple-600" }}
-      >
-        <p className="text-gray-600 mb-4">
-          Nhân viên sẽ nhận được thông báo và có thể xem phiếu lương tạm, sau đó xác nhận Đồng ý hoặc Không đồng ý.
-        </p>
-        <div className="flex items-center gap-3">
-          <span className="font-medium whitespace-nowrap">Thời hạn phản hồi:</span>
-          <InputNumber
-            min={1}
-            max={30}
-            value={reviewDays}
-            onChange={v => setReviewDays(v ?? 3)}
-            addonAfter="ngày"
-            style={{ width: 140 }}
-          />
-        </div>
-        <p className="text-xs text-gray-400 mt-2">
-          Sau khi hết hạn, Admin có thể duyệt kỳ lương ngay cả khi chưa có đủ phản hồi.
-        </p>
-      </Modal>
     </div>
   )
 }
