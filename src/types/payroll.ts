@@ -6,21 +6,19 @@ export interface IPayrollPeriod {
   year: number
   startDate: string
   endDate: string
-  status: 'Open' | 'Aggregated' | 'Calculated' | 'UnderReview' | 'Approved' | 'Rejected'
+  status: 'Open' | 'AttendanceReview' | 'Calculated' | 'Approved' | 'Rejected'
+  attendanceCutoffDate: string
+  reviewWindowDays: number
   totalEmployees: number
   totalGrossPay: number
   totalNetPay: number
   totalInsurance: number
   totalTax: number
-  aggregatedDate?: string
   calculatedDate?: string
   approvedDate?: string
   approvedByName?: string
-  workingDays?: number
   reviewDeadline?: string
   reviewDeadlineExpired?: boolean
-  allAgreed?: boolean
-  agreedCount?: number
   rejectionReason?: string
   rejectedByName?: string
   rejectedDate?: string
@@ -31,6 +29,8 @@ export interface ICreatePayrollPeriod {
   year: number
   startDate: string
   endDate: string
+  attendanceCutoffDate: string
+  reviewWindowDays: number
 }
 
 export interface IPayrollRecord {
@@ -45,8 +45,8 @@ export interface IPayrollRecord {
   baseSalary: number
   workingDays: number
   actualWorkingDays: number
-  salariedAmount: number   // Lương theo ngày công = baseSalary / workingDays × actualWorkingDays
-  totalAllowances: number  // Phụ cấp chính sách (không bao gồm OT)
+  salariedAmount: number
+  totalAllowances: number
   overtimePay: number
   bonusAmount: number
   grossPay: number
@@ -112,29 +112,6 @@ export interface IPayrollSummary {
   byDepartment: { departmentName: string; employeeCount: number; totalNetPay: number }[]
 }
 
-export interface IPayrollFeedback {
-  feedbackId: number
-  payrollRecordId: number
-  employeeId: number
-  employeeName: string
-  employeeCode: string
-  departmentName: string
-  content?: string
-  isAgreed: boolean
-  submittedAt: string
-  status: 'Pending' | 'Resolved' | 'Dismissed'
-  hrResponse?: string
-  resolvedAt?: string
-  resolvedByName?: string
-  netPay: number
-  periodLabel: string
-}
-
-export interface ICreatePayrollFeedback {
-  isAgreed: boolean
-  content?: string
-}
-
 export interface IAttendanceItem {
   date: string
   status: string
@@ -170,11 +147,6 @@ export interface IAttendanceSummary {
   approvedLeaves: ILeaveItem[]
   approvedOvertime: IOvertimeItem[]
   totals: IAttendanceTotals
-}
-
-export interface IResolveFeedback {
-  status: 'Resolved' | 'Dismissed'
-  hrResponse: string
 }
 
 export interface IRejectPayrollPeriod {

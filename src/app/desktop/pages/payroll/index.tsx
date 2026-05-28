@@ -21,20 +21,19 @@ import CreatePeriodModal from "./CreatePeriodModal"
 const { Title } = Typography
 
 const STATUS_COLORS: Record<string, string> = {
-  Open: "blue",
-  Aggregated: "orange",
-  Calculated: "gold",
-  UnderReview: "purple",
-  Approved: "green",
-  Closed: "default",
+  Open:             "blue",
+  AttendanceReview: "orange",
+  Calculated:       "gold",
+  Approved:         "green",
+  Rejected:         "red",
 }
 
 const STATUS_LABELS_VI: Record<string, string> = {
-  Open: "Đang mở",
-  Calculated: "Đã tính lương",
-  UnderReview: "Chờ xem xét",
-  Approved: "Đã duyệt",
-  Rejected: "Đã từ chối",
+  Open:             "Chưa xử lý",
+  AttendanceReview: "Review chấm công",
+  Calculated:       "Đã tính lương",
+  Approved:         "Đã duyệt",
+  Rejected:         "Đã từ chối",
 }
 
 const ALL_STATUSES = Object.keys(STATUS_LABELS_VI)

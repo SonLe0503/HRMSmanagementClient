@@ -16,6 +16,7 @@ interface ApprovalSettings {
 
 interface PayrollSettings {
     payrollCutOffDay: number;
+    defaultReviewWindowDays: number;
 }
 
 interface CompanySettings {
