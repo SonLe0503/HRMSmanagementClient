@@ -130,7 +130,7 @@ const Sidebar = () => {
                 key: "manage-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
-                    { key: URL.MyPayrollDraftList, label: "Phiếu lương tạm" },
+                    { key: URL.MyPayrollDraftList, label: "Xem chấm công" },
                     { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
                 ]
             },
@@ -154,7 +154,7 @@ const Sidebar = () => {
             {
                 key: "employee-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
-                    { key: URL.MyPayrollDraftList, label: "Phiếu lương tạm" },
+                    { key: URL.MyPayrollDraftList, label: "Xem chấm công" },
                     { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
                 ]
             },
@@ -208,7 +208,7 @@ const Sidebar = () => {
                 key: "hr-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
-                    { key: URL.MyPayrollDraftList, label: "Phiếu lương tạm" },
+                    { key: URL.MyPayrollDraftList, label: "Xem chấm công" },
                     { key: URL.MyPayslips, label: "Phiếu lương của tôi" },
                     { key: URL.PayrollReport, label: "Báo cáo quỹ lương" },
                     { key: URL.PayrollMethodology, label: "Quy tắc tính lương" },
