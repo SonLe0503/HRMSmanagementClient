@@ -48,9 +48,6 @@ export interface IHrDashboardData {
         overallAttendanceRate: number;
         averageLeaveDays: number;
         pendingLeaveRequests: number;
-        pendingEvaluations: number;
-        completedEvaluations: number;
-        averagePerformanceScore: number;
     };
     upcomingProbationEnds: IUpcomingEvent[];
     contractRenewals: IUpcomingEvent[];
@@ -80,7 +77,6 @@ export interface IManagerDashboardData {
         activeTasks: number;
         overdueTasks: number;
         completionRate: number;
-        pendingEvaluations: number;
     };
     actionSummary: {
         pendingLeaveApprovals: number;

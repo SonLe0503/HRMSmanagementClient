@@ -146,9 +146,6 @@ const DashboardManage = () => {
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                             <Text>Tỉ lệ hoàn thành:</Text><Text strong>{managerData?.taskPerformance.completionRate}%</Text>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <Text>Đánh giá chờ xử lý:</Text><Text strong>{managerData?.taskPerformance.pendingEvaluations}</Text>
-                                        </div>
                                     </Space>
                                 </Card>
                             </motion.div>

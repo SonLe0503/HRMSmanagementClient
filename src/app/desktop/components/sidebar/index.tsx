@@ -6,7 +6,6 @@ import {
     TeamOutlined,
     IdcardOutlined,
     BankOutlined,
-    SolutionOutlined,
     ClockCircleOutlined,
     CalendarOutlined,
     PieChartOutlined,
@@ -66,17 +65,6 @@ const Sidebar = () => {
                 ]
             },
             {
-                key: "admin-perf", icon: <SolutionOutlined />, label: "Đánh giá Năng lực",
-                children: [
-                    { key: URL.PerformanceTemplates, label: "Mẫu đánh giá" },
-                    { key: URL.PerformanceCycles, label: "Đợt đánh giá" },
-                    { key: URL.EvaluatorAssignments, label: "Phân công đánh giá" },
-                    { key: URL.EvaluationList, label: "Phiếu đánh giá" },
-                    { key: URL.PendingEvaluations, label: "Đánh giá nhân viên" },
-                    { key: URL.MyEvaluationResults, label: "Kết quả đánh giá" },
-                ]
-            },
-            {
                 key: "admin-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
@@ -87,7 +75,6 @@ const Sidebar = () => {
                 key: "admin-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
                 children: [
                     { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
-                    { key: URL.CompetencyReport, label: "Báo cáo Năng lực" },
                 ]
             },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
@@ -119,14 +106,6 @@ const Sidebar = () => {
                 ]
             },
             {
-                key: "manage-perf", icon: <SolutionOutlined />, label: "Đánh giá Năng lực",
-                children: [
-                    { key: URL.EvaluationList, label: "Phiếu đánh giá" },
-                    { key: URL.PendingEvaluations, label: "Đánh giá nhân viên" },
-                    { key: URL.MyEvaluationResults, label: "Kết quả đánh giá" },
-                ]
-            },
-            {
                 key: "manage-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
                     { key: URL.PayrollPeriods, label: "Quản lý kỳ lương" },
@@ -138,7 +117,6 @@ const Sidebar = () => {
                 key: "manage-analytics", icon: <PieChartOutlined />, label: "Báo cáo",
                 children: [
                     { key: URL.WorkforceAnalytics, label: "Phân tích Nhân sự" },
-                    { key: URL.CompetencyReport, label: "Báo cáo Năng lực" },
                 ]
             },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
@@ -149,8 +127,6 @@ const Sidebar = () => {
             { key: URL.MyOvertimeRequest, icon: <ClockCircleOutlined />, label: "Tăng ca của tôi" },
             { key: URL.MyResignationRequest, icon: <IdcardOutlined />, label: "Đơn thôi việc" },
             { key: URL.ManageTask, icon: <TeamOutlined />, label: "Quản lý công việc" },
-            { key: URL.EvaluationList, icon: <SolutionOutlined />, label: "Phiếu đánh giá của tôi" },
-            { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá" },
             {
                 key: "employee-payroll", icon: <WalletOutlined />, label: "Lương & Thưởng",
                 children: [
@@ -193,15 +169,6 @@ const Sidebar = () => {
                 children: [
                     { key: URL.ManageHRProcedure, label: "Quản lý thủ tục" },
                     { key: URL.MyResignationRequest, label: "Đơn thôi việc của tôi" },
-                ]
-            },
-            {
-                key: "hr-perf", icon: <SolutionOutlined />, label: "Đánh giá Năng lực",
-                children: [
-                    { key: URL.PerformanceTemplates, label: "Mẫu đánh giá" },
-                    { key: URL.PerformanceCycles, label: "Đợt đánh giá" },
-                    { key: URL.EvaluatorAssignments, label: "Phân công đánh giá" },
-                    { key: URL.EvaluationList, label: "Phiếu đánh giá" },
                 ]
             },
             {

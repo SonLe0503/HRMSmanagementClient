@@ -21,13 +21,6 @@ import leaveBalanceSlide from "./leaveBalanceSlide";
 import overtimeSlide from "./overtimeSlide";
 import exportSlide from "./exportSlide";
 import workforceAnalyticsSlide from "./workforceAnalyticsSlide";
-import competencySlide from "./competencySlide";
-import evaluationCycleSlide from "./evaluationCycleSlide";
-import evaluationTemplateSlide from "./evaluationTemplateSlide";
-import evaluationCriteriaSlide from "./evaluationCriteriaSlide";
-import evaluationSlide from "./evaluationSlide";
-import submitEvaluationSlide from "./submitEvaluationSlide";
-import evaluationResultSlide from "./evaluationResultSlide";
 import systemSettingSlide from "./systemSettingSlide";
 import faceSlide from "./faceSlide";
 import dashboardSlide from "./dashboardSlide";
@@ -61,13 +54,6 @@ const reducers = {
   overtime: overtimeSlide,
   export: exportSlide,
   workforceAnalytics: workforceAnalyticsSlide,
-  competency: competencySlide,
-  evaluationCycle: evaluationCycleSlide,
-  evaluationTemplate: evaluationTemplateSlide,
-  evaluationCriteria: evaluationCriteriaSlide,
-  evaluation: evaluationSlide,
-  submitEvaluation: submitEvaluationSlide,
-  evaluationResult: evaluationResultSlide,
   systemSetting: systemSettingSlide,
   face: faceSlide,
   dashboard: dashboardSlide,

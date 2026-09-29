@@ -18,10 +18,6 @@ const MobileProfile           = lazy(() => import("../app/mobile/pages/MobilePro
 const MobileResignation       = lazy(() => import("../app/mobile/pages/MobileResignation"))
 const MobileManageTask        = lazy(() => import("../app/mobile/pages/MobileManageTask"))
 const MobilePayslips          = lazy(() => import("../app/mobile/pages/MobilePayslips"))
-const MobileEvaluationList              = lazy(() => import("../app/mobile/pages/MobileEvaluationList"))
-const MobileEvaluationResults           = lazy(() => import("../app/mobile/pages/MobileEvaluationResults"))
-const MobileSubmitEvaluation            = lazy(() => import("../app/mobile/pages/MobileSubmitEvaluation"))
-const MobileViewEvaluationResultDetail  = lazy(() => import("../app/mobile/pages/MobileViewEvaluationResultDetail"))
 const MobileFaceRegistration            = lazy(() => import("../app/mobile/pages/MobileFaceRegistration"))
 
 const MOBILE_ROLES = [EUserRole.EMPLOYEE, EUserRole.HR, EUserRole.MANAGE]
@@ -66,16 +62,6 @@ const LeaveConfiguration = lazy(() => import("../app/desktop/pages/leaveConfigur
 const MyOvertimeRequest = lazy(() => import("../app/desktop/pages/myOvertimeRequest/index"));
 const ManageOvertimeRequest = lazy(() => import("../app/desktop/pages/manageOvertimeRequest/index"));
 const WorkforceAnalytics = lazy(() => import("../app/desktop/pages/analytics/WorkforceAnalytics"));
-const CompetencyReport = lazy(() => import("../app/desktop/pages/competency/CompetencyReport"));
-const PerformanceTemplates = lazy(() => import("../app/desktop/pages/performanceEvaluation/PerformanceTemplates"));
-const PerformanceCriteria = lazy(() => import("../app/desktop/pages/performanceEvaluation/PerformanceCriteria"));
-const PerformanceCycles = lazy(() => import("../app/desktop/pages/performanceEvaluation/PerformanceCycles"));
-const EvaluatorAssignments = lazy(() => import("../app/desktop/pages/performanceEvaluation/EvaluatorAssignments"));
-const EvaluationList = lazy(() => import("../app/desktop/pages/performanceEvaluation/EvaluationList"));
-const PendingEvaluations = lazy(() => import("../app/desktop/pages/performanceEvaluation/PendingEvaluations"));
-const SubmitEvaluation = lazy(() => import("../app/desktop/pages/performanceEvaluation/SubmitEvaluation"));
-const MyEvaluationResults = lazy(() => import("../app/desktop/pages/performanceEvaluation/MyEvaluationResults"));
-const ViewEvaluationResultDetail = lazy(() => import("../app/desktop/pages/performanceEvaluation/ViewEvaluationResultDetail"));
 const ManageSystemSettings = lazy(() => import("../app/desktop/pages/manageSystemSettings/index"));
 const HRPayrollSettings = lazy(() => import("../app/desktop/pages/hrPayrollSettings/index"));
 const ManageFaceRegistration = lazy(() => import("../app/desktop/pages/manageFaceRegistration/index"));
@@ -261,66 +247,6 @@ const privateResourceItem = [
     {
         key: URL.WorkforceAnalytics,
         element: <WorkforceAnalytics />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.CompetencyReport,
-        element: <CompetencyReport />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.PerformanceTemplates,
-        element: <PerformanceTemplates />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.PerformanceCriteria,
-        element: <PerformanceCriteria />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.PerformanceCycles,
-        element: <PerformanceCycles />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.EvaluatorAssignments,
-        element: <EvaluatorAssignments />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.EvaluationList,
-        element: <AdaptivePage desktop={<EvaluationList />} mobile={<MobileEvaluationList />} />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.PendingEvaluations,
-        element: <PendingEvaluations />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.SubmitEvaluation,
-        element: <AdaptivePage desktop={<SubmitEvaluation />} mobile={<MobileSubmitEvaluation />} />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.MyEvaluationResults,
-        element: <AdaptivePage desktop={<MyEvaluationResults />} mobile={<MobileEvaluationResults />} />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.ViewEvaluationResultDetail,
-        element: <AdaptivePage desktop={<ViewEvaluationResultDetail />} mobile={<MobileViewEvaluationResultDetail />} />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

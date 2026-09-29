@@ -10,8 +10,6 @@ import {
     UserOutlined,
     CalendarOutlined,
     IdcardOutlined,
-    SolutionOutlined,
-    AppstoreOutlined,
 } from "@ant-design/icons";
 import URL from "../../constants/url";
 
@@ -28,7 +26,6 @@ const MobileBottomTabs = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [donTuOpen, setDonTuOpen] = useState(false);
-    const [morePagesOpen, setMorePagesOpen] = useState(false);
 
     const donTuItems = [
         { key: URL.MyLeaveRequest,       icon: <CalendarOutlined />, label: "Nghỉ phép của tôi"   },
@@ -36,13 +33,7 @@ const MobileBottomTabs = () => {
         { key: URL.MyResignationRequest, icon: <IdcardOutlined />,   label: "Đơn thôi việc"       },
     ];
 
-    const morePagesItems = [
-        { key: URL.EvaluationList,    icon: <SolutionOutlined />, label: "Phiếu đánh giá của tôi" },
-        { key: URL.MyEvaluationResults, icon: <AppstoreOutlined />, label: "Kết quả đánh giá"     },
-    ];
-
     const donTuRoutes = donTuItems.map((i) => i.key);
-    const morePagesRoutes = morePagesItems.map((i) => i.key);
 
     const tabs: TabItem[] = [
         {
@@ -70,8 +61,8 @@ const MobileBottomTabs = () => {
             key: "payslips",
             label: "Lương",
             icon: <WalletOutlined />,
-            routes: [URL.MyPayslips, ...morePagesRoutes],
-            action: () => setMorePagesOpen(true),
+            routes: [URL.MyPayslips],
+            path: URL.MyPayslips,
         },
         {
             key: "profile",
@@ -83,7 +74,6 @@ const MobileBottomTabs = () => {
     ];
 
     useAndroidBack(donTuOpen, () => setDonTuOpen(false));
-    useAndroidBack(morePagesOpen, () => setMorePagesOpen(false));
 
     const isActive = (tab: TabItem) =>
         tab.routes.some((r) => location.pathname === r || location.pathname.startsWith(r + "/"));
@@ -142,34 +132,6 @@ const MobileBottomTabs = () => {
                         key={item.key}
                         className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
                         onClick={() => handleDrawerNavigate(item.key, () => setDonTuOpen(false))}
-                    >
-                        <span className="text-blue-500 text-xl">{item.icon}</span>
-                        <span className="text-sm font-medium text-gray-800">{item.label}</span>
-                    </button>
-                ))}
-            </Drawer>
-
-            {/* Lương & Đánh giá drawer */}
-            <Drawer
-                title="Lương & Đánh giá"
-                placement="bottom"
-                height="auto"
-                open={morePagesOpen}
-                onClose={() => setMorePagesOpen(false)}
-                styles={{ body: { padding: "8px 0 16px" } }}
-            >
-                <button
-                    className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                    onClick={() => handleDrawerNavigate(URL.MyPayslips, () => setMorePagesOpen(false))}
-                >
-                    <span className="text-blue-500 text-xl"><WalletOutlined /></span>
-                    <span className="text-sm font-medium text-gray-800">Phiếu lương của tôi</span>
-                </button>
-                {morePagesItems.map((item) => (
-                    <button
-                        key={item.key}
-                        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                        onClick={() => handleDrawerNavigate(item.key, () => setMorePagesOpen(false))}
                     >
                         <span className="text-blue-500 text-xl">{item.icon}</span>
                         <span className="text-sm font-medium text-gray-800">{item.label}</span>

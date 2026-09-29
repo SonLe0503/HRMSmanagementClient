@@ -1,9 +1,9 @@
 import { Row, Col, Card, Statistic, DatePicker, Typography, Space, List, Badge, Spin, Tag } from "antd";
-import { 
+import {
      TeamOutlined, UserAddOutlined, UserDeleteOutlined,
-    CheckCircleOutlined, ClockCircleOutlined, 
-    CalendarOutlined, FileTextOutlined, StarOutlined, 
-    CarryOutOutlined, GiftOutlined, HistoryOutlined
+    CheckCircleOutlined,
+    CalendarOutlined, FileTextOutlined,
+    GiftOutlined, HistoryOutlined
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
@@ -36,9 +36,6 @@ const DashboardHR = () => {
         { title: "Tỉ lệ chuyên cần", value: `${stats?.overallAttendanceRate ?? 0}%`, icon: <CheckCircleOutlined />, color: "#722ed1", desc: "Nhân viên có mặt đầy đủ" },
         { title: "Ngày nghỉ trung bình", value: stats?.averageLeaveDays, icon: <CalendarOutlined />, color: "#13c2c2", desc: "Trung bình ngày nghỉ/nhân viên" },
         { title: "Đơn nghỉ chờ duyệt", value: stats?.pendingLeaveRequests, icon: <FileTextOutlined />, color: "#faad14", desc: "Yêu cầu chờ phê duyệt" },
-        { title: "Đánh giá chờ xử lý", value: stats?.pendingEvaluations, icon: <ClockCircleOutlined />, color: "#fa8c16", desc: "Đánh giá đến hạn hoặc quá hạn" },
-        { title: "Đánh giá hoàn thành", value: stats?.completedEvaluations, icon: <CarryOutOutlined />, color: "#2f54eb", desc: "Đánh giá hoàn thành trong kỳ" },
-        { title: "Điểm hiệu suất TB", value: stats?.averagePerformanceScore, icon: <StarOutlined />, color: "#eb2f96", desc: "Trung bình hiệu suất toàn công ty" },
     ];
 
     const container = {
