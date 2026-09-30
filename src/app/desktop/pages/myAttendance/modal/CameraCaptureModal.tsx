@@ -23,11 +23,13 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
     const webcamRef = useRef<Webcam>(null);
     const [image, setImage] = useState<string | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
+    const [cameraError, setCameraError] = useState<string | null>(null);
 
     useEffect(() => {
         if (open) {
             setImage(null);
             setIsCameraReady(false);
+            setCameraError(null);
         } else {
             // Stop all camera tracks so iOS Safari releases the camera indicator
             const stream = webcamRef.current?.stream;
@@ -60,6 +62,22 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
 
     const handleUserMedia = () => {
         setIsCameraReady(true);
+        setCameraError(null);
+    };
+
+    // Browsers only expose the camera on HTTPS/localhost and otherwise fail without prompting.
+    const handleUserMediaError = (error: string | DOMException) => {
+        setIsCameraReady(false);
+        const name = typeof error === "string" ? "" : error.name;
+        if (!window.isSecureContext) {
+            setCameraError("Trình duyệt chỉ cho phép dùng camera khi truy cập bằng HTTPS.");
+        } else if (name === "NotAllowedError") {
+            setCameraError("Bạn đã chặn quyền camera. Hãy cho phép truy cập camera trong cài đặt trình duyệt rồi thử lại.");
+        } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+            setCameraError("Không tìm thấy camera phù hợp trên thiết bị.");
+        } else {
+            setCameraError("Không thể khởi động camera. Hãy đóng các ứng dụng khác đang dùng camera rồi thử lại.");
+        }
     };
 
     return (
@@ -80,12 +98,17 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
                             screenshotFormat="image/jpeg"
                             videoConstraints={videoConstraints}
                             onUserMedia={handleUserMedia}
-                            onUserMediaError={() => setIsCameraReady(false)}
+                            onUserMediaError={handleUserMediaError}
                             className="w-full h-full object-cover"
                             playsInline
                         />
                     ) : (
                         <img src={image} alt="Capture" className="w-full h-full object-cover" />
+                    )}
+                    {cameraError && !image && (
+                        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center p-6 text-center">
+                            <Text type="danger">{cameraError}</Text>
+                        </div>
                     )}
                     {loading && (
                         <div className="absolute inset-0 bg-white/50 flex flex-col items-center justify-center">
@@ -104,7 +127,7 @@ const CameraCaptureModal: React.FC<CameraCaptureModalProps> = ({ open, title, on
                             onClick={capture}
                             disabled={loading || !isCameraReady}
                         >
-                            {isCameraReady ? "Chụp ảnh xác minh" : "Đang khởi động Camera..."}
+                            {isCameraReady ? "Chụp ảnh xác minh" : cameraError ? "Camera không khả dụng" : "Đang khởi động Camera..."}
                         </Button>
                     ) : (
                         <Space className="w-full justify-center">

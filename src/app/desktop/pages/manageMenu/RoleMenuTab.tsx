@@ -41,6 +41,11 @@ const RoleMenuTab = () => {
   const [granted, setGranted] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
 
+  // Default to the first role so the tab never opens empty.
+  useEffect(() => {
+    if (roleId == null && roles.length > 0) setRoleId(roles[0].roleId);
+  }, [roles, roleId]);
+
   useEffect(() => {
     if (roleId != null) dispatch(fetchRoleMenus(roleId));
   }, [roleId, dispatch]);
