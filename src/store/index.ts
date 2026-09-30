@@ -20,12 +20,12 @@ import leaveTypeSlide from "./leaveTypeSlide";
 import leaveBalanceSlide from "./leaveBalanceSlide";
 import overtimeSlide from "./overtimeSlide";
 import exportSlide from "./exportSlide";
-import workforceAnalyticsSlide from "./workforceAnalyticsSlide";
 import systemSettingSlide from "./systemSettingSlide";
 import faceSlide from "./faceSlide";
 import dashboardSlide from "./dashboardSlide";
 import payrollSlide from "./payrollSlide";
 import resignationRequestSlide from "./resignationRequestSlide";
+import menuSlide from "./menuSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -53,12 +53,12 @@ const reducers = {
   leaveBalance: leaveBalanceSlide,
   overtime: overtimeSlide,
   export: exportSlide,
-  workforceAnalytics: workforceAnalyticsSlide,
   systemSetting: systemSettingSlide,
   face: faceSlide,
   dashboard: dashboardSlide,
   payroll: payrollSlide,
   resignationRequest: resignationRequestSlide,
+  menu: menuSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

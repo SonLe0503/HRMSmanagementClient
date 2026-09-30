@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Tag, Space, Card, Switch, message, Typography, Tooltip } from "antd";
-import { SafetyCertificateOutlined, CalendarOutlined, TeamOutlined, EyeOutlined } from "@ant-design/icons";
+import { SafetyCertificateOutlined, CalendarOutlined, TeamOutlined, EyeOutlined, PlusOutlined, KeyOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import URL from "../../../../constants/url";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchAllRoles, changeRoleStatus, selectRoles, selectRoleLoading } from "../../../../store/roleSlide";
 import Condition from "./Condition";
+import AddRoleModal from "./modal/AddRoleModal";
 
 const { Title } = Typography;
 
@@ -20,6 +21,7 @@ const ManageRole = () => {
     const [statusFilter, setStatusFilter] = useState<boolean | null>(null);
     const [togglingRoleId, setTogglingRoleId] = useState<number | null>(null);
     const [viewingRoleId, setViewingRoleId] = useState<number | null>(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchAllRoles());
@@ -41,11 +43,6 @@ const ManageRole = () => {
                 setTogglingRoleId(null);
             });
     };
-
-    // const handleSuccess = () => {
-    //     // setIsAddModalOpen(false);
-    //     dispatch(fetchAllRoles());
-    // };
 
     const filteredRoles = roles.filter((role) => {
         const matchesSearch = role.roleName.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -130,6 +127,12 @@ const ManageRole = () => {
                             }}
                         />
                     </Tooltip>
+                    <Tooltip title="Phân quyền">
+                        <Button
+                            icon={<KeyOutlined />}
+                            onClick={() => navigate(`${URL.ManagePermission}?roleId=${record.roleId}`)}
+                        />
+                    </Tooltip>
                     <Switch
                         size="small"
                         loading={togglingRoleId === record.roleId}
@@ -147,6 +150,9 @@ const ManageRole = () => {
                 title={
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <Title level={4} style={{ margin: 0 }}>Quản lý Vai trò</Title>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsAddModalOpen(true)}>
+                            Thêm vai trò
+                        </Button>
                     </div>
                 }
             >
@@ -165,6 +171,7 @@ const ManageRole = () => {
                     pagination={{ pageSize: 10 }}
                 />
             </Card>
+            <AddRoleModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
         </div>
     );
 };

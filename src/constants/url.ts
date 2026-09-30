@@ -11,6 +11,8 @@ const URL = {
     DashboardSale: "/dashboard/sale",
     ManageUser: "/admin/manage-user",
     ManageRole: "/admin/manage-role",
+    ManagePermission: "/admin/manage-permission",
+    ManageMenu: "/admin/manage-menu",
     ManageCategory: "/admin/manage-category",
     ManageProduct: "/admin/manage-product",
 
@@ -35,7 +37,6 @@ const URL = {
     LeaveConfiguration: "/leave/configuration",
     MyOvertimeRequest: "/overtime/my",
     ManageOvertimeRequest: "/overtime/manage",
-    WorkforceAnalytics: "/analytics/workforce",
     ManageSystemSettings: "/admin/system-settings",
     HRPayrollSettings: "/hr/payroll-settings",
     ManageFaceRegistration: "/hr/manage-face-registration",

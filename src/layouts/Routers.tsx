@@ -38,6 +38,8 @@ const DashboardHR = lazy(() => import("../app/desktop/pages/dashboard/DashboardH
 const DashboardManage = lazy(() => import("../app/desktop/pages/dashboard/DashboardManage"))
 const ManageUser = lazy(() => import("../app/desktop/pages/manageAccount"))
 const ManageRole = lazy(() => import("../app/desktop/pages/manageRole"))
+const ManagePermission = lazy(() => import("../app/desktop/pages/managePermission"))
+const ManageMenu = lazy(() => import("../app/desktop/pages/manageMenu"))
 
 const ManageTask = lazy(() => import("../app/desktop/pages/manageTask"))
 const ManageEmployee = lazy(() => import("../app/desktop/pages/manageEmployee"))
@@ -61,7 +63,6 @@ const ManageLeaveRequest = lazy(() => import("../app/desktop/pages/manageLeaveRe
 const LeaveConfiguration = lazy(() => import("../app/desktop/pages/leaveConfiguration/index"));
 const MyOvertimeRequest = lazy(() => import("../app/desktop/pages/myOvertimeRequest/index"));
 const ManageOvertimeRequest = lazy(() => import("../app/desktop/pages/manageOvertimeRequest/index"));
-const WorkforceAnalytics = lazy(() => import("../app/desktop/pages/analytics/WorkforceAnalytics"));
 const ManageSystemSettings = lazy(() => import("../app/desktop/pages/manageSystemSettings/index"));
 const HRPayrollSettings = lazy(() => import("../app/desktop/pages/hrPayrollSettings/index"));
 const ManageFaceRegistration = lazy(() => import("../app/desktop/pages/manageFaceRegistration/index"));
@@ -114,6 +115,18 @@ const privateResourceItem = [
     {
         key: URL.ManageRole,
         element: <ManageRole />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManagePermission,
+        element: <ManagePermission />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageMenu,
+        element: <ManageMenu />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
@@ -241,12 +254,6 @@ const privateResourceItem = [
     {
         key: URL.ManageOvertimeRequest,
         element: <ManageOvertimeRequest />,
-        layout: DEFAULT_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.WorkforceAnalytics,
-        element: <WorkforceAnalytics />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },
