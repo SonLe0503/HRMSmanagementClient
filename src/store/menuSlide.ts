@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";
 import { logout } from "./authSlide";
+import { companyScopeHeader } from "./companySlide";
 
 export interface IMyMenuNode {
   menuId: number;
@@ -57,7 +58,7 @@ const initialState: IMenuState = {
 
 const authHeader = (getState: () => unknown) => {
   const state: any = getState();
-  return { Authorization: `Bearer ${state.auth.infoLogin?.accessToken}` };
+  return { Authorization: `Bearer ${state.auth.infoLogin?.accessToken}`, ...companyScopeHeader(state) };
 };
 
 const errorOf = (error: any, fallback: string) =>

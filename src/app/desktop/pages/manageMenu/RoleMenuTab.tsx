@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Select, Tree, Button, Space, Spin, Empty, Tag, Typography, message } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
 import type { DataNode } from "antd/es/tree";
@@ -11,7 +11,9 @@ import {
   selectRoleMenuTreeLoading,
   type IMenuAdminNode,
 } from "../../../../store/menuSlide";
-import { selectRoles } from "../../../../store/roleSlide";
+import { fetchAllRoles, selectRoles } from "../../../../store/roleSlide";
+import CompanyScopeSelect from "../../components/companyScopeSelect";
+import { useConfigScope } from "../../components/companyScopeSelect/hooks";
 import { renderMenuIcon } from "../../../../constants/menuIcons";
 import { flattenTree } from "./menuTreeUtils";
 
@@ -40,15 +42,30 @@ const RoleMenuTab = () => {
   const [roleId, setRoleId] = useState<number | null>(null);
   const [granted, setGranted] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
+  // Roles in the store may still belong to the previously configured company until the refetch lands
+  const [rolesReady, setRolesReady] = useState(false);
+  const { ready, scopeKey } = useConfigScope();
+  const loadedScope = useRef(scopeKey);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (loadedScope.current !== scopeKey) {
+      // Switched company: its roles are different, so drop the selection
+      loadedScope.current = scopeKey;
+      setRoleId(null);
+    }
+    setRolesReady(false);
+    dispatch(fetchAllRoles()).finally(() => setRolesReady(true));
+  }, [dispatch, ready, scopeKey]);
 
   // Default to the first role so the tab never opens empty.
   useEffect(() => {
-    if (roleId == null && roles.length > 0) setRoleId(roles[0].roleId);
-  }, [roles, roleId]);
+    if (rolesReady && roleId == null && roles.length > 0) setRoleId(roles[0].roleId);
+  }, [rolesReady, roles, roleId]);
 
   useEffect(() => {
-    if (roleId != null) dispatch(fetchRoleMenus(roleId));
-  }, [roleId, dispatch]);
+    if (rolesReady && roleId != null) dispatch(fetchRoleMenus(roleId));
+  }, [rolesReady, roleId, dispatch]);
 
   const rows = useMemo(() => flattenTree(roleTree), [roleTree]);
 
@@ -94,6 +111,7 @@ const RoleMenuTab = () => {
   return (
     <>
       <Space style={{ marginBottom: 16 }} wrap>
+        <CompanyScopeSelect />
         <Select
           style={{ width: 240 }}
           placeholder="Chọn vai trò"

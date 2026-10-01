@@ -56,11 +56,25 @@ export interface IResetAdminPasswordResult {
 interface ICompanyState {
   list: ICompany[];
   loading: boolean;
+  /** Company whose roles, permissions and role menus the SuperAdmin is currently configuring. */
+  scopeCompanyId: number | null;
 }
 
 const initialState: ICompanyState = {
   list: [],
   loading: false,
+  scopeCompanyId: null,
+};
+
+/**
+ * Header telling the API which company the SuperAdmin is configuring.
+ * The backend honors it only for the SuperAdmin and only on role / permission / menu endpoints.
+ */
+export const companyScopeHeader = (state: any): Record<string, string> => {
+  const scopeCompanyId = state.company?.scopeCompanyId;
+  return state.auth?.infoLogin?.role === "SUPERADMIN" && scopeCompanyId != null
+    ? { "X-Company-Id": String(scopeCompanyId) }
+    : {};
 };
 
 const authHeader = (getState: () => unknown) => {
@@ -145,7 +159,11 @@ export const resetCompanyAdminPassword = createAsyncThunk(
 export const companySlice = createSlice({
   name: "company",
   initialState,
-  reducers: {},
+  reducers: {
+    setScopeCompany: (state, action: { payload: number | null }) => {
+      state.scopeCompanyId = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCompanies.pending, (state) => {
@@ -163,5 +181,8 @@ export const companySlice = createSlice({
 
 export const selectCompanies = (state: RootState) => state.company.list;
 export const selectCompaniesLoading = (state: RootState) => state.company.loading;
+export const selectScopeCompanyId = (state: RootState) => state.company.scopeCompanyId;
+
+export const { setScopeCompany } = companySlice.actions;
 
 export default companySlice.reducer;

@@ -1,3 +1,4 @@
+import { companyScopeHeader } from "./companySlide";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";
@@ -49,7 +50,7 @@ export const fetchAllRoles = createAsyncThunk(
                 url: "/Role",
                 method: "GET",
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, ...companyScopeHeader(state),
                 },
             });
             return response.data;
@@ -71,7 +72,7 @@ export const createRole = createAsyncThunk(
                 method: "POST",
                 data,
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, ...companyScopeHeader(state),
                 },
             });
             return response.data;
@@ -91,7 +92,7 @@ export const fetchPermissionCatalog = createAsyncThunk(
             const response = await request({
                 url: "/Role/permissions",
                 method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}`, ...companyScopeHeader(state), },
             });
             return response.data;
         } catch (error: any) {
@@ -110,7 +111,7 @@ export const fetchRolePermissions = createAsyncThunk(
             const response = await request({
                 url: `/Role/${roleId}/permissions`,
                 method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}`, ...companyScopeHeader(state), },
             });
             return response.data as string[];
         } catch (error: any) {
@@ -130,7 +131,7 @@ export const updateRolePermissions = createAsyncThunk(
                 url: `/Role/${roleId}/permissions`,
                 method: "PUT",
                 data: { permissionKeys },
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}`, ...companyScopeHeader(state), },
             });
             return response.data;
         } catch (error: any) {
@@ -151,7 +152,7 @@ export const changeRoleStatus = createAsyncThunk(
                 method: "PATCH",
                 params: { isActive },
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, ...companyScopeHeader(state),
                 },
             });
             return { id, isActive, message: response.data };

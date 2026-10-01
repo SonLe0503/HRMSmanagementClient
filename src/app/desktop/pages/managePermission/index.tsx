@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type Key } from "react";
+import { useEffect, useMemo, useRef, useState, type Key } from "react";
 import { Card, Select, Tree, Button, Typography, Spin, Space, message } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
 import type { DataNode } from "antd/es/tree";
@@ -14,12 +14,14 @@ import {
   selectRolePermissionKeys,
   selectPermissionsLoading,
 } from "../../../../store/roleSlide";
+import CompanyScopeSelect, { SuperAdminOnly } from "../../components/companyScopeSelect";
+import { useConfigScope } from "../../components/companyScopeSelect/hooks";
 
 const { Title, Text } = Typography;
 const UNGROUPED = "Chung";
 const GROUP_PREFIX = "group:";
 
-const ManagePermission = () => {
+const ManagePermissionContent = () => {
   const dispatch = useAppDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const roles = useAppSelector(selectRoles);
@@ -31,20 +33,32 @@ const ManagePermission = () => {
   const [roleId, setRoleId] = useState<number | null>(initialRoleId);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  // Roles in the store may still belong to the previously configured company until the refetch lands
+  const [rolesReady, setRolesReady] = useState(false);
+  const { ready, scopeKey } = useConfigScope();
+  const loadedScope = useRef(scopeKey);
 
   useEffect(() => {
-    dispatch(fetchAllRoles());
+    if (!ready) return;
+    if (loadedScope.current !== scopeKey) {
+      // Switched company: its roles are different, so drop the selection
+      loadedScope.current = scopeKey;
+      setRoleId(null);
+      setSearchParams({});
+    }
+    setRolesReady(false);
+    dispatch(fetchAllRoles()).finally(() => setRolesReady(true));
     dispatch(fetchPermissionCatalog());
-  }, [dispatch]);
+  }, [dispatch, ready, scopeKey, setSearchParams]);
 
   // Default to the first role so the page never opens empty.
   useEffect(() => {
-    if (roleId == null && roles.length > 0) setRoleId(roles[0].roleId);
-  }, [roles, roleId]);
+    if (rolesReady && roleId == null && roles.length > 0) setRoleId(roles[0].roleId);
+  }, [rolesReady, roles, roleId]);
 
   useEffect(() => {
-    if (roleId != null) dispatch(fetchRolePermissions(roleId));
-  }, [roleId, dispatch]);
+    if (rolesReady && roleId != null) dispatch(fetchRolePermissions(roleId));
+  }, [rolesReady, roleId, dispatch]);
 
   useEffect(() => {
     setSelected(new Set(grantedKeys));
@@ -101,6 +115,7 @@ const ManagePermission = () => {
     <div className="p-2">
       <Card title={<Title level={4} style={{ margin: 0 }}>Phân quyền</Title>}>
         <Space style={{ marginBottom: 16 }} wrap>
+          <CompanyScopeSelect />
           <Select
             style={{ width: 240 }}
             placeholder="Chọn vai trò"
@@ -134,5 +149,11 @@ const ManagePermission = () => {
     </div>
   );
 };
+
+const ManagePermission = () => (
+  <SuperAdminOnly>
+    <ManagePermissionContent />
+  </SuperAdminOnly>
+);
 
 export default ManagePermission;

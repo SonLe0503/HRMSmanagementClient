@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Tag, Space, Card, Switch, message, Typography, Tooltip } from "antd";
-import { SafetyCertificateOutlined, CalendarOutlined, TeamOutlined, EyeOutlined, PlusOutlined, KeyOutlined } from "@ant-design/icons";
+import { SafetyCertificateOutlined, CalendarOutlined, TeamOutlined, PlusOutlined, KeyOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import URL from "../../../../constants/url";
@@ -8,10 +8,12 @@ import { useAppDispatch, useAppSelector } from "../../../../store";
 import { fetchAllRoles, changeRoleStatus, selectRoles, selectRoleLoading } from "../../../../store/roleSlide";
 import Condition from "./Condition";
 import AddRoleModal from "./modal/AddRoleModal";
+import CompanyScopeSelect, { SuperAdminOnly } from "../../components/companyScopeSelect";
+import { useConfigScope } from "../../components/companyScopeSelect/hooks";
 
 const { Title } = Typography;
 
-const ManageRole = () => {
+const ManageRoleContent = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const roles = useAppSelector(selectRoles);
@@ -20,12 +22,13 @@ const ManageRole = () => {
     const [searchText, setSearchText] = useState("");
     const [statusFilter, setStatusFilter] = useState<boolean | null>(null);
     const [togglingRoleId, setTogglingRoleId] = useState<number | null>(null);
-    const [viewingRoleId, setViewingRoleId] = useState<number | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+    const { ready, scopeKey } = useConfigScope();
+
     useEffect(() => {
-        dispatch(fetchAllRoles());
-    }, [dispatch]);
+        if (ready) dispatch(fetchAllRoles());
+    }, [dispatch, ready, scopeKey]);
 
 
     const handleToggleStatus = (record: any) => {
@@ -113,20 +116,6 @@ const ManageRole = () => {
             width: 150,
             render: (_: any, record: any) => (
                 <Space size="middle">
-                    <Tooltip title="Xem tài khoản">
-                        <Button
-                            type="primary"
-                            icon={<EyeOutlined />}
-                            loading={viewingRoleId === record.roleId}
-                            onClick={() => {
-                                setViewingRoleId(record.roleId);
-                                setTimeout(() => {
-                                    navigate(`${URL.ManageUser}?role=${record.roleName}`);
-                                    setViewingRoleId(null);
-                                }, 500);
-                            }}
-                        />
-                    </Tooltip>
                     <Tooltip title="Phân quyền">
                         <Button
                             icon={<KeyOutlined />}
@@ -156,6 +145,9 @@ const ManageRole = () => {
                     </div>
                 }
             >
+                <div style={{ marginBottom: 16 }}>
+                    <CompanyScopeSelect />
+                </div>
                 <Condition
                     searchText={searchText}
                     setSearchText={setSearchText}
@@ -175,5 +167,11 @@ const ManageRole = () => {
         </div>
     );
 };
+
+const ManageRole = () => (
+    <SuperAdminOnly>
+        <ManageRoleContent />
+    </SuperAdminOnly>
+);
 
 export default ManageRole;
