@@ -26,6 +26,7 @@ import dashboardSlide from "./dashboardSlide";
 import payrollSlide from "./payrollSlide";
 import resignationRequestSlide from "./resignationRequestSlide";
 import menuSlide from "./menuSlide";
+import companySlide from "./companySlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -59,6 +60,7 @@ const reducers = {
   payroll: payrollSlide,
   resignationRequest: resignationRequestSlide,
   menu: menuSlide,
+  company: companySlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

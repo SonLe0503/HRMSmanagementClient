@@ -5,6 +5,7 @@ export const EUserRole = {
     MANAGE: "MANAGE",
     EMPLOYEE: "EMPLOYEE",
     HR: "HR",
+    SUPERADMIN: "SUPERADMIN",
 } as const;
 
 export type EUserRole = keyof typeof EUserRole;

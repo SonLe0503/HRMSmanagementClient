@@ -10,7 +10,6 @@ import {
   selectMenuTreeLoading,
   type IMenuAdminNode,
 } from "../../../../store/menuSlide";
-import { selectRoles } from "../../../../store/roleSlide";
 import { isKnownMenuIcon, renderMenuIcon } from "../../../../constants/menuIcons";
 import { MAX_MENU_DEPTH, flattenTree, type FlatRow } from "./menuTreeUtils";
 import MenuItemModal from "./MenuItemModal";
@@ -19,14 +18,12 @@ const MenuTreeTab = () => {
   const dispatch = useAppDispatch();
   const tree = useAppSelector(selectMenuTree);
   const loading = useAppSelector(selectMenuTreeLoading);
-  const roles = useAppSelector(selectRoles);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<IMenuAdminNode | null>(null);
   const [defaultParentId, setDefaultParentId] = useState<number | null>(null);
 
   const rows = useMemo(() => flattenTree(tree), [tree]);
-  const roleName = (id: number) => roles.find((r) => r.roleId === id)?.roleName ?? `#${id}`;
 
   const openCreate = (parentId: number | null) => {
     setEditing(null);
@@ -73,12 +70,6 @@ const MenuTreeTab = () => {
     { title: "Mã", key: "code", render: (_: unknown, { node }: FlatRow) => <code>{node.code}</code> },
     { title: "Đường dẫn", key: "route", render: (_: unknown, { node }: FlatRow) => node.route || <i style={{ color: "#999" }}>(nhóm)</i> },
     { title: "Thứ tự", key: "order", width: 80, render: (_: unknown, { node }: FlatRow) => node.displayOrder },
-    {
-      title: "Vai trò",
-      key: "roles",
-      render: (_: unknown, { node }: FlatRow) =>
-        node.roleIds.length ? node.roleIds.map((id) => <Tag key={id} color="blue">{roleName(id)}</Tag>) : <Tag color="red">Chưa gán</Tag>,
-    },
     {
       title: "Thao tác",
       key: "actions",

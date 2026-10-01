@@ -40,6 +40,7 @@ const ManageUser = lazy(() => import("../app/desktop/pages/manageAccount"))
 const ManageRole = lazy(() => import("../app/desktop/pages/manageRole"))
 const ManagePermission = lazy(() => import("../app/desktop/pages/managePermission"))
 const ManageMenu = lazy(() => import("../app/desktop/pages/manageMenu"))
+const ManageCompany = lazy(() => import("../app/desktop/pages/manageCompany"))
 
 const ManageTask = lazy(() => import("../app/desktop/pages/manageTask"))
 const ManageEmployee = lazy(() => import("../app/desktop/pages/manageEmployee"))
@@ -127,6 +128,12 @@ const privateResourceItem = [
     {
         key: URL.ManageMenu,
         element: <ManageMenu />,
+        layout: DEFAULT_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageCompany,
+        element: <ManageCompany />,
         layout: DEFAULT_LAYOUT,
         private: true,
     },

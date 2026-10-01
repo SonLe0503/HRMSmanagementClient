@@ -13,6 +13,7 @@ const URL = {
     ManageRole: "/admin/manage-role",
     ManagePermission: "/admin/manage-permission",
     ManageMenu: "/admin/manage-menu",
+    ManageCompany: "/superadmin/companies",
     ManageCategory: "/admin/manage-category",
     ManageProduct: "/admin/manage-product",
 

@@ -71,6 +71,7 @@ const LoginPage = () => {
                 [EUserRole.EMPLOYEE]: URL.MyAttendance,
                 [EUserRole.MANAGE]: URL.DashboardManage,
                 [EUserRole.HR]: URL.DashboardHR,
+                [EUserRole.SUPERADMIN]: URL.ManageCompany,
             };
             navigate(routes[role as keyof typeof routes] || URL.MyAttendance);
         }

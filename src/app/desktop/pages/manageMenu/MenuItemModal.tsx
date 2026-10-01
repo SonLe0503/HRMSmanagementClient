@@ -1,8 +1,7 @@
 import { useEffect, useMemo } from "react";
-import { Modal, Form, Input, InputNumber, Select, Switch, Checkbox, message, Space } from "antd";
-import { useAppDispatch, useAppSelector } from "../../../../store";
+import { Modal, Form, Input, InputNumber, Select, Switch, message, Space } from "antd";
+import { useAppDispatch } from "../../../../store";
 import { createMenu, updateMenu, fetchMenuTree, fetchMyMenu, type IMenuAdminNode } from "../../../../store/menuSlide";
-import { selectRoles } from "../../../../store/roleSlide";
 import { MENU_ICON_NAMES, renderMenuIcon } from "../../../../constants/menuIcons";
 import { MAX_MENU_DEPTH, flattenTree, collectDescendantIds } from "./menuTreeUtils";
 
@@ -18,7 +17,6 @@ interface Props {
 
 const MenuItemModal = ({ open, editing, defaultParentId, tree, onClose }: Props) => {
   const dispatch = useAppDispatch();
-  const roles = useAppSelector(selectRoles);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -32,11 +30,10 @@ const MenuItemModal = ({ open, editing, defaultParentId, tree, onClose }: Props)
         iconName: editing.iconName,
         displayOrder: editing.displayOrder,
         isActive: editing.isActive,
-        roleIds: editing.roleIds,
       });
     } else {
       form.resetFields();
-      form.setFieldsValue({ parentId: defaultParentId, displayOrder: 0, isActive: true, roleIds: [] });
+      form.setFieldsValue({ parentId: defaultParentId, displayOrder: 0, isActive: true });
     }
   }, [open, editing, defaultParentId, form]);
 
@@ -130,9 +127,6 @@ const MenuItemModal = ({ open, editing, defaultParentId, tree, onClose }: Props)
             <Switch />
           </Form.Item>
         </Space>
-        <Form.Item name="roleIds" label="Vai trò thấy mục này">
-          <Checkbox.Group options={roles.map((r) => ({ value: r.roleId, label: r.roleName }))} />
-        </Form.Item>
       </Form>
     </Modal>
   );
